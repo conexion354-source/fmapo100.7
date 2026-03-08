@@ -818,6 +818,12 @@
       return mapa[String(dia || "").trim().toLowerCase()];
     }
 
+    function normalizarEstado(estado) {
+      const valor = String(estado || "").trim().toLowerCase();
+      if (valor === "suspendido") return "suspendido";
+      return "activo";
+    }
+
     function getNowParts() {
       const now = new Date();
 
@@ -870,35 +876,12 @@
       }) || null;
     }
 
-    function getActiveAnnouncements() {
-      return AVISOS.filter(item => String(item.activo || "").trim().toLowerCase() === "si" && String(item.mensaje || "").trim() !== "");
-    }
-
-    function haySuspensionActiva() {
-      const avisosActivos = getActiveAnnouncements();
-
-      return avisosActivos.some(item => {
-        const mensaje = String(item.mensaje || "").toLowerCase().trim();
-        return (
-          mensaje.includes("suspendido") ||
-          mensaje.includes("suspendida") ||
-          mensaje.includes("radio apagada") ||
-          mensaje.includes("radio apagado") ||
-          mensaje.includes("no se emite") ||
-          mensaje.includes("transmisión suspendida") ||
-          mensaje.includes("transmision suspendida")
-        );
-      });
-    }
-
     function getProgramStatusForToday() {
       const { time } = getNowParts();
       const nowMinutes = timeToMinutes(time);
       const programs = getTodayPrograms();
 
       if (!programs.length) return null;
-
-      const suspensionActiva = haySuspensionActiva();
 
       const current = programs.find(programa => {
         const startMinutes = timeToMinutes(programa.start);
@@ -909,7 +892,7 @@
       if (current) {
         return {
           program: current,
-          label: suspensionActiva ? "Suspendido" : "Ahora",
+          label: current.status === "suspendido" ? "Suspendido" : "Ahora",
           className: "red"
         };
       }
@@ -918,15 +901,15 @@
       if (upcoming) {
         return {
           program: upcoming,
-          label: suspensionActiva ? "Suspendido" : "Próximo",
-          className: suspensionActiva ? "red" : ""
+          label: upcoming.status === "suspendido" ? "Suspendido" : "Próximo",
+          className: upcoming.status === "suspendido" ? "red" : ""
         };
       }
 
       const lastFinished = programs[programs.length - 1];
       return {
         program: lastFinished,
-        label: suspensionActiva ? "Suspendido" : "Finalizado",
+        label: lastFinished.status === "suspendido" ? "Suspendido" : "Finalizado",
         className: "red"
       };
     }
@@ -986,6 +969,7 @@
               <div class="weekly-time">${item.start} a ${item.end} hs</div>
               <div class="weekly-show">${item.title}</div>
               <div class="weekly-hosts">${item.hosts || "FM Apocalipsis 100.7"}</div>
+              ${item.status === "suspendido" ? `<div class="weekly-note">Suspendido</div>` : ""}
               ${item.notice ? `<div class="weekly-note">${item.notice}</div>` : ""}
             `;
 
@@ -1007,6 +991,10 @@
     function closeWeeklyProgram() {
       weeklyProgramPanel.hidden = true;
       renderProgramacionDeHoy();
+    }
+
+    function getActiveAnnouncements() {
+      return AVISOS.filter(item => String(item.activo || "").trim().toLowerCase() === "si" && String(item.mensaje || "").trim() !== "");
     }
 
     function getAnnouncementFingerprint() {
@@ -1272,7 +1260,7 @@
       if (!currentProgram) return;
       if (!("Notification" in window)) return;
       if (Notification.permission !== "granted") return;
-      if (haySuspensionActiva()) return;
+      if (currentProgram.status === "suspendido") return;
 
       const todayKey = `${getNowParts().day}-${currentProgram.start}-${currentProgram.title}`;
       if (lastProgramNotificationKey === todayKey) return;
@@ -1346,6 +1334,7 @@
               end: String(item.fin || "").trim(),
               title: String(item.programa || "").trim(),
               hosts: String(item.conductores || "").trim(),
+              status: normalizarEstado(item.estado),
               notice: String(item.aviso || "").trim()
             };
           })
