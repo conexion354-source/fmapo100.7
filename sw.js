@@ -1,43 +1,14 @@
-const CACHE_NAME = 'fm-apocalipsis-v2';
-const APP_SHELL = [
-  './',
-  './index.html',
-  './manifest.json',
-  './logo.png',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
-];
+const CACHE_NAME = "apocalipsis-radio-v1";
 
-self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
+self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) => Promise.all(
-      keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-    ))
-  );
-  self.clients.claim();
+self.addEventListener("activate", (event) => {
+  event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener('fetch', (event) => {
-  const { request } = event;
-  if (request.method !== 'GET') return;
-
-  const url = new URL(request.url);
-  if (url.origin !== self.location.origin) {
-    return;
-  }
-
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      return cached || fetch(request).then((response) => {
-        const cloned = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, cloned));
-        return response;
-      }).catch(() => caches.match('./index.html'));
-    })
-  );
+self.addEventListener("fetch", (event) => {
+  // dejamos pasar todas las peticiones sin cachear
+  return;
 });
