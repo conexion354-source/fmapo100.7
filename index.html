@@ -408,12 +408,6 @@
       border-color: rgba(255, 95, 95, .32);
     }
 
-    .program-state.orange {
-      background: rgba(255, 176, 59, .18);
-      color: #ffd18d;
-      border-color: rgba(255, 176, 59, .28);
-    }
-
     .program-actions {
       display: flex;
       align-items: center;
@@ -545,30 +539,6 @@
       color: #ffd6d6;
     }
 
-    .weekly-state {
-      display: inline-flex;
-      margin-top: 6px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 800;
-      background: rgba(255,255,255,.12);
-      color: rgba(255,255,255,.86);
-      border: 1px solid rgba(255,255,255,.12);
-    }
-
-    .weekly-state.red {
-      background: rgba(255, 59, 59, .18);
-      color: #ff8d8d;
-      border-color: rgba(255, 95, 95, .32);
-    }
-
-    .weekly-state.orange {
-      background: rgba(255, 176, 59, .18);
-      color: #ffd18d;
-      border-color: rgba(255, 176, 59, .28);
-    }
-
     .weekly-empty,
     .announcement-empty {
       font-size: .86rem;
@@ -668,15 +638,15 @@
 
       <button class="btn btn-announcement full" id="announcementBtn" type="button">📢 Anuncios importantes</button>
 
-      <div class="today-program-widget" id="todayProgramWidget" hidden>
+      <div class="today-program-widget" id="todayProgramWidget">
         <div class="today-program-left">
           <div class="program-header">
-            <div class="today-program-title" id="todayProgramTitle">Programa</div>
-            <span class="program-state" id="programState">Ahora</span>
+            <div class="today-program-title" id="todayProgramTitle">Programación</div>
+            <span class="program-state" id="programState">Próximo</span>
           </div>
-          <div class="today-program-subtitle" id="todayProgramTime"></div>
-          <div class="today-program-hosts" id="todayProgramHosts"></div>
-          <div class="today-program-note" id="todayProgramNote"></div>
+          <div class="today-program-subtitle" id="todayProgramTime">Cargando programación...</div>
+          <div class="today-program-hosts" id="todayProgramHosts">FM Apocalipsis 100.7</div>
+          <div class="today-program-note" id="todayProgramNote" style="display:none;"></div>
         </div>
 
         <div class="program-actions">
@@ -837,12 +807,6 @@
       return mapa[String(dia || "").trim().toLowerCase()];
     }
 
-    function normalizarEstado(estado) {
-      const value = String(estado || "activo").trim().toLowerCase();
-      if (["activo", "suspendido", "especial", "reprogramado"].includes(value)) return value;
-      return "activo";
-    }
-
     function getNowParts() {
       const now = new Date();
 
@@ -895,6 +859,27 @@
       }) || null;
     }
 
+    function getActiveAnnouncements() {
+      return AVISOS.filter(item => String(item.activo || "").trim().toLowerCase() === "si" && String(item.mensaje || "").trim() !== "");
+    }
+
+    function haySuspensionActiva() {
+      const avisosActivos = getActiveAnnouncements();
+
+      return avisosActivos.some(item => {
+        const mensaje = String(item.mensaje || "").toLowerCase().trim();
+        return (
+          mensaje.includes("suspendido") ||
+          mensaje.includes("suspendida") ||
+          mensaje.includes("radio apagada") ||
+          mensaje.includes("radio apagado") ||
+          mensaje.includes("no se emite") ||
+          mensaje.includes("transmisión suspendida") ||
+          mensaje.includes("transmision suspendida")
+        );
+      });
+    }
+
     function getProgramStatusForToday() {
       const { time } = getNowParts();
       const nowMinutes = timeToMinutes(time);
@@ -908,55 +893,49 @@
         return nowMinutes >= startMinutes && nowMinutes < endMinutes;
       });
 
-      if (current) {
-        if (current.status === "suspendido") {
-          return { program: current, label: "Suspendido", className: "red" };
-        }
-        if (current.status === "especial") {
-          return { program: current, label: "Especial", className: "orange" };
-        }
-        if (current.status === "reprogramado") {
-          return { program: current, label: "Reprogramado", className: "orange" };
-        }
-        return { program: current, label: "Ahora", className: "red" };
-      }
-
       const upcoming = programs.find(programa => nowMinutes < timeToMinutes(programa.start));
-      if (upcoming) {
-        if (upcoming.status === "suspendido") {
-          return { program: upcoming, label: "Suspendido", className: "red" };
-        }
-        if (upcoming.status === "especial") {
-          return { program: upcoming, label: "Especial", className: "orange" };
-        }
-        if (upcoming.status === "reprogramado") {
-          return { program: upcoming, label: "Reprogramado", className: "orange" };
-        }
-        return { program: upcoming, label: "Próximo", className: "" };
+      const lastFinished = programs[programs.length - 1];
+      const suspensionActiva = haySuspensionActiva();
+
+      if (current) {
+        return {
+          program: current,
+          label: suspensionActiva ? "Suspendido" : "Ahora",
+          className: "red"
+        };
       }
 
-      const lastFinished = programs[programs.length - 1];
-      if (lastFinished.status === "suspendido") {
-        return { program: lastFinished, label: "Suspendido", className: "red" };
+      if (upcoming) {
+        return {
+          program: upcoming,
+          label: suspensionActiva ? "Suspendido" : "Próximo",
+          className: suspensionActiva ? "red" : ""
+        };
       }
-      if (lastFinished.status === "especial") {
-        return { program: lastFinished, label: "Especial", className: "orange" };
-      }
-      if (lastFinished.status === "reprogramado") {
-        return { program: lastFinished, label: "Reprogramado", className: "orange" };
-      }
-      return { program: lastFinished, label: "Finalizado", className: "red" };
+
+      return {
+        program: lastFinished,
+        label: suspensionActiva ? "Suspendido" : "Finalizado",
+        className: "red"
+      };
     }
 
     function renderProgramacionDeHoy() {
       const info = getProgramStatusForToday();
 
+      todayProgramWidget.hidden = false;
+
       if (!info) {
-        todayProgramWidget.hidden = true;
+        todayProgramTitle.textContent = "Programación";
+        todayProgramTime.textContent = "Sin programa cargado para hoy";
+        todayProgramHosts.textContent = "FM Apocalipsis 100.7";
+        todayProgramNote.textContent = "";
+        todayProgramNote.style.display = "none";
+        programState.textContent = "Sin datos";
+        programState.className = "program-state";
         return;
       }
 
-      todayProgramWidget.hidden = false;
       todayProgramTitle.textContent = info.program.title || "Programa";
       todayProgramTime.textContent = `${info.program.start} a ${info.program.end} hs`;
       todayProgramHosts.textContent = info.program.hosts || "FM Apocalipsis 100.7";
@@ -992,25 +971,10 @@
             const itemEl = document.createElement("div");
             itemEl.className = "weekly-item";
 
-            let stateLabel = "";
-            let stateClass = "";
-
-            if (item.status === "suspendido") {
-              stateLabel = "Suspendido";
-              stateClass = "red";
-            } else if (item.status === "especial") {
-              stateLabel = "Especial";
-              stateClass = "orange";
-            } else if (item.status === "reprogramado") {
-              stateLabel = "Reprogramado";
-              stateClass = "orange";
-            }
-
             itemEl.innerHTML = `
               <div class="weekly-time">${item.start} a ${item.end} hs</div>
               <div class="weekly-show">${item.title}</div>
               <div class="weekly-hosts">${item.hosts || "FM Apocalipsis 100.7"}</div>
-              ${stateLabel ? `<div class="weekly-state ${stateClass}">${stateLabel}</div>` : ""}
               ${item.notice ? `<div class="weekly-note">${item.notice}</div>` : ""}
             `;
 
@@ -1032,10 +996,6 @@
     function closeWeeklyProgram() {
       weeklyProgramPanel.hidden = true;
       renderProgramacionDeHoy();
-    }
-
-    function getActiveAnnouncements() {
-      return AVISOS.filter(item => String(item.activo || "").trim().toLowerCase() === "si" && String(item.mensaje || "").trim() !== "");
     }
 
     function getAnnouncementFingerprint() {
@@ -1301,7 +1261,7 @@
       if (!currentProgram) return;
       if (!("Notification" in window)) return;
       if (Notification.permission !== "granted") return;
-      if (currentProgram.status === "suspendido") return;
+      if (haySuspensionActiva()) return;
 
       const todayKey = `${getNowParts().day}-${currentProgram.start}-${currentProgram.title}`;
       if (lastProgramNotificationKey === todayKey) return;
@@ -1366,7 +1326,6 @@
               end: String(item.fin || "").trim(),
               title: String(item.programa || "").trim(),
               hosts: String(item.conductores || "").trim(),
-              status: normalizarEstado(item.estado),
               notice: String(item.aviso || "").trim()
             };
           })
@@ -1377,19 +1336,18 @@
           activo: String(item.activo || "").trim().toLowerCase()
         }));
 
-        if (weeklyProgramPanel.hidden) {
+        if (weeklyProgramPanel.hidden && announcementPanel.hidden) {
           renderProgramacionDeHoy();
-        } else {
+        } else if (!weeklyProgramPanel.hidden) {
           renderWeeklyProgram();
-        }
-
-        if (!announcementPanel.hidden) {
+        } else if (!announcementPanel.hidden) {
           renderAnnouncementPanel();
         }
 
         renderAnnouncementButton();
       } catch (error) {
         console.error(error);
+        renderProgramacionDeHoy();
       }
     }
 
@@ -1484,6 +1442,7 @@
     }
 
     cargarClima();
+    renderProgramacionDeHoy();
     cargarDatosRemotos();
     renderAnnouncementButton();
     initProgramNotifyButton();
