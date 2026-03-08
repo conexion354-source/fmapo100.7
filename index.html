@@ -257,6 +257,19 @@
       border: 1px solid rgba(255,255,255,.12);
     }
 
+    .btn-announcement {
+      background: rgba(255,255,255,.14);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.14);
+    }
+
+    .btn-announcement.unread {
+      background: linear-gradient(135deg, #ff5f5f, #ff2f2f);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 12px 24px rgba(255, 59, 59, .28);
+    }
+
     .full {
       width: 100%;
       margin-top: 10px;
@@ -277,7 +290,9 @@
 
     .weather-widget,
     .today-program-widget,
-    .weekly-program-panel {
+    .weekly-program-panel,
+    .announcement-panel,
+    .banner-alert {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -290,6 +305,25 @@
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    .banner-alert {
+      display: block;
+      background: rgba(255, 59, 59, .16);
+      border-color: rgba(255, 95, 95, .30);
+    }
+
+    .banner-alert-title {
+      font-size: .92rem;
+      font-weight: 800;
+      color: #ffd6d6;
+      margin-bottom: 4px;
+    }
+
+    .banner-alert-text {
+      font-size: .92rem;
+      color: #fff;
+      line-height: 1.4;
     }
 
     .weather-left,
@@ -308,10 +342,17 @@
 
     .weather-location,
     .today-program-subtitle,
-    .today-program-hosts {
+    .today-program-hosts,
+    .today-program-note {
       font-size: 13px;
       opacity: 0.82;
       margin-top: 4px;
+    }
+
+    .today-program-note {
+      color: #ffd6d6;
+      opacity: 1;
+      font-weight: 600;
     }
 
     .weather-right img,
@@ -335,7 +376,9 @@
     }
 
     .today-program-widget[hidden],
-    .weekly-program-panel[hidden] {
+    .weekly-program-panel[hidden],
+    .announcement-panel[hidden],
+    .banner-alert[hidden] {
       display: none;
     }
 
@@ -365,14 +408,26 @@
       border-color: rgba(255, 95, 95, .32);
     }
 
+    .program-state.orange {
+      background: rgba(255, 176, 59, .18);
+      color: #ffd18d;
+      border-color: rgba(255, 176, 59, .28);
+    }
+
+    .program-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .mini-bell-btn,
     .plus-btn {
       width: 42px;
       height: 42px;
       border: 0;
       border-radius: 14px;
       cursor: pointer;
-      font-size: 1.4rem;
-      font-weight: 700;
       color: #fff;
       background: rgba(255,255,255,.14);
       border: 1px solid rgba(255,255,255,.16);
@@ -380,15 +435,34 @@
       flex-shrink: 0;
     }
 
-    .plus-btn:active {
+    .plus-btn {
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .mini-bell-btn {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .mini-bell-btn.enabled {
+      background: rgba(255, 59, 59, .18);
+      border-color: rgba(255, 95, 95, .32);
+      color: #ffd4d4;
+    }
+
+    .plus-btn:active,
+    .mini-bell-btn:active {
       transform: scale(.97);
     }
 
-    .weekly-program-panel {
+    .weekly-program-panel,
+    .announcement-panel {
       display: block;
     }
 
-    .weekly-program-top {
+    .weekly-program-top,
+    .announcement-top {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -396,7 +470,8 @@
       margin-bottom: 12px;
     }
 
-    .weekly-program-title {
+    .weekly-program-title,
+    .announcement-title {
       font-size: 1rem;
       font-weight: 800;
       margin: 0;
@@ -414,12 +489,14 @@
       border: 1px solid rgba(255,255,255,.14);
     }
 
-    .weekly-list {
+    .weekly-list,
+    .announcement-list {
       display: grid;
       gap: 10px;
     }
 
-    .weekly-day {
+    .weekly-day,
+    .announcement-item {
       border-radius: 16px;
       padding: 12px;
       background: rgba(255,255,255,.08);
@@ -456,34 +533,46 @@
       color: #fff;
     }
 
-    .weekly-hosts {
+    .weekly-hosts,
+    .weekly-note,
+    .announcement-item-text {
       font-size: .82rem;
       color: rgba(255,255,255,.78);
       margin-top: 3px;
     }
 
-    .weekly-empty {
+    .weekly-note {
+      color: #ffd6d6;
+    }
+
+    .weekly-state {
+      display: inline-flex;
+      margin-top: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      background: rgba(255,255,255,.12);
+      color: rgba(255,255,255,.86);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .weekly-state.red {
+      background: rgba(255, 59, 59, .18);
+      color: #ff8d8d;
+      border-color: rgba(255, 95, 95, .32);
+    }
+
+    .weekly-state.orange {
+      background: rgba(255, 176, 59, .18);
+      color: #ffd18d;
+      border-color: rgba(255, 176, 59, .28);
+    }
+
+    .weekly-empty,
+    .announcement-empty {
       font-size: .86rem;
       color: rgba(255,255,255,.70);
-    }
-
-    .notify-btn {
-      margin-top: 10px;
-      width: 100%;
-      border: 0;
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-size: .95rem;
-      font-weight: 700;
-      cursor: pointer;
-      background: rgba(255,255,255,.14);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,.14);
-      box-shadow: 0 10px 18px rgba(0,0,0,.14);
-    }
-
-    .notify-btn[hidden] {
-      display: none;
     }
 
     @media (max-width: 430px) {
@@ -506,7 +595,8 @@
         max-width: 68%;
       }
 
-      .weekly-program-top {
+      .weekly-program-top,
+      .announcement-top {
         flex-direction: row;
         align-items: center;
       }
@@ -540,6 +630,11 @@
         <span></span>
       </div>
 
+      <div class="banner-alert" id="bannerAlert" hidden>
+        <div class="banner-alert-title">⚠️ Anuncio importante</div>
+        <div class="banner-alert-text" id="bannerAlertText"></div>
+      </div>
+
       <div class="status" id="status">Listo para reproducir</div>
 
       <audio id="radio" preload="none" playsinline>
@@ -552,7 +647,6 @@
       </div>
 
       <button class="btn btn-primary full" id="installBtn" hidden>📲 Instalar App</button>
-      <button class="notify-btn" id="notifyBtn">🔔 Activar avisos de programas</button>
 
       <a
         class="link-btn"
@@ -572,6 +666,8 @@
         <button class="btn btn-youtube full" type="button">▶ Mira Zona Fe en vivo</button>
       </a>
 
+      <button class="btn btn-announcement full" id="announcementBtn" type="button">📢 Anuncios importantes</button>
+
       <div class="today-program-widget" id="todayProgramWidget" hidden>
         <div class="today-program-left">
           <div class="program-header">
@@ -580,8 +676,13 @@
           </div>
           <div class="today-program-subtitle" id="todayProgramTime"></div>
           <div class="today-program-hosts" id="todayProgramHosts"></div>
+          <div class="today-program-note" id="todayProgramNote"></div>
         </div>
-        <button class="plus-btn" id="openWeeklyBtn" type="button" aria-label="Ver programación semanal">+</button>
+
+        <div class="program-actions">
+          <button class="mini-bell-btn" id="programNotifyBtn" type="button" aria-label="Activar avisos del programa">🔔</button>
+          <button class="plus-btn" id="openWeeklyBtn" type="button" aria-label="Ver programación semanal">+</button>
+        </div>
       </div>
 
       <div class="weekly-program-panel" id="weeklyProgramPanel" hidden>
@@ -590,6 +691,14 @@
           <button class="back-btn" id="closeWeeklyBtn" type="button">← Volver</button>
         </div>
         <div class="weekly-list" id="weeklyList"></div>
+      </div>
+
+      <div class="announcement-panel" id="announcementPanel" hidden>
+        <div class="announcement-top">
+          <h3 class="announcement-title">⚠️ Anuncios importantes</h3>
+          <button class="back-btn" id="closeAnnouncementBtn" type="button">← Volver</button>
+        </div>
+        <div class="announcement-list" id="announcementList"></div>
       </div>
 
       <div class="weather-widget">
@@ -612,6 +721,10 @@
   </div>
 
   <script>
+    const SHEET_API_URL = "https://script.google.com/macros/s/AKfycbxWfdKidGgCYfNBpK-cfPc95KCNUpdLxq7W2eJHtxtVpERNjJ__4MxPhoDYg6S8Is3e/exec";
+    const STREAM_HOST = "https://radios.solumedia.com:6322";
+    const APP_TIMEZONE = "America/Argentina/Buenos_Aires";
+
     const radio = document.getElementById("radio");
     const statusEl = document.getElementById("status");
     const playBtn = document.getElementById("playBtn");
@@ -622,7 +735,7 @@
     const todayProgramTitle = document.getElementById("todayProgramTitle");
     const todayProgramTime = document.getElementById("todayProgramTime");
     const todayProgramHosts = document.getElementById("todayProgramHosts");
-    const notifyBtn = document.getElementById("notifyBtn");
+    const todayProgramNote = document.getElementById("todayProgramNote");
     const liveBadge = document.getElementById("liveBadge");
     const shareBtn = document.getElementById("shareBtn");
     const audioVisualizer = document.getElementById("audioVisualizer");
@@ -631,43 +744,19 @@
     const closeWeeklyBtn = document.getElementById("closeWeeklyBtn");
     const weeklyProgramPanel = document.getElementById("weeklyProgramPanel");
     const weeklyList = document.getElementById("weeklyList");
-
-    const STREAM_HOST = "https://radios.solumedia.com:6322";
-    const APP_TIMEZONE = "America/Argentina/Buenos_Aires";
+    const programNotifyBtn = document.getElementById("programNotifyBtn");
+    const announcementBtn = document.getElementById("announcementBtn");
+    const announcementPanel = document.getElementById("announcementPanel");
+    const announcementList = document.getElementById("announcementList");
+    const closeAnnouncementBtn = document.getElementById("closeAnnouncementBtn");
+    const bannerAlert = document.getElementById("bannerAlert");
+    const bannerAlertText = document.getElementById("bannerAlertText");
 
     let deferredPrompt = null;
     let lastProgramNotificationKey = "";
-
-    const PROGRAMACION = [
-      {
-        days: [1, 3],
-        start: "21:00",
-        end: "23:00",
-        title: "Zona Fe",
-        hosts: "Juan Alarcon y Mauro Polini"
-      },
-      {
-        days: [5],
-        start: "20:00",
-        end: "22:00",
-        title: "Conectados",
-        hosts: "FM Apocalipsis 100.7"
-      },
-      {
-        days: [6],
-        start: "08:00",
-        end: "10:00",
-        title: "Zona Fe",
-        hosts: "Juan Alarcon y Mauro Polini"
-      },
-      {
-        days: [0],
-        start: "09:00",
-        end: "11:00",
-        title: "Conectados",
-        hosts: "José Crespin y Andrea Jimenez"
-      }
-    ];
+    let currentAnnouncementFingerprint = "";
+    let PROGRAMACION = [];
+    let AVISOS = [];
 
     const WEEK_DAYS = [
       { id: 1, name: "Lunes" },
@@ -729,12 +818,34 @@
     }
 
     function timeToMinutes(time) {
-      const [hours, minutes] = time.split(":").map(Number);
+      const [hours, minutes] = String(time || "00:00").split(":").map(Number);
       return (hours * 60) + minutes;
+    }
+
+    function diaTextoANumero(dia) {
+      const mapa = {
+        domingo: 0,
+        lunes: 1,
+        martes: 2,
+        miercoles: 3,
+        miércoles: 3,
+        jueves: 4,
+        viernes: 5,
+        sabado: 6,
+        sábado: 6
+      };
+      return mapa[String(dia || "").trim().toLowerCase()];
+    }
+
+    function normalizarEstado(estado) {
+      const value = String(estado || "activo").trim().toLowerCase();
+      if (["activo", "suspendido", "especial", "reprogramado"].includes(value)) return value;
+      return "activo";
     }
 
     function getNowParts() {
       const now = new Date();
+
       const weekdayName = new Intl.DateTimeFormat("es-AR", {
         timeZone: APP_TIMEZONE,
         weekday: "long"
@@ -798,28 +909,43 @@
       });
 
       if (current) {
-        return {
-          program: current,
-          label: "Ahora",
-          className: "red"
-        };
+        if (current.status === "suspendido") {
+          return { program: current, label: "Suspendido", className: "red" };
+        }
+        if (current.status === "especial") {
+          return { program: current, label: "Especial", className: "orange" };
+        }
+        if (current.status === "reprogramado") {
+          return { program: current, label: "Reprogramado", className: "orange" };
+        }
+        return { program: current, label: "Ahora", className: "red" };
       }
 
       const upcoming = programs.find(programa => nowMinutes < timeToMinutes(programa.start));
       if (upcoming) {
-        return {
-          program: upcoming,
-          label: "Próximo",
-          className: ""
-        };
+        if (upcoming.status === "suspendido") {
+          return { program: upcoming, label: "Suspendido", className: "red" };
+        }
+        if (upcoming.status === "especial") {
+          return { program: upcoming, label: "Especial", className: "orange" };
+        }
+        if (upcoming.status === "reprogramado") {
+          return { program: upcoming, label: "Reprogramado", className: "orange" };
+        }
+        return { program: upcoming, label: "Próximo", className: "" };
       }
 
       const lastFinished = programs[programs.length - 1];
-      return {
-        program: lastFinished,
-        label: "Finalizado",
-        className: "red"
-      };
+      if (lastFinished.status === "suspendido") {
+        return { program: lastFinished, label: "Suspendido", className: "red" };
+      }
+      if (lastFinished.status === "especial") {
+        return { program: lastFinished, label: "Especial", className: "orange" };
+      }
+      if (lastFinished.status === "reprogramado") {
+        return { program: lastFinished, label: "Reprogramado", className: "orange" };
+      }
+      return { program: lastFinished, label: "Finalizado", className: "red" };
     }
 
     function renderProgramacionDeHoy() {
@@ -831,9 +957,11 @@
       }
 
       todayProgramWidget.hidden = false;
-      todayProgramTitle.textContent = info.program.title;
+      todayProgramTitle.textContent = info.program.title || "Programa";
       todayProgramTime.textContent = `${info.program.start} a ${info.program.end} hs`;
       todayProgramHosts.textContent = info.program.hosts || "FM Apocalipsis 100.7";
+      todayProgramNote.textContent = info.program.notice || "";
+      todayProgramNote.style.display = info.program.notice ? "block" : "none";
       programState.textContent = info.label;
       programState.className = "program-state" + (info.className ? ` ${info.className}` : "");
     }
@@ -864,10 +992,26 @@
             const itemEl = document.createElement("div");
             itemEl.className = "weekly-item";
 
+            let stateLabel = "";
+            let stateClass = "";
+
+            if (item.status === "suspendido") {
+              stateLabel = "Suspendido";
+              stateClass = "red";
+            } else if (item.status === "especial") {
+              stateLabel = "Especial";
+              stateClass = "orange";
+            } else if (item.status === "reprogramado") {
+              stateLabel = "Reprogramado";
+              stateClass = "orange";
+            }
+
             itemEl.innerHTML = `
               <div class="weekly-time">${item.start} a ${item.end} hs</div>
               <div class="weekly-show">${item.title}</div>
               <div class="weekly-hosts">${item.hosts || "FM Apocalipsis 100.7"}</div>
+              ${stateLabel ? `<div class="weekly-state ${stateClass}">${stateLabel}</div>` : ""}
+              ${item.notice ? `<div class="weekly-note">${item.notice}</div>` : ""}
             `;
 
             dayEl.appendChild(itemEl);
@@ -880,12 +1024,83 @@
 
     function openWeeklyProgram() {
       weeklyProgramPanel.hidden = false;
+      announcementPanel.hidden = true;
       todayProgramWidget.hidden = true;
       renderWeeklyProgram();
     }
 
     function closeWeeklyProgram() {
       weeklyProgramPanel.hidden = true;
+      renderProgramacionDeHoy();
+    }
+
+    function getActiveAnnouncements() {
+      return AVISOS.filter(item => String(item.activo || "").trim().toLowerCase() === "si" && String(item.mensaje || "").trim() !== "");
+    }
+
+    function getAnnouncementFingerprint() {
+      return getActiveAnnouncements().map(item => String(item.mensaje).trim()).join("||");
+    }
+
+    function getReadAnnouncementFingerprint() {
+      return localStorage.getItem("fm_apo_announcements_read") || "";
+    }
+
+    function markAnnouncementsAsRead() {
+      localStorage.setItem("fm_apo_announcements_read", currentAnnouncementFingerprint || "");
+      renderAnnouncementButton();
+    }
+
+    function renderAnnouncementButton() {
+      const activeAnnouncements = getActiveAnnouncements();
+      currentAnnouncementFingerprint = getAnnouncementFingerprint();
+
+      if (!activeAnnouncements.length) {
+        announcementBtn.textContent = "📢 Anuncios importantes";
+        announcementBtn.classList.remove("unread");
+        bannerAlert.hidden = true;
+        return;
+      }
+
+      const alreadyRead = getReadAnnouncementFingerprint() === currentAnnouncementFingerprint;
+
+      announcementBtn.textContent = alreadyRead ? "📢 Anuncios importantes" : "⚠️ Hay anuncios sin leer";
+      announcementBtn.classList.toggle("unread", !alreadyRead);
+
+      bannerAlert.hidden = false;
+      bannerAlertText.textContent = activeAnnouncements[0].mensaje;
+    }
+
+    function renderAnnouncementPanel() {
+      announcementList.innerHTML = "";
+      const activeAnnouncements = getActiveAnnouncements();
+
+      if (!activeAnnouncements.length) {
+        const emptyEl = document.createElement("div");
+        emptyEl.className = "announcement-empty";
+        emptyEl.textContent = "No hay anuncios importantes por el momento.";
+        announcementList.appendChild(emptyEl);
+        return;
+      }
+
+      activeAnnouncements.forEach(item => {
+        const block = document.createElement("div");
+        block.className = "announcement-item";
+        block.innerHTML = `<div class="announcement-item-text">${item.mensaje}</div>`;
+        announcementList.appendChild(block);
+      });
+    }
+
+    function openAnnouncementPanel() {
+      announcementPanel.hidden = false;
+      weeklyProgramPanel.hidden = true;
+      todayProgramWidget.hidden = true;
+      renderAnnouncementPanel();
+      markAnnouncementsAsRead();
+    }
+
+    function closeAnnouncementPanel() {
+      announcementPanel.hidden = true;
       renderProgramacionDeHoy();
     }
 
@@ -929,7 +1144,6 @@
         82: "Chubascos fuertes",
         95: "Tormenta"
       };
-
       return clima[code] || "Clima actualizado";
     }
 
@@ -950,7 +1164,6 @@
       if (!text) return "";
 
       let value = String(text).trim();
-
       value = value.replace(/^current song[:\-\s]*/i, "");
       value = value.replace(/^currentsong[:\-\s]*/i, "");
       value = value.replace(/^song title[:\-\s]*/i, "");
@@ -960,7 +1173,6 @@
 
       if (!value) return "";
       if (value.length > 120) return value.slice(0, 120).trim();
-
       return value;
     }
 
@@ -1014,12 +1226,7 @@
       if (!text) return "";
 
       const cleanedFull = cleanMetadataText(text);
-      if (
-        cleanedFull &&
-        !cleanedFull.includes("{") &&
-        !cleanedFull.includes("[") &&
-        cleanedFull.length < 120
-      ) {
+      if (cleanedFull && !cleanedFull.includes("{") && !cleanedFull.includes("[") && cleanedFull.length < 120) {
         return cleanedFull;
       }
 
@@ -1079,11 +1286,22 @@
       }
     }
 
+    function updateProgramNotifyButton() {
+      if (!("Notification" in window)) {
+        programNotifyBtn.style.display = "none";
+        return;
+      }
+
+      programNotifyBtn.style.display = "inline-flex";
+      programNotifyBtn.classList.toggle("enabled", Notification.permission === "granted");
+    }
+
     function maybeNotifyProgramStart() {
       const currentProgram = getCurrentProgram();
       if (!currentProgram) return;
       if (!("Notification" in window)) return;
       if (Notification.permission !== "granted") return;
+      if (currentProgram.status === "suspendido") return;
 
       const todayKey = `${getNowParts().day}-${currentProgram.start}-${currentProgram.title}`;
       if (lastProgramNotificationKey === todayKey) return;
@@ -1095,33 +1313,84 @@
       lastProgramNotificationKey = todayKey;
     }
 
-    function initNotificationButton() {
-      if (!("Notification" in window)) {
-        notifyBtn.hidden = true;
-        return;
-      }
+    function initProgramNotifyButton() {
+      updateProgramNotifyButton();
 
-      if (Notification.permission === "granted") {
-        notifyBtn.textContent = "🔔 Avisos activados";
-        return;
-      }
+      if (!("Notification" in window)) return;
 
-      if (Notification.permission === "denied") {
-        notifyBtn.textContent = "🔕 Avisos bloqueados";
-        return;
-      }
+      programNotifyBtn.addEventListener("click", async () => {
+        if (Notification.permission === "granted") {
+          statusEl.textContent = "Avisos del programa activados";
+          updateProgramNotifyButton();
+          maybeNotifyProgramStart();
+          return;
+        }
 
-      notifyBtn.addEventListener("click", async () => {
+        if (Notification.permission === "denied") {
+          statusEl.textContent = "Las notificaciones están bloqueadas";
+          updateProgramNotifyButton();
+          return;
+        }
+
         try {
           const permission = await Notification.requestPermission();
           if (permission === "granted") {
-            notifyBtn.textContent = "🔔 Avisos activados";
+            statusEl.textContent = "Avisos del programa activados";
+            updateProgramNotifyButton();
             maybeNotifyProgramStart();
           } else if (permission === "denied") {
-            notifyBtn.textContent = "🔕 Avisos bloqueados";
+            statusEl.textContent = "Las notificaciones fueron bloqueadas";
+            updateProgramNotifyButton();
           }
         } catch (e) {}
-      }, { once: true });
+      });
+    }
+
+    async function cargarDatosRemotos() {
+      try {
+        const res = await fetch(SHEET_API_URL, { cache: "no-store" });
+        if (!res.ok) throw new Error("No se pudo cargar Google Sheet");
+        const data = await res.json();
+
+        const rawProgramacion = Array.isArray(data.programacion) ? data.programacion : [];
+        const rawAvisos = Array.isArray(data.avisos) ? data.avisos : [];
+
+        PROGRAMACION = rawProgramacion
+          .filter(item => String(item.dia || "").trim() !== "" && String(item.inicio || "").trim() !== "" && String(item.fin || "").trim() !== "")
+          .map(item => {
+            const dayNumber = diaTextoANumero(item.dia);
+            return {
+              id: String(item.id || "").trim(),
+              days: typeof dayNumber === "number" ? [dayNumber] : [],
+              start: String(item.inicio || "").trim(),
+              end: String(item.fin || "").trim(),
+              title: String(item.programa || "").trim(),
+              hosts: String(item.conductores || "").trim(),
+              status: normalizarEstado(item.estado),
+              notice: String(item.aviso || "").trim()
+            };
+          })
+          .filter(item => item.days.length);
+
+        AVISOS = rawAvisos.map(item => ({
+          mensaje: String(item.mensaje || "").trim(),
+          activo: String(item.activo || "").trim().toLowerCase()
+        }));
+
+        if (weeklyProgramPanel.hidden) {
+          renderProgramacionDeHoy();
+        } else {
+          renderWeeklyProgram();
+        }
+
+        if (!announcementPanel.hidden) {
+          renderAnnouncementPanel();
+        }
+
+        renderAnnouncementButton();
+      } catch (error) {
+        console.error(error);
+      }
     }
 
     playBtn.addEventListener("click", async () => {
@@ -1145,6 +1414,8 @@
     shareBtn.addEventListener("click", compartirApp);
     openWeeklyBtn.addEventListener("click", openWeeklyProgram);
     closeWeeklyBtn.addEventListener("click", closeWeeklyProgram);
+    announcementBtn.addEventListener("click", openAnnouncementPanel);
+    closeAnnouncementBtn.addEventListener("click", closeAnnouncementPanel);
 
     radio.addEventListener("waiting", () => {
       statusEl.textContent = "Conectando...";
@@ -1213,9 +1484,9 @@
     }
 
     cargarClima();
-    renderProgramacionDeHoy();
-    renderWeeklyProgram();
-    initNotificationButton();
+    cargarDatosRemotos();
+    renderAnnouncementButton();
+    initProgramNotifyButton();
     maybeNotifyProgramStart();
 
     setInterval(cargarClima, 600000);
@@ -1225,11 +1496,7 @@
       }
     }, 30000);
     setInterval(() => {
-      if (weeklyProgramPanel.hidden) {
-        renderProgramacionDeHoy();
-      } else {
-        renderWeeklyProgram();
-      }
+      cargarDatosRemotos();
       maybeNotifyProgramStart();
     }, 60000);
 
