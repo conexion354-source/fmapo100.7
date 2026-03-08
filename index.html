@@ -42,7 +42,7 @@
       -webkit-backdrop-filter: blur(18px);
       border: 1px solid rgba(255,255,255,0.22);
       border-radius: 30px;
-      padding: 22px;
+      padding: 20px;
       box-shadow:
         0 12px 35px rgba(0,0,0,.22),
         inset 0 1px 0 rgba(255,255,255,.18);
@@ -101,13 +101,13 @@
     .logo-wrap {
       display: flex;
       justify-content: center;
-      margin-bottom: 14px;
-      margin-top: 24px;
+      margin-bottom: 12px;
+      margin-top: 22px;
     }
 
     .logo {
-      width: 180px;
-      max-width: 80%;
+      width: 150px;
+      max-width: 72%;
       border-radius: 20px;
       box-shadow: 0 10px 24px rgba(0,0,0,.18);
     }
@@ -293,7 +293,12 @@
       }
 
       .logo-wrap {
-        margin-top: 28px;
+        margin-top: 26px;
+      }
+
+      .logo {
+        width: 138px;
+        max-width: 68%;
       }
     }
   </style>
@@ -421,7 +426,7 @@
         start: "09:00",
         end: "11:00",
         title: "Conectados",
-        hosts: "José Crespin y Andre Jimenez"
+        hosts: "José Crespin y Andrea Jimenez"
       }
     ];
 
@@ -586,6 +591,8 @@
     }
 
     async function cargarStatsRadio() {
+      const currentProgram = getCurrentProgram();
+
       try {
         const res = await fetch(STREAM_STATS_URL, { cache: "no-store" });
         if (!res.ok) throw new Error("No se pudo cargar stats");
@@ -596,7 +603,9 @@
 
         if (!source) {
           if (!radio.paused) {
-            statusEl.textContent = "FM Apocalipsis en vivo";
+            statusEl.textContent = currentProgram
+              ? currentProgram.title
+              : "FM Apocalipsis en vivo";
           }
           return;
         }
@@ -605,14 +614,19 @@
           source.title ||
           source.server_description ||
           source.server_name ||
-          "FM Apocalipsis en vivo";
+          "";
 
         if (!radio.paused) {
-          statusEl.textContent = nowPlaying;
+          statusEl.textContent =
+            nowPlaying && nowPlaying.trim() !== ""
+              ? nowPlaying
+              : (currentProgram ? currentProgram.title : "FM Apocalipsis en vivo");
         }
       } catch (error) {
         if (!radio.paused) {
-          statusEl.textContent = "FM Apocalipsis en vivo";
+          statusEl.textContent = currentProgram
+            ? currentProgram.title
+            : "FM Apocalipsis en vivo";
         }
       }
     }
