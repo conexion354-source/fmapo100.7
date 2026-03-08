@@ -46,6 +46,7 @@
       box-shadow:
         0 12px 35px rgba(0,0,0,.22),
         inset 0 1px 0 rgba(255,255,255,.18);
+      overflow: hidden;
     }
 
     .top-row {
@@ -275,7 +276,8 @@
     }
 
     .weather-widget,
-    .today-program-widget {
+    .today-program-widget,
+    .weekly-program-panel {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -332,8 +334,137 @@
       opacity: 0.7;
     }
 
-    .today-program-widget[hidden] {
+    .today-program-widget[hidden],
+    .weekly-program-panel[hidden] {
       display: none;
+    }
+
+    .program-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .program-state {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      background: rgba(255,255,255,.12);
+      color: rgba(255,255,255,.86);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .program-state.red {
+      background: rgba(255, 59, 59, .18);
+      color: #ff8d8d;
+      border-color: rgba(255, 95, 95, .32);
+    }
+
+    .plus-btn {
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 10px 18px rgba(0,0,0,.14);
+      flex-shrink: 0;
+    }
+
+    .plus-btn:active {
+      transform: scale(.97);
+    }
+
+    .weekly-program-panel {
+      display: block;
+    }
+
+    .weekly-program-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .weekly-program-title {
+      font-size: 1rem;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    .back-btn {
+      border: 0;
+      border-radius: 14px;
+      padding: 10px 12px;
+      font-size: .92rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: rgba(255,255,255,.14);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.14);
+    }
+
+    .weekly-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .weekly-day {
+      border-radius: 16px;
+      padding: 12px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+
+    .weekly-day-name {
+      font-size: .95rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .weekly-item {
+      padding: 8px 0;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+
+    .weekly-item:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .weekly-time {
+      font-size: .88rem;
+      font-weight: 700;
+      color: #c9fff1;
+      margin-bottom: 3px;
+    }
+
+    .weekly-show {
+      font-size: .95rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .weekly-hosts {
+      font-size: .82rem;
+      color: rgba(255,255,255,.78);
+      margin-top: 3px;
+    }
+
+    .weekly-empty {
+      font-size: .86rem;
+      color: rgba(255,255,255,.70);
     }
 
     .notify-btn {
@@ -373,6 +504,11 @@
       .logo {
         width: 138px;
         max-width: 68%;
+      }
+
+      .weekly-program-top {
+        flex-direction: row;
+        align-items: center;
       }
     }
   </style>
@@ -438,11 +574,22 @@
 
       <div class="today-program-widget" id="todayProgramWidget" hidden>
         <div class="today-program-left">
-          <div class="today-program-title" id="todayProgramTitle">Programa | Hoy</div>
+          <div class="program-header">
+            <div class="today-program-title" id="todayProgramTitle">Programa</div>
+            <span class="program-state" id="programState">Ahora</span>
+          </div>
           <div class="today-program-subtitle" id="todayProgramTime"></div>
           <div class="today-program-hosts" id="todayProgramHosts"></div>
         </div>
-        <div class="card-icon">📻</div>
+        <button class="plus-btn" id="openWeeklyBtn" type="button" aria-label="Ver programación semanal">+</button>
+      </div>
+
+      <div class="weekly-program-panel" id="weeklyProgramPanel" hidden>
+        <div class="weekly-program-top">
+          <h3 class="weekly-program-title">Programación semanal</h3>
+          <button class="back-btn" id="closeWeeklyBtn" type="button">← Volver</button>
+        </div>
+        <div class="weekly-list" id="weeklyList"></div>
       </div>
 
       <div class="weather-widget">
@@ -479,6 +626,11 @@
     const liveBadge = document.getElementById("liveBadge");
     const shareBtn = document.getElementById("shareBtn");
     const audioVisualizer = document.getElementById("audioVisualizer");
+    const programState = document.getElementById("programState");
+    const openWeeklyBtn = document.getElementById("openWeeklyBtn");
+    const closeWeeklyBtn = document.getElementById("closeWeeklyBtn");
+    const weeklyProgramPanel = document.getElementById("weeklyProgramPanel");
+    const weeklyList = document.getElementById("weeklyList");
 
     const STREAM_HOST = "https://radios.solumedia.com:6322";
     const APP_TIMEZONE = "America/Argentina/Buenos_Aires";
@@ -515,6 +667,16 @@
         title: "Conectados",
         hosts: "José Crespin y Andrea Jimenez"
       }
+    ];
+
+    const WEEK_DAYS = [
+      { id: 1, name: "Lunes" },
+      { id: 2, name: "Martes" },
+      { id: 3, name: "Miércoles" },
+      { id: 4, name: "Jueves" },
+      { id: 5, name: "Viernes" },
+      { id: 6, name: "Sábado" },
+      { id: 0, name: "Domingo" }
     ];
 
     function isIOS() {
@@ -605,7 +767,9 @@
 
     function getTodayPrograms() {
       const { day } = getNowParts();
-      return PROGRAMACION.filter(programa => programa.days.includes(day));
+      return PROGRAMACION
+        .filter(programa => programa.days.includes(day))
+        .sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
     }
 
     function getCurrentProgram() {
@@ -620,21 +784,109 @@
       }) || null;
     }
 
-    function renderProgramacionDeHoy() {
+    function getProgramStatusForToday() {
+      const { time } = getNowParts();
+      const nowMinutes = timeToMinutes(time);
       const programs = getTodayPrograms();
 
-      if (!programs.length) {
+      if (!programs.length) return null;
+
+      const current = programs.find(programa => {
+        const startMinutes = timeToMinutes(programa.start);
+        const endMinutes = timeToMinutes(programa.end);
+        return nowMinutes >= startMinutes && nowMinutes < endMinutes;
+      });
+
+      if (current) {
+        return {
+          program: current,
+          label: "Ahora",
+          className: "red"
+        };
+      }
+
+      const upcoming = programs.find(programa => nowMinutes < timeToMinutes(programa.start));
+      if (upcoming) {
+        return {
+          program: upcoming,
+          label: "Próximo",
+          className: ""
+        };
+      }
+
+      const lastFinished = programs[programs.length - 1];
+      return {
+        program: lastFinished,
+        label: "Finalizado",
+        className: "red"
+      };
+    }
+
+    function renderProgramacionDeHoy() {
+      const info = getProgramStatusForToday();
+
+      if (!info) {
         todayProgramWidget.hidden = true;
         return;
       }
 
-      const currentProgram = getCurrentProgram();
-      const principal = currentProgram || programs[0];
-
       todayProgramWidget.hidden = false;
-      todayProgramTitle.textContent = `${principal.title} | Hoy`;
-      todayProgramTime.textContent = `${principal.start} a ${principal.end} hs`;
-      todayProgramHosts.textContent = principal.hosts || "FM Apocalipsis 100.7";
+      todayProgramTitle.textContent = info.program.title;
+      todayProgramTime.textContent = `${info.program.start} a ${info.program.end} hs`;
+      todayProgramHosts.textContent = info.program.hosts || "FM Apocalipsis 100.7";
+      programState.textContent = info.label;
+      programState.className = "program-state" + (info.className ? ` ${info.className}` : "");
+    }
+
+    function renderWeeklyProgram() {
+      weeklyList.innerHTML = "";
+
+      WEEK_DAYS.forEach(day => {
+        const items = PROGRAMACION
+          .filter(programa => programa.days.includes(day.id))
+          .sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
+
+        const dayEl = document.createElement("div");
+        dayEl.className = "weekly-day";
+
+        const titleEl = document.createElement("div");
+        titleEl.className = "weekly-day-name";
+        titleEl.textContent = day.name;
+        dayEl.appendChild(titleEl);
+
+        if (!items.length) {
+          const emptyEl = document.createElement("div");
+          emptyEl.className = "weekly-empty";
+          emptyEl.textContent = "Sin programas cargados";
+          dayEl.appendChild(emptyEl);
+        } else {
+          items.forEach(item => {
+            const itemEl = document.createElement("div");
+            itemEl.className = "weekly-item";
+
+            itemEl.innerHTML = `
+              <div class="weekly-time">${item.start} a ${item.end} hs</div>
+              <div class="weekly-show">${item.title}</div>
+              <div class="weekly-hosts">${item.hosts || "FM Apocalipsis 100.7"}</div>
+            `;
+
+            dayEl.appendChild(itemEl);
+          });
+        }
+
+        weeklyList.appendChild(dayEl);
+      });
+    }
+
+    function openWeeklyProgram() {
+      weeklyProgramPanel.hidden = false;
+      todayProgramWidget.hidden = true;
+      renderWeeklyProgram();
+    }
+
+    function closeWeeklyProgram() {
+      weeklyProgramPanel.hidden = true;
+      renderProgramacionDeHoy();
     }
 
     async function cargarClima() {
@@ -891,6 +1143,8 @@
     });
 
     shareBtn.addEventListener("click", compartirApp);
+    openWeeklyBtn.addEventListener("click", openWeeklyProgram);
+    closeWeeklyBtn.addEventListener("click", closeWeeklyProgram);
 
     radio.addEventListener("waiting", () => {
       statusEl.textContent = "Conectando...";
@@ -960,6 +1214,7 @@
 
     cargarClima();
     renderProgramacionDeHoy();
+    renderWeeklyProgram();
     initNotificationButton();
     maybeNotifyProgramStart();
 
@@ -970,7 +1225,11 @@
       }
     }, 30000);
     setInterval(() => {
-      renderProgramacionDeHoy();
+      if (weeklyProgramPanel.hidden) {
+        renderProgramacionDeHoy();
+      } else {
+        renderWeeklyProgram();
+      }
       maybeNotifyProgramStart();
     }, 60000);
 
