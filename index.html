@@ -604,11 +604,7 @@
       <p class="subtitle">La voz que viene de lo alto</p>
 
       <div class="audio-visualizer" id="audioVisualizer" aria-hidden="true">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span><span></span><span></span>
       </div>
 
       <div class="banner-alert" id="bannerAlert" hidden>
@@ -629,21 +625,11 @@
 
       <button class="btn btn-primary full" id="installBtn" hidden>📲 Instalar App</button>
 
-      <a
-        class="link-btn"
-        href="https://chat.whatsapp.com/FQnkIaic0ZEKR5nYNmheOV?mode=hq2tswi"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
+      <a class="link-btn" href="https://chat.whatsapp.com/FQnkIaic0ZEKR5nYNmheOV?mode=hq2tswi" target="_blank" rel="noopener noreferrer">
         <button class="btn btn-whatsapp full" type="button">💬 Unirse al grupo de WhatsApp</button>
       </a>
 
-      <a
-        class="link-btn"
-        href="https://www.youtube.com/@zonafe"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
+      <a class="link-btn" href="https://www.youtube.com/@zonafe" target="_blank" rel="noopener noreferrer">
         <button class="btn btn-youtube full" type="button">▶ Mira Zona Fe en vivo</button>
       </a>
 
@@ -787,13 +773,11 @@
           await navigator.share(shareData);
           return;
         }
-
         if (navigator.clipboard && navigator.clipboard.writeText) {
           await navigator.clipboard.writeText(shareData.url);
           statusEl.textContent = "Enlace copiado para compartir";
           return;
         }
-
         statusEl.textContent = shareData.url;
       } catch (error) {}
     }
@@ -820,8 +804,7 @@
 
     function normalizarEstado(estado) {
       const valor = String(estado || "").trim().toLowerCase();
-      if (valor === "suspendido") return "suspendido";
-      return "activo";
+      return valor === "suspendido" ? "suspendido" : "activo";
     }
 
     function getNowParts() {
@@ -916,7 +899,6 @@
 
     function renderProgramacionDeHoy() {
       const info = getProgramStatusForToday();
-
       todayProgramWidget.hidden = false;
 
       if (!info) {
@@ -964,7 +946,6 @@
           items.forEach(item => {
             const itemEl = document.createElement("div");
             itemEl.className = "weekly-item";
-
             itemEl.innerHTML = `
               <div class="weekly-time">${item.start} a ${item.end} hs</div>
               <div class="weekly-show">${item.title}</div>
@@ -972,7 +953,6 @@
               ${item.status === "suspendido" ? `<div class="weekly-note">Suspendido</div>` : ""}
               ${item.notice ? `<div class="weekly-note">${item.notice}</div>` : ""}
             `;
-
             dayEl.appendChild(itemEl);
           });
         }
@@ -994,7 +974,10 @@
     }
 
     function getActiveAnnouncements() {
-      return AVISOS.filter(item => String(item.activo || "").trim().toLowerCase() === "si" && String(item.mensaje || "").trim() !== "");
+      return AVISOS.filter(item =>
+        String(item.activo || "").trim().toLowerCase() === "si" &&
+        String(item.mensaje || "").trim() !== ""
+      );
     }
 
     function getAnnouncementFingerprint() {
@@ -1121,7 +1104,6 @@
 
     function cleanMetadataText(text) {
       if (!text) return "";
-
       let value = String(text).trim();
       value = value.replace(/^current song[:\-\s]*/i, "");
       value = value.replace(/^currentsong[:\-\s]*/i, "");
@@ -1230,13 +1212,11 @@
           if (result) return result;
         } catch (e) {}
       }
-
       return "";
     }
 
     async function cargarStatsRadio() {
       if (radio.paused) return;
-
       try {
         const nowPlaying = await getStreamingMetadata();
         statusEl.textContent = nowPlaying || getFallbackStatusText();
@@ -1250,7 +1230,6 @@
         programNotifyBtn.style.display = "none";
         return;
       }
-
       programNotifyBtn.style.display = "inline-flex";
       programNotifyBtn.classList.toggle("enabled", Notification.permission === "granted");
     }
@@ -1274,7 +1253,6 @@
 
     function initProgramNotifyButton() {
       updateProgramNotifyButton();
-
       if (!("Notification" in window)) return;
 
       programNotifyBtn.addEventListener("click", async () => {
@@ -1314,7 +1292,6 @@
         if (!res.ok) throw new Error("No se pudo cargar Google Sheet");
 
         const data = await res.json();
-
         const rawProgramacion = Array.isArray(data.programacion) ? data.programacion : [];
         const rawAvisos = Array.isArray(data.avisos) ? data.avisos : [];
 
@@ -1326,7 +1303,6 @@
           )
           .map(item => {
             const dayNumber = diaTextoANumero(item.dia);
-
             return {
               id: String(item.id || "").trim(),
               days: typeof dayNumber === "number" ? [dayNumber] : [],
