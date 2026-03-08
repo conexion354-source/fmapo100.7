@@ -6,7 +6,7 @@
   <title>FM Apocalipsis 100.7</title>
 
   <meta name="theme-color" content="#2f5f5a" />
-  <meta name="description" content="FM Apocalipsis 100.7 - Radio cristiana online" />
+  <meta name="description" content="FM Apocalipsis 100.7 - La voz que viene de lo alto" />
 
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="logo.png" />
@@ -48,10 +48,17 @@
         inset 0 1px 0 rgba(255,255,255,.18);
     }
 
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 2;
+    }
+
     .live-badge {
-      position: absolute;
-      top: 16px;
-      left: 16px;
       display: inline-flex;
       align-items: center;
       gap: 7px;
@@ -60,7 +67,6 @@
       font-size: .82rem;
       font-weight: 800;
       letter-spacing: .02em;
-      z-index: 2;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       background: rgba(255,255,255,.16);
@@ -92,6 +98,31 @@
       animation: pulse 1.6s infinite;
     }
 
+    .share-top-btn {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: .82rem;
+      font-weight: 800;
+      letter-spacing: .02em;
+      cursor: pointer;
+      color: #fff;
+      background: rgba(255,255,255,.12);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 8px 18px rgba(0,0,0,.14);
+      transition: transform .15s ease, opacity .15s ease, background .2s ease;
+    }
+
+    .share-top-btn:active {
+      transform: scale(.98);
+    }
+
+    .share-top-btn:hover {
+      opacity: .96;
+      background: rgba(255,255,255,.16);
+    }
+
     @keyframes pulse {
       0% { box-shadow: 0 0 0 0 rgba(255,255,255,.55); }
       70% { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
@@ -102,7 +133,7 @@
       display: flex;
       justify-content: center;
       margin-bottom: 12px;
-      margin-top: 22px;
+      margin-top: 8px;
     }
 
     .logo {
@@ -122,9 +153,47 @@
 
     .subtitle {
       text-align: center;
-      margin: 6px 0 18px;
+      margin: 6px 0 14px;
       color: rgba(255,255,255,.82);
       font-size: .98rem;
+      font-weight: 600;
+    }
+
+    .audio-visualizer {
+      height: 30px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 5px;
+      margin: 0 auto 14px;
+      max-width: 120px;
+    }
+
+    .audio-visualizer span {
+      display: block;
+      width: 6px;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #c9fff1 0%, #7ff0cd 100%);
+      opacity: .35;
+      transform-origin: bottom;
+      transition: opacity .2s ease;
+    }
+
+    .audio-visualizer.playing span {
+      opacity: 1;
+      animation: waveBounce 1s infinite ease-in-out;
+    }
+
+    .audio-visualizer.playing span:nth-child(1) { animation-delay: 0s; }
+    .audio-visualizer.playing span:nth-child(2) { animation-delay: .12s; }
+    .audio-visualizer.playing span:nth-child(3) { animation-delay: .24s; }
+    .audio-visualizer.playing span:nth-child(4) { animation-delay: .36s; }
+    .audio-visualizer.playing span:nth-child(5) { animation-delay: .48s; }
+
+    @keyframes waveBounce {
+      0%, 100% { height: 8px; }
+      50% { height: 28px; }
     }
 
     .status {
@@ -287,13 +356,18 @@
     }
 
     @media (max-width: 430px) {
-      .live-badge {
+      .top-row {
+        margin-bottom: 8px;
+      }
+
+      .live-badge,
+      .share-top-btn {
         font-size: .76rem;
         padding: 7px 10px;
       }
 
       .logo-wrap {
-        margin-top: 26px;
+        margin-top: 10px;
       }
 
       .logo {
@@ -306,9 +380,13 @@
 <body>
   <div class="app">
     <div class="player">
-      <div class="live-badge" id="liveBadge">
-        <span class="live-dot"></span>
-        <span>EN VIVO</span>
+      <div class="top-row">
+        <div class="live-badge" id="liveBadge">
+          <span class="live-dot"></span>
+          <span>EN VIVO</span>
+        </div>
+
+        <button class="share-top-btn" id="shareBtn" type="button">📤 Compartir</button>
       </div>
 
       <div class="logo-wrap">
@@ -316,7 +394,15 @@
       </div>
 
       <h1 class="title">FM Apocalipsis 100.7</h1>
-      <p class="subtitle">Radio cristiana online</p>
+      <p class="subtitle">La voz que viene de lo alto</p>
+
+      <div class="audio-visualizer" id="audioVisualizer" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
 
       <div class="status" id="status">Listo para reproducir</div>
 
@@ -391,6 +477,8 @@
     const todayProgramHosts = document.getElementById("todayProgramHosts");
     const notifyBtn = document.getElementById("notifyBtn");
     const liveBadge = document.getElementById("liveBadge");
+    const shareBtn = document.getElementById("shareBtn");
+    const audioVisualizer = document.getElementById("audioVisualizer");
 
     const STREAM_HOST = "https://radios.solumedia.com:6322";
     const APP_TIMEZONE = "America/Argentina/Buenos_Aires";
@@ -439,10 +527,12 @@
 
     function activarEstadoPlay() {
       playBtn.classList.add("playing");
+      audioVisualizer.classList.add("playing");
     }
 
     function desactivarEstadoPlay() {
       playBtn.classList.remove("playing");
+      audioVisualizer.classList.remove("playing");
     }
 
     function activarEnVivo() {
@@ -451,6 +541,29 @@
 
     function desactivarEnVivo() {
       liveBadge.classList.remove("active");
+    }
+
+    async function compartirApp() {
+      const shareData = {
+        title: "FM Apocalipsis 100.7",
+        text: "Escuchá FM Apocalipsis 100.7 - La voz que viene de lo alto",
+        url: "https://conexion354-source.github.io/fmapo100.7/"
+      };
+
+      try {
+        if (navigator.share) {
+          await navigator.share(shareData);
+          return;
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(shareData.url);
+          statusEl.textContent = "Enlace copiado para compartir";
+          return;
+        }
+
+        statusEl.textContent = shareData.url;
+      } catch (error) {}
     }
 
     function timeToMinutes(time) {
@@ -776,6 +889,8 @@
       desactivarEstadoPlay();
       desactivarEnVivo();
     });
+
+    shareBtn.addEventListener("click", compartirApp);
 
     radio.addEventListener("waiting", () => {
       statusEl.textContent = "Conectando...";
