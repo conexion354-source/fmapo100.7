@@ -48,10 +48,10 @@
         inset 0 1px 0 rgba(255,255,255,.18);
     }
 
-    .live-badge,
-    .listeners-badge {
+    .live-badge {
       position: absolute;
       top: 16px;
+      left: 16px;
       display: inline-flex;
       align-items: center;
       gap: 7px;
@@ -63,24 +63,10 @@
       z-index: 2;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-    }
-
-    .live-badge {
-      left: 16px;
       background: linear-gradient(135deg, #ff5f5f, #ff2f2f);
       color: #fff;
       border: 1px solid rgba(255,255,255,.18);
       box-shadow: 0 8px 18px rgba(255, 59, 59, .25);
-    }
-
-    .listeners-badge {
-      right: 16px;
-      background: rgba(255,255,255,.18);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,.16);
-      box-shadow: 0 8px 18px rgba(0,0,0,.12);
-      min-width: 88px;
-      justify-content: center;
     }
 
     .live-dot {
@@ -290,8 +276,7 @@
     }
 
     @media (max-width: 430px) {
-      .live-badge,
-      .listeners-badge {
+      .live-badge {
         font-size: .76rem;
         padding: 7px 10px;
       }
@@ -309,8 +294,6 @@
         <span class="live-dot"></span>
         <span>EN VIVO</span>
       </div>
-
-      <div class="listeners-badge" id="listenersBadge">-- oyentes</div>
 
       <div class="logo-wrap">
         <img src="logo.png" alt="FM Apocalipsis 100.7" class="logo" />
@@ -376,7 +359,7 @@
 
       <div class="today-program-widget" id="todayProgramWidget" hidden>
         <div class="today-program-left">
-          <div class="today-program-title" id="todayProgramTitle">Programación de hoy</div>
+          <div class="today-program-title" id="todayProgramTitle">Hoy | Programación</div>
           <div class="today-program-subtitle" id="todayProgramTime"></div>
           <div class="today-program-hosts" id="todayProgramHosts"></div>
         </div>
@@ -394,7 +377,6 @@
     const pauseBtn = document.getElementById("pauseBtn");
     const installBtn = document.getElementById("installBtn");
     const installHint = document.getElementById("installHint");
-    const listenersBadge = document.getElementById("listenersBadge");
     const metadataText = document.getElementById("metadataText");
     const todayProgramWidget = document.getElementById("todayProgramWidget");
     const todayProgramTitle = document.getElementById("todayProgramTitle");
@@ -484,8 +466,13 @@
 
       return {
         day: dayMap[weekdayName],
-        time: timeString
+        time: timeString,
+        weekdayName
       };
+    }
+
+    function capitalizeDay(dayName) {
+      return dayName.charAt(0).toUpperCase() + dayName.slice(1);
     }
 
     function timeToMinutes(time) {
@@ -512,6 +499,7 @@
 
     function renderProgramacionDeHoy() {
       const programs = getTodayPrograms();
+      const { weekdayName } = getNowParts();
 
       if (!programs.length) {
         todayProgramWidget.hidden = true;
@@ -520,13 +508,11 @@
 
       const currentProgram = getCurrentProgram();
       const principal = currentProgram || programs[0];
+      const dayLabel = capitalizeDay(weekdayName);
 
       todayProgramWidget.hidden = false;
-      todayProgramTitle.textContent = currentProgram
-        ? `${principal.title} · EN VIVO`
-        : principal.title;
-
-      todayProgramTime.textContent = `Hoy ${principal.start} a ${principal.end} hs`;
+      todayProgramTitle.textContent = `Hoy ${dayLabel} | ${principal.title}`;
+      todayProgramTime.textContent = `${principal.start} a ${principal.end} hs`;
       todayProgramHosts.textContent = principal.hosts || "FM Apocalipsis 100.7";
     }
 
@@ -605,16 +591,9 @@
         const source = pickMainSource(sources);
 
         if (!source) {
-          listenersBadge.textContent = "En línea";
           metadataText.textContent = "FM Apocalipsis en vivo";
           return;
         }
-
-        const listeners = source.listeners ?? source.listener_peak ?? "--";
-        listenersBadge.textContent =
-          typeof listeners === "number" || /^\d+$/.test(String(listeners))
-            ? `${listeners} oyentes`
-            : "En línea";
 
         const nowPlaying =
           source.title ||
@@ -624,7 +603,6 @@
 
         metadataText.textContent = nowPlaying;
       } catch (error) {
-        listenersBadge.textContent = "En línea";
         metadataText.textContent = "FM Apocalipsis en vivo";
       }
     }
