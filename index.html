@@ -393,7 +393,6 @@
     const liveBadge = document.getElementById("liveBadge");
 
     const STREAM_STATS_URL = "https://radios.solumedia.com:6322/status-json.xsl";
-    const STREAM_MOUNT = "/stream";
     const APP_TIMEZONE = "America/Argentina/Buenos_Aires";
 
     let deferredPrompt = null;
@@ -583,11 +582,13 @@
     }
 
     function pickMainSource(sources) {
-      const exact = sources.find(source =>
-        source.listenurl && source.listenurl.includes(STREAM_MOUNT)
+      if (!sources || !sources.length) return null;
+
+      const withTitle = sources.find(source =>
+        source && (source.title || source.server_name || source.server_description)
       );
-      if (exact) return exact;
-      return sources[0] || null;
+
+      return withTitle || sources[0];
     }
 
     async function cargarStatsRadio() {
