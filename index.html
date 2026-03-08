@@ -36,6 +36,7 @@
     }
 
     .player {
+      position: relative;
       background: rgba(255,255,255,0.12);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
@@ -47,10 +48,38 @@
         inset 0 1px 0 rgba(255,255,255,.18);
     }
 
+    .live-badge {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: linear-gradient(135deg, #ff5f5f, #ff2f2f);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: .82rem;
+      font-weight: 800;
+      letter-spacing: .02em;
+      box-shadow: 0 8px 18px rgba(255, 59, 59, .25);
+      z-index: 2;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(255,255,255,.16);
+    }
+
     .logo-wrap {
       display: flex;
       justify-content: center;
       margin-bottom: 14px;
+      margin-top: 24px;
     }
 
     .logo {
@@ -97,7 +126,7 @@
       font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
-      transition: transform .15s ease, opacity .15s ease;
+      transition: transform .15s ease, opacity .15s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
       box-shadow: 0 10px 18px rgba(0,0,0,.18);
     }
 
@@ -110,10 +139,28 @@
       color: #173531;
     }
 
+    .btn-primary.playing {
+      background: linear-gradient(135deg, #ff8b8b, #ff5f5f);
+      color: #fff;
+      box-shadow: 0 12px 22px rgba(255, 95, 95, .32);
+    }
+
     .btn-secondary {
       background: rgba(255,255,255,.18);
       color: #fff;
       border: 1px solid rgba(255,255,255,.18);
+    }
+
+    .btn-whatsapp {
+      background: linear-gradient(135deg, #33d17a, #1faa59);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .btn-youtube {
+      background: linear-gradient(135deg, #ff8f8f, #ff6666);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.12);
     }
 
     .full {
@@ -124,7 +171,6 @@
     .link-btn {
       display: block;
       text-decoration: none;
-      text-align: center;
     }
 
     .hint {
@@ -134,11 +180,61 @@
       margin-top: 12px;
       min-height: 18px;
     }
+
+    .weather-widget {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    .weather-left {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .weather-main {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.4;
+      color: #fff;
+    }
+
+    .weather-location {
+      font-size: 13px;
+      opacity: 0.82;
+      margin-top: 4px;
+    }
+
+    .weather-right img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .dot {
+      margin: 0 5px;
+      opacity: 0.7;
+    }
   </style>
 </head>
 <body>
   <div class="app">
     <div class="player">
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        <span>EN VIVO</span>
+      </div>
+
       <div class="logo-wrap">
         <img src="logo.png" alt="FM Apocalipsis 100.7" class="logo" />
       </div>
@@ -165,7 +261,7 @@
         target="_blank"
         rel="noopener noreferrer"
       >
-        <button class="btn btn-secondary full" type="button">💬 Unirse al grupo de WhatsApp</button>
+        <button class="btn btn-whatsapp full" type="button">💬 Unirse al grupo de WhatsApp</button>
       </a>
 
       <a
@@ -174,8 +270,23 @@
         target="_blank"
         rel="noopener noreferrer"
       >
-        <button class="btn btn-secondary full" type="button">▶ Mira Zona Fe en vivo</button>
+        <button class="btn btn-youtube full" type="button">▶ Mira Zona Fe en vivo</button>
       </a>
+
+      <div class="weather-widget">
+        <div class="weather-left">
+          <div class="weather-main">
+            Actualmente hace <span id="weatherTemp">--°</span>
+            <span class="dot">·</span>
+            <span id="weatherText">Cargando clima...</span>
+          </div>
+          <div class="weather-location">Santa Sylvina, Chaco</div>
+        </div>
+
+        <div class="weather-right">
+          <img id="weatherIcon" src="https://openweathermap.org/img/wn/02d@2x.png" alt="Clima actual" />
+        </div>
+      </div>
 
       <div class="hint" id="installHint"></div>
     </div>
@@ -199,18 +310,29 @@
       return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
     }
 
+    function activarEstadoPlay() {
+      playBtn.classList.add("playing");
+    }
+
+    function desactivarEstadoPlay() {
+      playBtn.classList.remove("playing");
+    }
+
     playBtn.addEventListener("click", async () => {
       try {
         await radio.play();
         statusEl.textContent = "Transmitiendo en vivo";
+        activarEstadoPlay();
       } catch (err) {
         statusEl.textContent = "No se pudo reproducir. Toca Play otra vez.";
+        desactivarEstadoPlay();
       }
     });
 
     pauseBtn.addEventListener("click", () => {
       radio.pause();
       statusEl.textContent = "Pausado";
+      desactivarEstadoPlay();
     });
 
     radio.addEventListener("waiting", () => {
@@ -219,10 +341,23 @@
 
     radio.addEventListener("playing", () => {
       statusEl.textContent = "Transmitiendo en vivo";
+      activarEstadoPlay();
+    });
+
+    radio.addEventListener("pause", () => {
+      if (radio.paused) {
+        statusEl.textContent = "Pausado";
+        desactivarEstadoPlay();
+      }
+    });
+
+    radio.addEventListener("ended", () => {
+      desactivarEstadoPlay();
     });
 
     radio.addEventListener("error", () => {
       statusEl.textContent = "Error al cargar el audio";
+      desactivarEstadoPlay();
     });
 
     window.addEventListener("beforeinstallprompt", (e) => {
@@ -260,6 +395,62 @@
       installBtn.hidden = false;
       installHint.textContent = "En iPhone se instala desde Compartir → Añadir a pantalla de inicio";
     }
+
+    async function cargarClima() {
+      try {
+        const lat = -27.83;
+        const lon = -61.13;
+
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data.current) return;
+
+        const temp = Math.round(data.current.temperature_2m);
+        const code = data.current.weather_code;
+
+        document.getElementById("weatherTemp").textContent = temp + "°";
+        document.getElementById("weatherText").textContent = traducirClima(code);
+        document.getElementById("weatherIcon").src = iconoClima(code);
+      } catch (error) {
+        document.getElementById("weatherText").textContent = "No disponible";
+      }
+    }
+
+    function traducirClima(code) {
+      const clima = {
+        0: "Despejado",
+        1: "Mayormente despejado",
+        2: "Parcialmente nublado",
+        3: "Nublado",
+        45: "Niebla",
+        48: "Niebla",
+        51: "Llovizna leve",
+        53: "Llovizna",
+        55: "Llovizna fuerte",
+        61: "Lluvia",
+        63: "Lluvia moderada",
+        65: "Lluvia fuerte",
+        80: "Chubascos",
+        81: "Chubascos moderados",
+        82: "Chubascos fuertes",
+        95: "Tormenta"
+      };
+
+      return clima[code] || "Clima actualizado";
+    }
+
+    function iconoClima(code) {
+      if (code === 0) return "https://openweathermap.org/img/wn/01d@2x.png";
+      if (code <= 2) return "https://openweathermap.org/img/wn/02d@2x.png";
+      if (code === 3) return "https://openweathermap.org/img/wn/03d@2x.png";
+      if (code >= 61) return "https://openweathermap.org/img/wn/09d@2x.png";
+      return "https://openweathermap.org/img/wn/02d@2x.png";
+    }
+
+    cargarClima();
 
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
