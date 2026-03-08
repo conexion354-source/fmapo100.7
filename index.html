@@ -63,6 +63,14 @@
       z-index: 2;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
+      background: rgba(255,255,255,.16);
+      color: rgba(255,255,255,.82);
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 8px 18px rgba(0,0,0,.14);
+      transition: background .25s ease, color .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+
+    .live-badge.active {
       background: linear-gradient(135deg, #ff5f5f, #ff2f2f);
       color: #fff;
       border: 1px solid rgba(255,255,255,.18);
@@ -73,6 +81,12 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
+      background: currentColor;
+      opacity: .9;
+      box-shadow: 0 0 0 4px rgba(255,255,255,.08);
+    }
+
+    .live-badge.active .live-dot {
       background: #fff;
       box-shadow: 0 0 0 4px rgba(255,255,255,.16);
       animation: pulse 1.6s infinite;
@@ -119,6 +133,7 @@
       font-size: .95rem;
       color: #eaf7f4;
       min-height: 22px;
+      font-weight: 600;
     }
 
     .controls {
@@ -191,7 +206,6 @@
     }
 
     .weather-widget,
-    .meta-widget,
     .today-program-widget {
       display: flex;
       justify-content: space-between;
@@ -208,14 +222,12 @@
     }
 
     .weather-left,
-    .meta-left,
     .today-program-left {
       flex: 1;
       min-width: 0;
     }
 
     .weather-main,
-    .meta-title,
     .today-program-title {
       font-size: 15px;
       font-weight: 700;
@@ -224,7 +236,6 @@
     }
 
     .weather-location,
-    .meta-subtitle,
     .today-program-subtitle,
     .today-program-hosts {
       font-size: 13px;
@@ -233,7 +244,7 @@
     }
 
     .weather-right img,
-    .meta-right {
+    .card-icon {
       width: 50px;
       height: 50px;
       object-fit: contain;
@@ -243,7 +254,7 @@
       flex-shrink: 0;
     }
 
-    .meta-right {
+    .card-icon {
       font-size: 1.55rem;
     }
 
@@ -290,7 +301,7 @@
 <body>
   <div class="app">
     <div class="player">
-      <div class="live-badge">
+      <div class="live-badge" id="liveBadge">
         <span class="live-dot"></span>
         <span>EN VIVO</span>
       </div>
@@ -334,6 +345,15 @@
         <button class="btn btn-youtube full" type="button">▶ Mira Zona Fe en vivo</button>
       </a>
 
+      <div class="today-program-widget" id="todayProgramWidget" hidden>
+        <div class="today-program-left">
+          <div class="today-program-title" id="todayProgramTitle">Programa | Hoy</div>
+          <div class="today-program-subtitle" id="todayProgramTime"></div>
+          <div class="today-program-hosts" id="todayProgramHosts"></div>
+        </div>
+        <div class="card-icon">📻</div>
+      </div>
+
       <div class="weather-widget">
         <div class="weather-left">
           <div class="weather-main">
@@ -349,23 +369,6 @@
         </div>
       </div>
 
-      <div class="meta-widget">
-        <div class="meta-left">
-          <div class="meta-title">Ahora suena</div>
-          <div class="meta-subtitle" id="metadataText">FM Apocalipsis en vivo</div>
-        </div>
-        <div class="meta-right">🎵</div>
-      </div>
-
-      <div class="today-program-widget" id="todayProgramWidget" hidden>
-        <div class="today-program-left">
-          <div class="today-program-title" id="todayProgramTitle">Programa | Hoy</div>
-          <div class="today-program-subtitle" id="todayProgramTime"></div>
-          <div class="today-program-hosts" id="todayProgramHosts"></div>
-        </div>
-        <div class="meta-right">📻</div>
-      </div>
-
       <div class="hint" id="installHint"></div>
     </div>
   </div>
@@ -377,12 +380,12 @@
     const pauseBtn = document.getElementById("pauseBtn");
     const installBtn = document.getElementById("installBtn");
     const installHint = document.getElementById("installHint");
-    const metadataText = document.getElementById("metadataText");
     const todayProgramWidget = document.getElementById("todayProgramWidget");
     const todayProgramTitle = document.getElementById("todayProgramTitle");
     const todayProgramTime = document.getElementById("todayProgramTime");
     const todayProgramHosts = document.getElementById("todayProgramHosts");
     const notifyBtn = document.getElementById("notifyBtn");
+    const liveBadge = document.getElementById("liveBadge");
 
     const STREAM_STATS_URL = "https://radios.solumedia.com:6322/status-json.xsl";
     const STREAM_MOUNT = "/stream";
@@ -436,6 +439,14 @@
 
     function desactivarEstadoPlay() {
       playBtn.classList.remove("playing");
+    }
+
+    function activarEnVivo() {
+      liveBadge.classList.add("active");
+    }
+
+    function desactivarEnVivo() {
+      liveBadge.classList.remove("active");
     }
 
     function timeToMinutes(time) {
@@ -584,7 +595,9 @@
         const source = pickMainSource(sources);
 
         if (!source) {
-          metadataText.textContent = "FM Apocalipsis en vivo";
+          if (!radio.paused) {
+            statusEl.textContent = "FM Apocalipsis en vivo";
+          }
           return;
         }
 
@@ -594,9 +607,13 @@
           source.server_name ||
           "FM Apocalipsis en vivo";
 
-        metadataText.textContent = nowPlaying;
+        if (!radio.paused) {
+          statusEl.textContent = nowPlaying;
+        }
       } catch (error) {
-        metadataText.textContent = "FM Apocalipsis en vivo";
+        if (!radio.paused) {
+          statusEl.textContent = "FM Apocalipsis en vivo";
+        }
       }
     }
 
@@ -647,12 +664,12 @@
 
     playBtn.addEventListener("click", async () => {
       try {
+        statusEl.textContent = "Conectando...";
         await radio.play();
-        statusEl.textContent = "Transmitiendo en vivo";
-        activarEstadoPlay();
       } catch (err) {
         statusEl.textContent = "No se pudo reproducir. Toca Play otra vez.";
         desactivarEstadoPlay();
+        desactivarEnVivo();
       }
     });
 
@@ -660,31 +677,37 @@
       radio.pause();
       statusEl.textContent = "Pausado";
       desactivarEstadoPlay();
+      desactivarEnVivo();
     });
 
     radio.addEventListener("waiting", () => {
-      statusEl.textContent = "Cargando audio...";
+      statusEl.textContent = "Conectando...";
     });
 
-    radio.addEventListener("playing", () => {
-      statusEl.textContent = "Transmitiendo en vivo";
+    radio.addEventListener("playing", async () => {
       activarEstadoPlay();
+      activarEnVivo();
+      await cargarStatsRadio();
     });
 
     radio.addEventListener("pause", () => {
       if (radio.paused) {
         statusEl.textContent = "Pausado";
         desactivarEstadoPlay();
+        desactivarEnVivo();
       }
     });
 
     radio.addEventListener("ended", () => {
       desactivarEstadoPlay();
+      desactivarEnVivo();
+      statusEl.textContent = "Finalizado";
     });
 
     radio.addEventListener("error", () => {
       statusEl.textContent = "Error al cargar el audio";
       desactivarEstadoPlay();
+      desactivarEnVivo();
     });
 
     window.addEventListener("beforeinstallprompt", (e) => {
@@ -724,13 +747,16 @@
     }
 
     cargarClima();
-    cargarStatsRadio();
     renderProgramacionDeHoy();
     initNotificationButton();
     maybeNotifyProgramStart();
 
     setInterval(cargarClima, 600000);
-    setInterval(cargarStatsRadio, 30000);
+    setInterval(() => {
+      if (!radio.paused) {
+        cargarStatsRadio();
+      }
+    }, 30000);
     setInterval(() => {
       renderProgramacionDeHoy();
       maybeNotifyProgramStart();
