@@ -6,7 +6,7 @@
   <title>FM Apocalipsis 100.7</title>
 
   <meta name="theme-color" content="#2f5f5a" />
-  <meta name="description" content="FM Apocalipsis 100.7 - Radio cristiana online" />
+  <meta name="description" content="FM Apocalipsis 100.7 - La voz que viene de lo Alto" />
 
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="logo.png" />
@@ -48,10 +48,10 @@
         inset 0 1px 0 rgba(255,255,255,.18);
     }
 
-    .live-badge {
+    .live-badge,
+    .share-btn-top {
       position: absolute;
       top: 16px;
-      left: 16px;
       display: inline-flex;
       align-items: center;
       gap: 7px;
@@ -64,10 +64,23 @@
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       background: rgba(255,255,255,.16);
-      color: rgba(255,255,255,.82);
+      color: rgba(255,255,255,.92);
       border: 1px solid rgba(255,255,255,.14);
       box-shadow: 0 8px 18px rgba(0,0,0,.14);
-      transition: background .25s ease, color .25s ease, box-shadow .25s ease, border-color .25s ease;
+      transition: background .25s ease, color .25s ease, box-shadow .25s ease, border-color .25s ease, transform .15s ease;
+    }
+
+    .live-badge {
+      left: 16px;
+    }
+
+    .share-btn-top {
+      right: 16px;
+      cursor: pointer;
+    }
+
+    .share-btn-top:active {
+      transform: scale(.97);
     }
 
     .live-badge.active {
@@ -122,18 +135,61 @@
 
     .subtitle {
       text-align: center;
-      margin: 6px 0 18px;
+      margin: 6px 0 14px;
       color: rgba(255,255,255,.82);
       font-size: .98rem;
     }
 
     .status {
       text-align: center;
-      margin-bottom: 18px;
+      margin-bottom: 10px;
       font-size: .95rem;
       color: #eaf7f4;
       min-height: 22px;
       font-weight: 600;
+    }
+
+    .visualizer {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 4px;
+      height: 26px;
+      margin: 0 auto 18px;
+      opacity: .28;
+      transition: opacity .25s ease;
+    }
+
+    .visualizer.active {
+      opacity: 1;
+    }
+
+    .visualizer span {
+      width: 4px;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      transform-origin: bottom center;
+      animation: sound 1s ease-in-out infinite;
+      animation-play-state: paused;
+      box-shadow: 0 0 10px rgba(255,255,255,.14);
+    }
+
+    .visualizer.active span {
+      animation-play-state: running;
+    }
+
+    .visualizer span:nth-child(1) { animation-delay: 0s; }
+    .visualizer span:nth-child(2) { animation-delay: .12s; }
+    .visualizer span:nth-child(3) { animation-delay: .24s; }
+    .visualizer span:nth-child(4) { animation-delay: .36s; }
+    .visualizer span:nth-child(5) { animation-delay: .48s; }
+
+    @keyframes sound {
+      0%, 100% { height: 8px; opacity: .7; }
+      25% { height: 24px; opacity: 1; }
+      50% { height: 14px; opacity: .85; }
+      75% { height: 20px; opacity: 1; }
     }
 
     .controls {
@@ -206,7 +262,8 @@
     }
 
     .weather-widget,
-    .today-program-widget {
+    .today-program-widget,
+    .schedule-list {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -258,6 +315,75 @@
       font-size: 1.55rem;
     }
 
+    .schedule-toggle {
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 12px;
+      background: rgba(255,255,255,.16);
+      color: #fff;
+      font-size: 1.25rem;
+      font-weight: 800;
+      cursor: pointer;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 8px 18px rgba(0,0,0,.12);
+    }
+
+    .schedule-list {
+      display: block;
+      padding: 14px;
+    }
+
+    .schedule-list[hidden] {
+      display: none;
+    }
+
+    .schedule-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 4px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+
+    .schedule-item:last-child {
+      border-bottom: 0;
+      padding-bottom: 4px;
+    }
+
+    .schedule-item-main {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .schedule-item-title {
+      font-size: .96rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.35;
+    }
+
+    .schedule-item-sub {
+      margin-top: 4px;
+      font-size: .86rem;
+      color: rgba(255,255,255,.78);
+      line-height: 1.4;
+    }
+
+    .schedule-item-day {
+      font-size: .82rem;
+      font-weight: 700;
+      color: rgba(255,255,255,.84);
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 999px;
+      padding: 6px 10px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
     .dot {
       margin: 0 5px;
       opacity: 0.7;
@@ -287,7 +413,8 @@
     }
 
     @media (max-width: 430px) {
-      .live-badge {
+      .live-badge,
+      .share-btn-top {
         font-size: .76rem;
         padding: 7px 10px;
       }
@@ -311,14 +438,24 @@
         <span>EN VIVO</span>
       </div>
 
+      <button class="share-btn-top" id="shareBtn" type="button">🔗 Compartir</button>
+
       <div class="logo-wrap">
         <img src="logo.png" alt="FM Apocalipsis 100.7" class="logo" />
       </div>
 
       <h1 class="title">FM Apocalipsis 100.7</h1>
-      <p class="subtitle">Radio cristiana online</p>
+      <p class="subtitle">La voz que viene de lo Alto</p>
 
       <div class="status" id="status">Listo para reproducir</div>
+
+      <div class="visualizer" id="visualizer" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
 
       <audio id="radio" preload="none" playsinline>
         <source src="https://radios.solumedia.com:6322/stream" type="audio/mpeg" />
@@ -356,8 +493,10 @@
           <div class="today-program-subtitle" id="todayProgramTime"></div>
           <div class="today-program-hosts" id="todayProgramHosts"></div>
         </div>
-        <div class="card-icon">📻</div>
+        <button class="schedule-toggle" id="scheduleToggle" type="button">+</button>
       </div>
+
+      <div class="schedule-list" id="scheduleList" hidden></div>
 
       <div class="weather-widget">
         <div class="weather-left">
@@ -391,12 +530,17 @@
     const todayProgramHosts = document.getElementById("todayProgramHosts");
     const notifyBtn = document.getElementById("notifyBtn");
     const liveBadge = document.getElementById("liveBadge");
+    const shareBtn = document.getElementById("shareBtn");
+    const visualizer = document.getElementById("visualizer");
+    const scheduleToggle = document.getElementById("scheduleToggle");
+    const scheduleList = document.getElementById("scheduleList");
 
     const STREAM_HOST = "https://radios.solumedia.com:6322";
     const APP_TIMEZONE = "America/Argentina/Buenos_Aires";
 
     let deferredPrompt = null;
     let lastProgramNotificationKey = "";
+    let notificationsEnabledByUser = false;
 
     const PROGRAMACION = [
       {
@@ -429,6 +573,16 @@
       }
     ];
 
+    const DAY_NAMES = {
+      0: "Domingo",
+      1: "Lunes",
+      2: "Martes",
+      3: "Miércoles",
+      4: "Jueves",
+      5: "Viernes",
+      6: "Sábado"
+    };
+
     function isIOS() {
       return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
     }
@@ -439,10 +593,12 @@
 
     function activarEstadoPlay() {
       playBtn.classList.add("playing");
+      visualizer.classList.add("active");
     }
 
     function desactivarEstadoPlay() {
       playBtn.classList.remove("playing");
+      visualizer.classList.remove("active");
     }
 
     function activarEnVivo() {
@@ -507,21 +663,81 @@
       }) || null;
     }
 
+    function getProgramLabel(programa) {
+      const { day, time } = getNowParts();
+      const nowMinutes = timeToMinutes(time);
+
+      if (!programa.days.includes(day)) {
+        return "";
+      }
+
+      const startMinutes = timeToMinutes(programa.start);
+      const endMinutes = timeToMinutes(programa.end);
+
+      if (nowMinutes >= startMinutes && nowMinutes < endMinutes) {
+        return "Ahora";
+      }
+
+      if (nowMinutes < startMinutes) {
+        return "Hoy";
+      }
+
+      return "Finalizado";
+    }
+
+    function getMainProgramForToday(programs) {
+      const currentProgram = getCurrentProgram();
+      if (currentProgram) return currentProgram;
+
+      const { time } = getNowParts();
+      const nowMinutes = timeToMinutes(time);
+
+      const upcoming = programs.find(programa => timeToMinutes(programa.start) > nowMinutes);
+      if (upcoming) return upcoming;
+
+      return programs[programs.length - 1];
+    }
+
     function renderProgramacionDeHoy() {
       const programs = getTodayPrograms();
 
       if (!programs.length) {
         todayProgramWidget.hidden = true;
+        scheduleList.hidden = true;
         return;
       }
 
-      const currentProgram = getCurrentProgram();
-      const principal = currentProgram || programs[0];
+      const principal = getMainProgramForToday(programs);
+      const label = getProgramLabel(principal);
 
       todayProgramWidget.hidden = false;
-      todayProgramTitle.textContent = `${principal.title} | Hoy`;
+      todayProgramTitle.textContent = `${principal.title}${label ? " | " + label : ""}`;
       todayProgramTime.textContent = `${principal.start} a ${principal.end} hs`;
       todayProgramHosts.textContent = principal.hosts || "FM Apocalipsis 100.7";
+
+      renderScheduleList();
+    }
+
+    function renderScheduleList() {
+      const items = PROGRAMACION.map(programa => {
+        const label = getProgramLabel(programa);
+        return `
+          <div class="schedule-item">
+            <div class="schedule-item-main">
+              <div class="schedule-item-title">
+                ${programa.title}${label ? " | " + label : ""}
+              </div>
+              <div class="schedule-item-sub">
+                ${programa.start} a ${programa.end} hs<br>
+                ${programa.hosts || "FM Apocalipsis 100.7"}
+              </div>
+            </div>
+            <div class="schedule-item-day">${programa.days.map(day => DAY_NAMES[day]).join(" / ")}</div>
+          </div>
+        `;
+      }).join("");
+
+      scheduleList.innerHTML = items;
     }
 
     async function cargarClima() {
@@ -719,6 +935,7 @@
       if (!currentProgram) return;
       if (!("Notification" in window)) return;
       if (Notification.permission !== "granted") return;
+      if (!notificationsEnabledByUser) return;
 
       const todayKey = `${getNowParts().day}-${currentProgram.start}-${currentProgram.title}`;
       if (lastProgramNotificationKey === todayKey) return;
@@ -736,8 +953,12 @@
         return;
       }
 
+      if (localStorage.getItem("fm_apocalipsis_notifications") === "on") {
+        notificationsEnabledByUser = true;
+      }
+
       if (Notification.permission === "granted") {
-        notifyBtn.textContent = "🔔 Avisos activados";
+        notifyBtn.textContent = notificationsEnabledByUser ? "🔔 Avisos activados" : "🔔 Activar avisos de programas";
         return;
       }
 
@@ -750,14 +971,54 @@
         try {
           const permission = await Notification.requestPermission();
           if (permission === "granted") {
+            notificationsEnabledByUser = true;
+            localStorage.setItem("fm_apocalipsis_notifications", "on");
             notifyBtn.textContent = "🔔 Avisos activados";
             maybeNotifyProgramStart();
           } else if (permission === "denied") {
             notifyBtn.textContent = "🔕 Avisos bloqueados";
           }
         } catch (e) {}
-      }, { once: true });
+      });
+
+      if (Notification.permission === "granted") {
+        notifyBtn.addEventListener("click", () => {
+          notificationsEnabledByUser = !notificationsEnabledByUser;
+          localStorage.setItem("fm_apocalipsis_notifications", notificationsEnabledByUser ? "on" : "off");
+          notifyBtn.textContent = notificationsEnabledByUser ? "🔔 Avisos activados" : "🔕 Avisos desactivados";
+        });
+      }
     }
+
+    function initShareButton() {
+      shareBtn.addEventListener("click", async () => {
+        const shareData = {
+          title: "FM Apocalipsis 100.7",
+          text: "Escuchá FM Apocalipsis 100.7 - La voz que viene de lo Alto",
+          url: window.location.href
+        };
+
+        try {
+          if (navigator.share) {
+            await navigator.share(shareData);
+          } else if (navigator.clipboard) {
+            await navigator.clipboard.writeText(window.location.href);
+            installHint.textContent = "Enlace copiado para compartir";
+            setTimeout(() => {
+              if (installHint.textContent === "Enlace copiado para compartir") {
+                installHint.textContent = "";
+              }
+            }, 2500);
+          }
+        } catch (e) {}
+      });
+    }
+
+    scheduleToggle.addEventListener("click", () => {
+      const isHidden = scheduleList.hidden;
+      scheduleList.hidden = !isHidden;
+      scheduleToggle.textContent = isHidden ? "−" : "+";
+    });
 
     playBtn.addEventListener("click", async () => {
       try {
@@ -846,6 +1107,7 @@
     cargarClima();
     renderProgramacionDeHoy();
     initNotificationButton();
+    initShareButton();
     maybeNotifyProgramStart();
 
     setInterval(cargarClima, 600000);
