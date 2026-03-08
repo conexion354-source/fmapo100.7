@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>FM Apocalipsis 100.7</title>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#174f4b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Apocalipsis 100.7">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <style>
+    :root{
+      --bg1:#174f4b;
+      --bg2:#0f2624;
+      --card:rgba(255,255,255,.14);
+      --card-strong:rgba(255,255,255,.18);
+      --stroke:rgba(255,255,255,.20);
+      --text:#f8fbfb;
+      --muted:rgba(255,255,255,.78);
+      --shadow:0 18px 50px rgba(0,0,0,.28);
+      --radius:28px;
+    }
+
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.14), transparent 26%),
+        radial-gradient(circle at 85% 12%, rgba(255,214,77,.16), transparent 18%),
+        linear-gradient(160deg,var(--bg1),var(--bg2));
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+    }
+
+    .phone{
+      width:min(100%,410px);
+      border-radius:34px;
+      padding:18px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.18);
+      backdrop-filter:blur(22px) saturate(145%);
+      -webkit-backdrop-filter:blur(22px) saturate(145%);
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .phone::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg,rgba(255,255,255,.16),transparent 35%);
+      pointer-events:none;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:14px;
+      color:var(--muted);
+      font-size:14px;
+      position:relative;
+      z-index:1;
+    }
+
+    .pill{
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      font-weight:600;
+      backdrop-filter:blur(10px);
+    }
+
+    .hero, .card{
+      background:var(--card);
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+      position:relative;
+      z-index:1;
+    }
+
+    .hero{padding:18px 18px 16px;margin-bottom:14px}
+    .brand{
+      display:flex;
+      gap:14px;
+      align-items:center;
+    }
+    .cover-wrap{
+      width:84px;height:84px;flex:0 0 84px;
+      border-radius:24px;
+      background:rgba(255,255,255,.12);
+      display:grid;place-items:center;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:0 12px 30px rgba(0,0,0,.18);
+    }
+    .cover{
+      width:100%;height:100%;object-fit:cover;
+    }
+    h1{
+      margin:0;
+      font-size:30px;
+      line-height:1;
+      letter-spacing:-0.03em;
+    }
+    .subtitle{
+      margin:7px 0 10px;
+      color:var(--muted);
+      font-size:15px;
+    }
+    .live-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+    .live{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(13,214,125,.14);
+      color:#b7ffd9;
+      border:1px solid rgba(13,214,125,.22);
+      font-weight:700;
+      font-size:14px;
+    }
+    .dot{
+      width:9px;height:9px;border-radius:50%;background:#17e47c;
+      box-shadow:0 0 0 6px rgba(23,228,124,.15);
+      animation:pulse 1.6s infinite;
+    }
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+
+    .meta{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .mini{
+      padding:14px;
+      border-radius:22px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .label{font-size:12px;color:var(--muted);margin-bottom:4px}
+    .value{font-size:17px;font-weight:700}
+
+    .player.card{padding:16px;margin-bottom:14px}
+    .player-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .player-title{font-size:17px;font-weight:800}
+    .player-sub{font-size:13px;color:var(--muted)}
+
+    .now-playing{
+      padding:14px;
+      border-radius:22px;
+      background:linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.06));
+      border:1px solid rgba(255,255,255,.12);
+      margin-bottom:14px;
+    }
+    .np-title{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .np-text{font-size:18px;font-weight:700}
+
+    .controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+    button, .link-button{
+      width:100%;
+      border:none;
+      border-radius:20px;
+      padding:15px 16px;
+      font-size:16px;
+      font-weight:800;
+      cursor:pointer;
+      transition:transform .15s ease, filter .15s ease, opacity .15s ease;
+      text-decoration:none;
+      display:inline-flex;
+      justify-content:center;
+      align-items:center;
+      gap:8px;
+    }
+    button:active, .link-button:active{transform:scale(.985)}
+    .primary{
+      background:linear-gradient(180deg,#ffffff,#dfe9e8);
+      color:#143a37;
+      box-shadow:0 10px 24px rgba(0,0,0,.18);
+    }
+    .secondary{
+      background:rgba(255,255,255,.10);
+      color:#fff;
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .install{
+      background:linear-gradient(180deg,#56a9ff,#1978ff);
+      color:#fff;
+    }
+    .actions{display:grid;gap:10px}
+    .whatsapp{
+      background:linear-gradient(180deg,#38e27d,#20c65f);
+      color:#0c2315;
+    }
+    .youtube{
+      background:linear-gradient(180deg,#ff4e45,#db1515);
+      color:#fff;
+    }
+
+    .footer{
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+      margin-top:4px;
+      position:relative;
+      z-index:1;
+    }
+  </style>
+</head>
+<body>
+  <main class="phone">
+    <div class="topbar">
+      <div class="pill">Radio Cristiana</div>
+      <div id="clock">--:--:--</div>
+    </div>
+
+    <section class="hero">
+      <div class="brand">
+        <div class="cover-wrap">
+          <img src="logo.png" alt="FM Apocalipsis 100.7" class="cover">
+        </div>
+        <div>
+          <h1>FM Apocalipsis</h1>
+          <div class="subtitle">100.7 · La voz que viene de lo Alto</div>
+          <div class="live-row">
+            <div class="live"><span class="dot"></span> EN VIVO</div>
+            <div class="pill">Santa Sylvina, Chaco</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="meta">
+        <div class="mini">
+          <div class="label">Temperatura</div>
+          <div class="value" id="weather">--°C</div>
+        </div>
+        <div class="mini">
+          <div class="label">Estado</div>
+          <div class="value" id="statusText">Listo para reproducir</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="player card">
+      <div class="player-header">
+        <div>
+          <div class="player-title">Reproductor</div>
+          <div class="player-sub">Sonido online 24/7</div>
+        </div>
+        <button id="installBtn" class="install" type="button">📲 Instalar</button>
+      </div>
+
+      <div class="now-playing">
+        <div class="np-title">Ahora escuchando</div>
+        <div class="np-text">FM Apocalipsis 100.7</div>
+      </div>
+
+      <audio id="radio" preload="none" playsinline>
+        <source src="https://radios.solumedia.com:6322/stream" type="audio/mpeg">
+      </audio>
+
+      <div class="controls">
+        <button class="primary" type="button" onclick="playRadio()">▶ Reproducir</button>
+        <button class="secondary" type="button" onclick="pauseRadio()">⏸ Pausar</button>
+      </div>
+
+      <div class="actions">
+        <button class="whatsapp" type="button" onclick="openWhatsAppGroup()">💬 Unirse al grupo de WhatsApp</button>
+        <a class="link-button youtube" href="https://www.youtube.com/@zonafe" target="_blank" rel="noopener noreferrer">▶ Mira Zona Fe en vivo</a>
+      </div>
+    </section>
+
+    <div class="footer">Escucha, instala y comparte la radio.</div>
+  </main>
+
+  <script>
+    const radio = document.getElementById('radio');
+    const statusText = document.getElementById('statusText');
+    const installBtn = document.getElementById('installBtn');
+
+    function playRadio() {
+      radio.play()
+        .then(() => statusText.textContent = 'Reproduciendo ahora')
+        .catch(() => statusText.textContent = 'Toca reproducir otra vez');
+    }
+
+    function pauseRadio() {
+      radio.pause();
+      statusText.textContent = 'Pausado';
+    }
+
+    radio.addEventListener('playing', () => statusText.textContent = 'Reproduciendo ahora');
+    radio.addEventListener('pause', () => {
+      if (radio.currentTime > 0 && !radio.ended) statusText.textContent = 'Pausado';
+    });
+    radio.addEventListener('waiting', () => statusText.textContent = 'Conectando audio...');
+    radio.addEventListener('error', () => statusText.textContent = 'No se pudo cargar el audio');
+
+    function openWhatsAppGroup() {
+      const url = 'https://chat.whatsapp.com/FQnkIaic0ZEKR5nYNmheOV?mode=hq2tswi';
+      const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+      if (!newWindow) {
+        window.location.href = url;
+      }
+    }
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent = now.toLocaleTimeString('es-AR', {
+        timeZone: 'America/Argentina/Cordoba',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    async function weather() {
+      try {
+        const url = 'https://api.open-meteo.com/v1/forecast?latitude=-27.83&longitude=-61.14&current_weather=true';
+        const response = await fetch(url);
+        const data = await response.json();
+        document.getElementById('weather').textContent = data.current_weather.temperature + '°C';
+      } catch {
+        document.getElementById('weather').textContent = '--°C';
+      }
+    }
+    weather();
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'inline-flex';
+    });
+
+    installBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+      } else {
+        alert("Si no aparece la instalación automática, usa el menú del navegador y elige 'Instalar app' o 'Añadir a pantalla de inicio'.");
+      }
+    });
+  </script>
+</body>
+</html>
