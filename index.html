@@ -359,7 +359,7 @@
 
       <div class="today-program-widget" id="todayProgramWidget" hidden>
         <div class="today-program-left">
-          <div class="today-program-title" id="todayProgramTitle">Hoy | Programación</div>
+          <div class="today-program-title" id="todayProgramTitle">Programa | Hoy</div>
           <div class="today-program-subtitle" id="todayProgramTime"></div>
           <div class="today-program-hosts" id="todayProgramHosts"></div>
         </div>
@@ -417,7 +417,7 @@
         days: [0],
         start: "09:00",
         end: "11:00",
-        title: "Programación de domingo",
+        title: "Zona Fe",
         hosts: "José Crespin y Andre Jimenez"
       }
     ];
@@ -436,6 +436,11 @@
 
     function desactivarEstadoPlay() {
       playBtn.classList.remove("playing");
+    }
+
+    function timeToMinutes(time) {
+      const [hours, minutes] = time.split(":").map(Number);
+      return (hours * 60) + minutes;
     }
 
     function getNowParts() {
@@ -466,18 +471,8 @@
 
       return {
         day: dayMap[weekdayName],
-        time: timeString,
-        weekdayName
+        time: timeString
       };
-    }
-
-    function capitalizeDay(dayName) {
-      return dayName.charAt(0).toUpperCase() + dayName.slice(1);
-    }
-
-    function timeToMinutes(time) {
-      const [hours, minutes] = time.split(":").map(Number);
-      return (hours * 60) + minutes;
     }
 
     function getTodayPrograms() {
@@ -499,7 +494,6 @@
 
     function renderProgramacionDeHoy() {
       const programs = getTodayPrograms();
-      const { weekdayName } = getNowParts();
 
       if (!programs.length) {
         todayProgramWidget.hidden = true;
@@ -508,10 +502,9 @@
 
       const currentProgram = getCurrentProgram();
       const principal = currentProgram || programs[0];
-      const dayLabel = capitalizeDay(weekdayName);
 
       todayProgramWidget.hidden = false;
-      todayProgramTitle.textContent = `Hoy ${dayLabel} | ${principal.title}`;
+      todayProgramTitle.textContent = `${principal.title} | Hoy`;
       todayProgramTime.textContent = `${principal.start} a ${principal.end} hs`;
       todayProgramHosts.textContent = principal.hosts || "FM Apocalipsis 100.7";
     }
