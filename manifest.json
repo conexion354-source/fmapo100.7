@@ -1,13 +1,13 @@
 {
   "name": "FM Apocalipsis 100.7",
   "short_name": "Apocalipsis",
-  "description": "Radio cristiana online FM Apocalipsis 100.7 desde Santa Sylvina, Chaco.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#174f4b",
-  "theme_color": "#174f4b",
+  "background_color": "#2f5f5a",
+  "theme_color": "#2f5f5a",
   "orientation": "portrait",
+  "description": "FM Apocalipsis 100.7 - Radio cristiana online",
   "icons": [
     {
       "src": "icons/icon-192.png",
