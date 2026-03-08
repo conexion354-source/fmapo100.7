@@ -392,7 +392,7 @@
     const notifyBtn = document.getElementById("notifyBtn");
     const liveBadge = document.getElementById("liveBadge");
 
-    const STREAM_STATS_URL = "https://radios.solumedia.com:6322/status-json.xsl";
+    const STREAM_HOST = "https://radios.solumedia.com:6322";
     const APP_TIMEZONE = "America/Argentina/Buenos_Aires";
 
     let deferredPrompt = null;
@@ -576,59 +576,141 @@
       return "https://openweathermap.org/img/wn/02d@2x.png";
     }
 
-    function normalizeSourceData(sourceData) {
-      if (!sourceData) return [];
-      return Array.isArray(sourceData) ? sourceData : [sourceData];
+    function getFallbackStatusText() {
+      const currentProgram = getCurrentProgram();
+      return currentProgram ? currentProgram.title : "FM Apocalipsis en vivo";
     }
 
-    function pickMainSource(sources) {
-      if (!sources || !sources.length) return null;
+    function cleanMetadataText(text) {
+      if (!text) return "";
 
-      const withTitle = sources.find(source =>
-        source && (source.title || source.server_name || source.server_description)
-      );
+      let value = String(text).trim();
 
-      return withTitle || sources[0];
+      value = value.replace(/^current song[:\-\s]*/i, "");
+      value = value.replace(/^currentsong[:\-\s]*/i, "");
+      value = value.replace(/^song title[:\-\s]*/i, "");
+      value = value.replace(/^streamtitle[:\-\s]*/i, "");
+      value = value.replace(/^title[:\-\s]*/i, "");
+      value = value.replace(/<[^>]*>/g, "").trim();
+
+      if (!value) return "";
+      if (value.length > 120) return value.slice(0, 120).trim();
+
+      return value;
+    }
+
+    async function fetchText(url) {
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error("No se pudo leer " + url);
+      return await res.text();
+    }
+
+    async function fetchJson(url) {
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error("No se pudo leer " + url);
+      return await res.json();
+    }
+
+    function extractFromJson(data) {
+      if (!data) return "";
+
+      const directFields = [
+        data.title,
+        data.songtitle,
+        data.currentsong,
+        data.current_song,
+        data.song,
+        data.nowplaying,
+        data.now_playing
+      ];
+
+      for (const item of directFields) {
+        const cleaned = cleanMetadataText(item);
+        if (cleaned) return cleaned;
+      }
+
+      const nestedCandidates = [
+        data?.stats?.songtitle,
+        data?.stats?.title,
+        data?.streamstatus?.songtitle,
+        data?.streamstatus?.title,
+        data?.icestats?.source?.title
+      ];
+
+      for (const item of nestedCandidates) {
+        const cleaned = cleanMetadataText(item);
+        if (cleaned) return cleaned;
+      }
+
+      return "";
+    }
+
+    function extractFromText(text) {
+      if (!text) return "";
+
+      const cleanedFull = cleanMetadataText(text);
+      if (
+        cleanedFull &&
+        !cleanedFull.includes("{") &&
+        !cleanedFull.includes("[") &&
+        cleanedFull.length < 120
+      ) {
+        return cleanedFull;
+      }
+
+      const patterns = [
+        /StreamTitle='([^']+)'/i,
+        /"title"\s*:\s*"([^"]+)"/i,
+        /"songtitle"\s*:\s*"([^"]+)"/i,
+        /current song[:\s-]+(.+)/i,
+        /currentsong[:\s-]+(.+)/i,
+        /song title[:\s-]+(.+)/i
+      ];
+
+      for (const pattern of patterns) {
+        const match = text.match(pattern);
+        if (match && match[1]) {
+          const cleaned = cleanMetadataText(match[1]);
+          if (cleaned) return cleaned;
+        }
+      }
+
+      return "";
+    }
+
+    async function getStreamingMetadata() {
+      const attempts = [
+        async () => extractFromText(await fetchText(`${STREAM_HOST}/currentsong?sid=1`)),
+        async () => extractFromText(await fetchText(`${STREAM_HOST}/currentsong?sid=0`)),
+        async () => extractFromJson(await fetchJson(`${STREAM_HOST}/statistics?sid=1&json=1`)),
+        async () => extractFromJson(await fetchJson(`${STREAM_HOST}/statistics?sid=0&json=1`)),
+        async () => extractFromJson(await fetchJson(`${STREAM_HOST}/stats?sid=1&json=1`)),
+        async () => extractFromJson(await fetchJson(`${STREAM_HOST}/stats?sid=0&json=1`)),
+        async () => extractFromText(await fetchText(`${STREAM_HOST}/stats?sid=1`)),
+        async () => extractFromText(await fetchText(`${STREAM_HOST}/stats?sid=0`)),
+        async () => extractFromText(await fetchText(`${STREAM_HOST}/7.html`)),
+        async () => extractFromText(await fetchText(`${STREAM_HOST}/played?sid=1&type=json&count=1`)),
+        async () => extractFromText(await fetchText(`${STREAM_HOST}/played?sid=0&type=json&count=1`))
+      ];
+
+      for (const attempt of attempts) {
+        try {
+          const result = await attempt();
+          if (result) return result;
+        } catch (e) {}
+      }
+
+      return "";
     }
 
     async function cargarStatsRadio() {
-      const currentProgram = getCurrentProgram();
+      if (radio.paused) return;
 
       try {
-        const res = await fetch(STREAM_STATS_URL, { cache: "no-store" });
-        if (!res.ok) throw new Error("No se pudo cargar stats");
-
-        const data = await res.json();
-        const sources = normalizeSourceData(data?.icestats?.source);
-        const source = pickMainSource(sources);
-
-        if (!source) {
-          if (!radio.paused) {
-            statusEl.textContent = currentProgram
-              ? currentProgram.title
-              : "FM Apocalipsis en vivo";
-          }
-          return;
-        }
-
-        const nowPlaying =
-          source.title ||
-          source.server_description ||
-          source.server_name ||
-          "";
-
-        if (!radio.paused) {
-          statusEl.textContent =
-            nowPlaying && nowPlaying.trim() !== ""
-              ? nowPlaying
-              : (currentProgram ? currentProgram.title : "FM Apocalipsis en vivo");
-        }
+        const nowPlaying = await getStreamingMetadata();
+        statusEl.textContent = nowPlaying || getFallbackStatusText();
       } catch (error) {
-        if (!radio.paused) {
-          statusEl.textContent = currentProgram
-            ? currentProgram.title
-            : "FM Apocalipsis en vivo";
-        }
+        statusEl.textContent = getFallbackStatusText();
       }
     }
 
