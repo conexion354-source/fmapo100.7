@@ -427,6 +427,10 @@
       border: 1px solid rgba(255,255,255,.16);
       box-shadow: 0 10px 18px rgba(0,0,0,.14);
       flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .15s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease, opacity .2s ease;
     }
 
     .plus-btn {
@@ -435,14 +439,21 @@
     }
 
     .mini-bell-btn {
-      font-size: 1.05rem;
+      font-size: 1.15rem;
       font-weight: 700;
     }
 
+    .mini-bell-btn:hover,
+    .plus-btn:hover {
+      opacity: .96;
+      background: rgba(255,255,255,.18);
+    }
+
     .mini-bell-btn.enabled {
-      background: rgba(255, 59, 59, .18);
-      border-color: rgba(255, 95, 95, .32);
-      color: #ffd4d4;
+      background: linear-gradient(135deg, #ff8b8b, #ff5f5f);
+      border-color: rgba(255,255,255,.18);
+      color: #fff;
+      box-shadow: 0 12px 22px rgba(255, 95, 95, .28);
     }
 
     .plus-btn:active,
@@ -927,11 +938,11 @@
 
       if (!info) {
         todayProgramTitle.textContent = "Programación";
-        todayProgramTime.textContent = "Sin programa cargado para hoy";
+        todayProgramTime.textContent = "Consultá la programación semanal";
         todayProgramHosts.textContent = "FM Apocalipsis 100.7";
         todayProgramNote.textContent = "";
         todayProgramNote.style.display = "none";
-        programState.textContent = "Sin datos";
+        programState.textContent = "Próximo";
         programState.className = "program-state";
         return;
       }
@@ -1457,7 +1468,7 @@
     setInterval(() => {
       cargarDatosRemotos();
       maybeNotifyProgramStart();
-    }, 60000);
+    }, 15000);
 
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
