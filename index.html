@@ -450,10 +450,10 @@
     }
 
     .mini-bell-btn.enabled {
-      background: linear-gradient(135deg, #ff8b8b, #ff5f5f);
-      border-color: rgba(255,255,255,.18);
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.16);
       color: #fff;
-      box-shadow: 0 12px 22px rgba(255, 95, 95, .28);
+      box-shadow: 0 10px 18px rgba(0,0,0,.14);
     }
 
     .plus-btn:active,
@@ -898,15 +898,13 @@
 
       if (!programs.length) return null;
 
+      const suspensionActiva = haySuspensionActiva();
+
       const current = programs.find(programa => {
         const startMinutes = timeToMinutes(programa.start);
         const endMinutes = timeToMinutes(programa.end);
         return nowMinutes >= startMinutes && nowMinutes < endMinutes;
       });
-
-      const upcoming = programs.find(programa => nowMinutes < timeToMinutes(programa.start));
-      const lastFinished = programs[programs.length - 1];
-      const suspensionActiva = haySuspensionActiva();
 
       if (current) {
         return {
@@ -916,6 +914,7 @@
         };
       }
 
+      const upcoming = programs.find(programa => nowMinutes < timeToMinutes(programa.start));
       if (upcoming) {
         return {
           program: upcoming,
@@ -924,6 +923,7 @@
         };
       }
 
+      const lastFinished = programs[programs.length - 1];
       return {
         program: lastFinished,
         label: suspensionActiva ? "Suspendido" : "Finalizado",
@@ -937,7 +937,7 @@
       todayProgramWidget.hidden = false;
 
       if (!info) {
-        todayProgramTitle.textContent = "Programación";
+        todayProgramTitle.textContent = "Sin programa hoy";
         todayProgramTime.textContent = "Consultá la programación semanal";
         todayProgramHosts.textContent = "FM Apocalipsis 100.7";
         todayProgramNote.textContent = "";
@@ -1319,17 +1319,26 @@
 
     async function cargarDatosRemotos() {
       try {
-        const res = await fetch(SHEET_API_URL, { cache: "no-store" });
+        const res = await fetch(SHEET_API_URL + "?t=" + Date.now(), {
+          cache: "no-store"
+        });
+
         if (!res.ok) throw new Error("No se pudo cargar Google Sheet");
+
         const data = await res.json();
 
         const rawProgramacion = Array.isArray(data.programacion) ? data.programacion : [];
         const rawAvisos = Array.isArray(data.avisos) ? data.avisos : [];
 
         PROGRAMACION = rawProgramacion
-          .filter(item => String(item.dia || "").trim() !== "" && String(item.inicio || "").trim() !== "" && String(item.fin || "").trim() !== "")
+          .filter(item =>
+            String(item.dia || "").trim() !== "" &&
+            String(item.inicio || "").trim() !== "" &&
+            String(item.fin || "").trim() !== ""
+          )
           .map(item => {
             const dayNumber = diaTextoANumero(item.dia);
+
             return {
               id: String(item.id || "").trim(),
               days: typeof dayNumber === "number" ? [dayNumber] : [],
@@ -1357,7 +1366,7 @@
 
         renderAnnouncementButton();
       } catch (error) {
-        console.error(error);
+        console.error("Error cargando datos remotos:", error);
         renderProgramacionDeHoy();
       }
     }
