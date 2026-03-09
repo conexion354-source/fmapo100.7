@@ -67,7 +67,7 @@
       color: rgba(255,255,255,.92);
       border: 1px solid rgba(255,255,255,.14);
       box-shadow: 0 8px 18px rgba(0,0,0,.14);
-      transition: background .25s ease, color .25s ease, box-shadow .25s ease, border-color .25s ease, transform .15s ease;
+      transition: background .25s ease, color .25s ease, box-shadow .25s ease, border-color .25s ease, transform .15s ease, opacity .15s ease;
     }
 
     .live-badge {
@@ -77,6 +77,12 @@
     .share-btn-top {
       right: 16px;
       cursor: pointer;
+    }
+
+    .share-btn-top:hover {
+      opacity: .96;
+      background: rgba(255,255,255,.18);
+      box-shadow: 0 10px 20px rgba(0,0,0,.16);
     }
 
     .share-btn-top:active {
@@ -210,6 +216,11 @@
       box-shadow: 0 10px 18px rgba(0,0,0,.18);
     }
 
+    .btn:hover {
+      opacity: .97;
+      box-shadow: 0 12px 22px rgba(0,0,0,.2);
+    }
+
     .btn:active {
       transform: scale(.98);
     }
@@ -220,7 +231,7 @@
     }
 
     .btn-primary.playing {
-      background: linear-gradient(135deg, #ff8b8b, #ff5f5f);
+      background: linear-gradient(135deg, #ff5f5f, #ff2f2f);
       color: #fff;
       box-shadow: 0 12px 22px rgba(255, 95, 95, .32);
     }
@@ -284,12 +295,38 @@
       min-width: 0;
     }
 
+    .program-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
     .weather-main,
     .today-program-title {
       font-size: 15px;
       font-weight: 700;
       line-height: 1.4;
       color: #fff;
+    }
+
+    .program-state {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      background: rgba(255,255,255,.12);
+      color: rgba(255,255,255,.92);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+
+    .program-state.red {
+      background: rgba(255, 59, 59, .18);
+      color: #ffb0b0;
+      border-color: rgba(255, 95, 95, .32);
     }
 
     .weather-location,
@@ -300,8 +337,7 @@
       margin-top: 4px;
     }
 
-    .weather-right img,
-    .card-icon {
+    .weather-right img {
       width: 50px;
       height: 50px;
       object-fit: contain;
@@ -311,15 +347,11 @@
       flex-shrink: 0;
     }
 
-    .card-icon {
-      font-size: 1.55rem;
-    }
-
     .schedule-toggle {
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       border: 0;
-      border-radius: 12px;
+      border-radius: 14px;
       background: rgba(255,255,255,.16);
       color: #fff;
       font-size: 1.25rem;
@@ -327,7 +359,21 @@
       cursor: pointer;
       flex-shrink: 0;
       border: 1px solid rgba(255,255,255,.14);
-      box-shadow: 0 8px 18px rgba(0,0,0,.12);
+      box-shadow: 0 10px 18px rgba(0,0,0,.14);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .15s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+
+    .schedule-toggle:hover {
+      opacity: .96;
+      background: rgba(255,255,255,.18);
+      box-shadow: 0 12px 20px rgba(0,0,0,.16);
+    }
+
+    .schedule-toggle:active {
+      transform: scale(.97);
     }
 
     .schedule-list {
@@ -406,6 +452,13 @@
       color: #fff;
       border: 1px solid rgba(255,255,255,.14);
       box-shadow: 0 10px 18px rgba(0,0,0,.14);
+      transition: transform .15s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+
+    .notify-btn:hover {
+      opacity: .96;
+      background: rgba(255,255,255,.18);
+      box-shadow: 0 12px 20px rgba(0,0,0,.16);
     }
 
     .notify-btn[hidden] {
@@ -489,7 +542,10 @@
 
       <div class="today-program-widget" id="todayProgramWidget" hidden>
         <div class="today-program-left">
-          <div class="today-program-title" id="todayProgramTitle">Programa | Hoy</div>
+          <div class="program-header">
+            <div class="today-program-title" id="todayProgramTitle">Programa</div>
+            <span class="program-state" id="programState">Próximo</span>
+          </div>
           <div class="today-program-subtitle" id="todayProgramTime"></div>
           <div class="today-program-hosts" id="todayProgramHosts"></div>
         </div>
@@ -534,6 +590,7 @@
     const visualizer = document.getElementById("visualizer");
     const scheduleToggle = document.getElementById("scheduleToggle");
     const scheduleList = document.getElementById("scheduleList");
+    const programState = document.getElementById("programState");
 
     const STREAM_HOST = "https://radios.solumedia.com:6322";
     const APP_TIMEZONE = "America/Argentina/Buenos_Aires";
@@ -544,7 +601,14 @@
 
     const PROGRAMACION = [
       {
-        days: [1, 3],
+        days: [1],
+        start: "21:00",
+        end: "23:00",
+        title: "Zona Fe",
+        hosts: "Juan Alarcon y Mauro Polini"
+      },
+      {
+        days: [3],
         start: "21:00",
         end: "23:00",
         title: "Zona Fe",
@@ -555,13 +619,13 @@
         start: "20:00",
         end: "22:00",
         title: "Conectados",
-        hosts: "FM Apocalipsis 100.7"
+        hosts: "José Crespin y Andrea Jimenez"
       },
       {
         days: [6],
         start: "08:00",
         end: "10:00",
-        title: "Zona Fe",
+        title: "Zona Fe Magazine",
         hosts: "Juan Alarcon y Mauro Polini"
       },
       {
@@ -679,7 +743,7 @@
       }
 
       if (nowMinutes < startMinutes) {
-        return "Hoy";
+        return "Próximo";
       }
 
       return "Finalizado";
@@ -698,6 +762,10 @@
       return programs[programs.length - 1];
     }
 
+    function getStateClass(label) {
+      return (label === "Ahora" || label === "Finalizado") ? "red" : "";
+    }
+
     function renderProgramacionDeHoy() {
       const programs = getTodayPrograms();
 
@@ -711,31 +779,28 @@
       const label = getProgramLabel(principal);
 
       todayProgramWidget.hidden = false;
-      todayProgramTitle.textContent = `${principal.title}${label ? " | " + label : ""}`;
+      todayProgramTitle.textContent = principal.title;
       todayProgramTime.textContent = `${principal.start} a ${principal.end} hs`;
       todayProgramHosts.textContent = principal.hosts || "FM Apocalipsis 100.7";
+      programState.textContent = label || "Próximo";
+      programState.className = "program-state" + (getStateClass(label) ? ` ${getStateClass(label)}` : "");
 
       renderScheduleList();
     }
 
     function renderScheduleList() {
-      const items = PROGRAMACION.map(programa => {
-        const label = getProgramLabel(programa);
-        return `
-          <div class="schedule-item">
-            <div class="schedule-item-main">
-              <div class="schedule-item-title">
-                ${programa.title}${label ? " | " + label : ""}
-              </div>
-              <div class="schedule-item-sub">
-                ${programa.start} a ${programa.end} hs<br>
-                ${programa.hosts || "FM Apocalipsis 100.7"}
-              </div>
+      const items = PROGRAMACION.map(programa => `
+        <div class="schedule-item">
+          <div class="schedule-item-main">
+            <div class="schedule-item-title">${programa.title}</div>
+            <div class="schedule-item-sub">
+              ${programa.start} a ${programa.end} hs<br>
+              ${programa.hosts || "FM Apocalipsis 100.7"}
             </div>
-            <div class="schedule-item-day">${programa.days.map(day => DAY_NAMES[day]).join(" / ")}</div>
           </div>
-        `;
-      }).join("");
+          <div class="schedule-item-day">${programa.days.map(day => DAY_NAMES[day]).join(" / ")}</div>
+        </div>
+      `).join("");
 
       scheduleList.innerHTML = items;
     }
@@ -959,6 +1024,13 @@
 
       if (Notification.permission === "granted") {
         notifyBtn.textContent = notificationsEnabledByUser ? "🔔 Avisos activados" : "🔔 Activar avisos de programas";
+
+        notifyBtn.addEventListener("click", () => {
+          notificationsEnabledByUser = !notificationsEnabledByUser;
+          localStorage.setItem("fm_apocalipsis_notifications", notificationsEnabledByUser ? "on" : "off");
+          notifyBtn.textContent = notificationsEnabledByUser ? "🔔 Avisos activados" : "🔕 Avisos desactivados";
+        });
+
         return;
       }
 
@@ -980,14 +1052,6 @@
           }
         } catch (e) {}
       });
-
-      if (Notification.permission === "granted") {
-        notifyBtn.addEventListener("click", () => {
-          notificationsEnabledByUser = !notificationsEnabledByUser;
-          localStorage.setItem("fm_apocalipsis_notifications", notificationsEnabledByUser ? "on" : "off");
-          notifyBtn.textContent = notificationsEnabledByUser ? "🔔 Avisos activados" : "🔕 Avisos desactivados";
-        });
-      }
     }
 
     function initShareButton() {
