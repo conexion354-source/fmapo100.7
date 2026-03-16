@@ -77,6 +77,7 @@
     .share-btn-top {
       right: 16px;
       cursor: pointer;
+      border: 0;
     }
 
     .share-btn-top:hover {
@@ -155,6 +156,47 @@
       font-weight: 600;
     }
 
+    .song-info {
+      margin: 0 auto 14px;
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.14);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      text-align: center;
+    }
+
+    .song-info[hidden] {
+      display: none;
+    }
+
+    .song-label {
+      font-size: .82rem;
+      font-weight: 800;
+      letter-spacing: .03em;
+      color: rgba(255,255,255,.72);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .song-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    .song-artist {
+      margin-top: 4px;
+      font-size: .92rem;
+      color: rgba(255,255,255,.82);
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
     .visualizer {
       display: flex;
       align-items: flex-end;
@@ -214,6 +256,11 @@
       cursor: pointer;
       transition: transform .15s ease, opacity .15s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
       box-shadow: 0 10px 18px rgba(0,0,0,.18);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
     }
 
     .btn:hover {
@@ -257,11 +304,6 @@
     .full {
       width: 100%;
       margin-top: 10px;
-    }
-
-    .link-btn {
-      display: block;
-      text-decoration: none;
     }
 
     .hint {
@@ -502,6 +544,12 @@
 
       <div class="status" id="status">Listo para reproducir</div>
 
+      <div class="song-info" id="songInfo" hidden>
+        <div class="song-label">♪ Sonando ahora</div>
+        <div class="song-title" id="songTitle">--</div>
+        <div class="song-artist" id="songArtist">--</div>
+      </div>
+
       <div class="visualizer" id="visualizer" aria-hidden="true">
         <span></span>
         <span></span>
@@ -515,30 +563,26 @@
       </audio>
 
       <div class="controls">
-        <button class="btn btn-primary" id="playBtn">▶ Play</button>
-        <button class="btn btn-secondary" id="pauseBtn">⏸ Pausa</button>
+        <button class="btn btn-primary" id="playBtn" type="button">▶ Play</button>
+        <button class="btn btn-secondary" id="pauseBtn" type="button">⏸ Pausa</button>
       </div>
 
-      <button class="btn btn-primary full" id="installBtn" hidden>📲 Instalar App</button>
-      <button class="notify-btn" id="notifyBtn">🔔 Activar avisos de programas</button>
+      <button class="btn btn-primary full" id="installBtn" hidden type="button">📲 Instalar App</button>
+      <button class="notify-btn" id="notifyBtn" type="button">🔔 Activar avisos de programas</button>
 
       <a
-        class="link-btn"
+        class="btn btn-whatsapp full"
         href="https://chat.whatsapp.com/FQnkIaic0ZEKR5nYNmheOV?mode=hq2tswi"
         target="_blank"
         rel="noopener noreferrer"
-      >
-        <button class="btn btn-whatsapp full" type="button">💬 Unirse al grupo de WhatsApp</button>
-      </a>
+      >💬 Unirse al grupo de WhatsApp</a>
 
       <a
-        class="link-btn"
+        class="btn btn-youtube full"
         href="https://www.youtube.com/@zonafe"
         target="_blank"
         rel="noopener noreferrer"
-      >
-        <button class="btn btn-youtube full" type="button">▶ Mira Zona Fe en vivo</button>
-      </a>
+      >▶ Mira Zona Fe en vivo</a>
 
       <div class="today-program-widget" id="todayProgramWidget" hidden>
         <div class="today-program-left">
@@ -591,6 +635,9 @@
     const scheduleToggle = document.getElementById("scheduleToggle");
     const scheduleList = document.getElementById("scheduleList");
     const programState = document.getElementById("programState");
+    const songInfo = document.getElementById("songInfo");
+    const songTitle = document.getElementById("songTitle");
+    const songArtist = document.getElementById("songArtist");
 
     const STREAM_HOST = "https://radios.solumedia.com:6322";
     const APP_TIMEZONE = "America/Argentina/Buenos_Aires";
@@ -653,6 +700,25 @@
 
     function isInStandaloneMode() {
       return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    }
+
+    function updateInstallVisibility() {
+      if (isInStandaloneMode()) {
+        installBtn.hidden = true;
+        return;
+      }
+
+      if (deferredPrompt) {
+        installBtn.hidden = false;
+        return;
+      }
+
+      if (isIOS()) {
+        installBtn.hidden = false;
+        return;
+      }
+
+      installBtn.hidden = true;
     }
 
     function activarEstadoPlay() {
@@ -731,20 +797,13 @@
       const { day, time } = getNowParts();
       const nowMinutes = timeToMinutes(time);
 
-      if (!programa.days.includes(day)) {
-        return "";
-      }
+      if (!programa.days.includes(day)) return "";
 
       const startMinutes = timeToMinutes(programa.start);
       const endMinutes = timeToMinutes(programa.end);
 
-      if (nowMinutes >= startMinutes && nowMinutes < endMinutes) {
-        return "Ahora";
-      }
-
-      if (nowMinutes < startMinutes) {
-        return "Próximo";
-      }
+      if (nowMinutes >= startMinutes && nowMinutes < endMinutes) return "Ahora";
+      if (nowMinutes < startMinutes) return "Próximo";
 
       return "Finalizado";
     }
@@ -880,6 +939,39 @@
       return value;
     }
 
+    function parseSongData(text) {
+      const clean = cleanMetadataText(text);
+
+      if (!clean) {
+        return {
+          full: "",
+          artist: "",
+          title: ""
+        };
+      }
+
+      const separators = [" - ", " – ", " — ", " | "];
+
+      for (const sep of separators) {
+        if (clean.includes(sep)) {
+          const parts = clean.split(sep);
+          if (parts.length >= 2) {
+            return {
+              full: clean,
+              artist: parts[0].trim(),
+              title: parts.slice(1).join(sep).trim()
+            };
+          }
+        }
+      }
+
+      return {
+        full: clean,
+        artist: "",
+        title: clean
+      };
+    }
+
     async function fetchText(url) {
       const res = await fetch(url, { cache: "no-store" });
       if (!res.ok) throw new Error("No se pudo leer " + url);
@@ -989,9 +1081,20 @@
 
       try {
         const nowPlaying = await getStreamingMetadata();
-        statusEl.textContent = nowPlaying || getFallbackStatusText();
+        const parsed = parseSongData(nowPlaying);
+
+        statusEl.textContent = parsed.full || getFallbackStatusText();
+
+        if (parsed.full) {
+          songInfo.hidden = false;
+          songTitle.textContent = parsed.title || parsed.full;
+          songArtist.textContent = parsed.artist || "FM Apocalipsis 100.7";
+        } else {
+          songInfo.hidden = true;
+        }
       } catch (error) {
         statusEl.textContent = getFallbackStatusText();
+        songInfo.hidden = true;
       }
     }
 
@@ -1090,6 +1193,7 @@
         await radio.play();
       } catch (err) {
         statusEl.textContent = "No se pudo reproducir. Toca Play otra vez.";
+        songInfo.hidden = true;
         desactivarEstadoPlay();
         desactivarEnVivo();
       }
@@ -1098,6 +1202,7 @@
     pauseBtn.addEventListener("click", () => {
       radio.pause();
       statusEl.textContent = "Pausado";
+      songInfo.hidden = true;
       desactivarEstadoPlay();
       desactivarEnVivo();
     });
@@ -1115,6 +1220,7 @@
     radio.addEventListener("pause", () => {
       if (radio.paused) {
         statusEl.textContent = "Pausado";
+        songInfo.hidden = true;
         desactivarEstadoPlay();
         desactivarEnVivo();
       }
@@ -1124,10 +1230,12 @@
       desactivarEstadoPlay();
       desactivarEnVivo();
       statusEl.textContent = "Finalizado";
+      songInfo.hidden = true;
     });
 
     radio.addEventListener("error", () => {
       statusEl.textContent = "Error al cargar el audio";
+      songInfo.hidden = true;
       desactivarEstadoPlay();
       desactivarEnVivo();
     });
@@ -1135,18 +1243,27 @@
     window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      installBtn.hidden = false;
       installHint.textContent = "";
+      updateInstallVisibility();
     });
 
     installBtn.addEventListener("click", async () => {
+      if (isInStandaloneMode()) {
+        installBtn.hidden = true;
+        return;
+      }
+
       if (deferredPrompt) {
         deferredPrompt.prompt();
         try {
-          await deferredPrompt.userChoice;
+          const choiceResult = await deferredPrompt.userChoice;
+          if (choiceResult.outcome === "accepted") {
+            installHint.textContent = "Instalación iniciada";
+          }
         } catch (e) {}
+
         deferredPrompt = null;
-        installBtn.hidden = true;
+        updateInstallVisibility();
         return;
       }
 
@@ -1159,20 +1276,21 @@
     });
 
     window.addEventListener("appinstalled", () => {
+      deferredPrompt = null;
       installBtn.hidden = true;
       installHint.textContent = "App instalada correctamente";
     });
-
-    if (isIOS() && !isInStandaloneMode()) {
-      installBtn.hidden = false;
-      installHint.textContent = "En iPhone se instala desde Compartir → Añadir a pantalla de inicio";
-    }
 
     cargarClima();
     renderProgramacionDeHoy();
     initNotificationButton();
     initShareButton();
     maybeNotifyProgramStart();
+    updateInstallVisibility();
+
+    if (isIOS() && !isInStandaloneMode()) {
+      installHint.textContent = "En iPhone se instala desde Compartir → Añadir a pantalla de inicio";
+    }
 
     setInterval(cargarClima, 600000);
     setInterval(() => {
