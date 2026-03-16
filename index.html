@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FM Apocalipsis 100.7</title>
 
-  <meta name="theme-color" content="#2f5f5a" />
+  <meta name="theme-color" content="#2f5f5a" id="themeColorMeta" />
   <meta name="description" content="FM Apocalipsis 100.7 - La voz que viene de lo Alto" />
 
   <link rel="manifest" href="manifest.json" />
@@ -15,6 +15,56 @@
   <style>
     * { box-sizing: border-box; }
 
+    :root {
+      --bg-main-start: #3f736d;
+      --bg-main-end: #2f5f5a;
+      --text-main: #ffffff;
+      --text-soft: rgba(255,255,255,.82);
+      --text-dim: rgba(255,255,255,.78);
+      --card-bg: rgba(255,255,255,0.12);
+      --card-border: rgba(255,255,255,0.22);
+      --soft-box: rgba(255,255,255,0.10);
+      --soft-border: rgba(255,255,255,0.14);
+      --soft-button: rgba(255,255,255,.16);
+      --primary-btn-bg: rgba(255,255,255,.92);
+      --primary-btn-text: #173531;
+      --secondary-btn-bg: rgba(255,255,255,.18);
+      --secondary-btn-text: #fff;
+      --status-text: #eaf7f4;
+      --program-default-bg: rgba(255,255,255,.12);
+      --program-default-text: rgba(255,255,255,.92);
+      --program-default-border: rgba(255,255,255,.12);
+      --shadow-strong: rgba(0,0,0,.22);
+      --shadow-soft: rgba(0,0,0,.14);
+      --inner-highlight: rgba(255,255,255,.18);
+      --theme-color: #2f5f5a;
+    }
+
+    body.dark-mode {
+      --bg-main-start: #12181b;
+      --bg-main-end: #0b1013;
+      --text-main: #f4f7f8;
+      --text-soft: rgba(244,247,248,.84);
+      --text-dim: rgba(244,247,248,.72);
+      --card-bg: rgba(18,24,27,0.72);
+      --card-border: rgba(255,255,255,0.08);
+      --soft-box: rgba(255,255,255,0.06);
+      --soft-border: rgba(255,255,255,0.09);
+      --soft-button: rgba(255,255,255,.10);
+      --primary-btn-bg: #f4f7f8;
+      --primary-btn-text: #0f171a;
+      --secondary-btn-bg: rgba(255,255,255,.09);
+      --secondary-btn-text: #f4f7f8;
+      --status-text: #dce7ea;
+      --program-default-bg: rgba(255,255,255,.08);
+      --program-default-text: rgba(244,247,248,.92);
+      --program-default-border: rgba(255,255,255,.10);
+      --shadow-strong: rgba(0,0,0,.42);
+      --shadow-soft: rgba(0,0,0,.24);
+      --inner-highlight: rgba(255,255,255,.06);
+      --theme-color: #10181b;
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -22,12 +72,13 @@
       background:
         radial-gradient(circle at top left, rgba(255,255,255,.18), transparent 30%),
         radial-gradient(circle at top right, rgba(255,255,255,.08), transparent 25%),
-        linear-gradient(180deg, #3f736d 0%, #2f5f5a 100%);
+        linear-gradient(180deg, var(--bg-main-start) 0%, var(--bg-main-end) 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
-      color: #fff;
+      color: var(--text-main);
+      transition: background .25s ease, color .25s ease;
     }
 
     .app {
@@ -37,19 +88,21 @@
 
     .player {
       position: relative;
-      background: rgba(255,255,255,0.12);
+      background: var(--card-bg);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(255,255,255,0.22);
+      border: 1px solid var(--card-border);
       border-radius: 30px;
       padding: 20px;
       box-shadow:
-        0 12px 35px rgba(0,0,0,.22),
-        inset 0 1px 0 rgba(255,255,255,.18);
+        0 12px 35px var(--shadow-strong),
+        inset 0 1px 0 var(--inner-highlight);
+      transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
     }
 
     .live-badge,
-    .share-btn-top {
+    .share-btn-top,
+    .theme-btn-top {
       position: absolute;
       top: 16px;
       display: inline-flex;
@@ -63,10 +116,10 @@
       z-index: 2;
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      background: rgba(255,255,255,.16);
-      color: rgba(255,255,255,.92);
-      border: 1px solid rgba(255,255,255,.14);
-      box-shadow: 0 8px 18px rgba(0,0,0,.14);
+      background: var(--soft-button);
+      color: var(--program-default-text);
+      border: 1px solid var(--soft-border);
+      box-shadow: 0 8px 18px var(--shadow-soft);
       transition: background .25s ease, color .25s ease, box-shadow .25s ease, border-color .25s ease, transform .15s ease, opacity .15s ease;
     }
 
@@ -80,13 +133,21 @@
       border: 0;
     }
 
-    .share-btn-top:hover {
-      opacity: .96;
-      background: rgba(255,255,255,.18);
-      box-shadow: 0 10px 20px rgba(0,0,0,.16);
+    .theme-btn-top {
+      right: 16px;
+      top: 58px;
+      cursor: pointer;
+      border: 0;
     }
 
-    .share-btn-top:active {
+    .share-btn-top:hover,
+    .theme-btn-top:hover {
+      opacity: .96;
+      box-shadow: 0 10px 20px var(--shadow-soft);
+    }
+
+    .share-btn-top:active,
+    .theme-btn-top:active {
       transform: scale(.97);
     }
 
@@ -122,7 +183,7 @@
       display: flex;
       justify-content: center;
       margin-bottom: 12px;
-      margin-top: 22px;
+      margin-top: 58px;
     }
 
     .logo {
@@ -143,7 +204,7 @@
     .subtitle {
       text-align: center;
       margin: 6px 0 14px;
-      color: rgba(255,255,255,.82);
+      color: var(--text-soft);
       font-size: .98rem;
     }
 
@@ -151,7 +212,7 @@
       text-align: center;
       margin-bottom: 10px;
       font-size: .95rem;
-      color: #eaf7f4;
+      color: var(--status-text);
       min-height: 22px;
       font-weight: 600;
     }
@@ -160,8 +221,8 @@
       margin: 0 auto 14px;
       padding: 14px 16px;
       border-radius: 20px;
-      background: rgba(255,255,255,0.10);
-      border: 1px solid rgba(255,255,255,0.14);
+      background: var(--soft-box);
+      border: 1px solid var(--soft-border);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
@@ -176,7 +237,7 @@
       font-size: .82rem;
       font-weight: 800;
       letter-spacing: .03em;
-      color: rgba(255,255,255,.72);
+      color: var(--text-dim);
       margin-bottom: 6px;
       text-transform: uppercase;
     }
@@ -184,7 +245,7 @@
     .song-title {
       font-size: 1rem;
       font-weight: 800;
-      color: #fff;
+      color: var(--text-main);
       line-height: 1.35;
       word-break: break-word;
     }
@@ -192,7 +253,7 @@
     .song-artist {
       margin-top: 4px;
       font-size: .92rem;
-      color: rgba(255,255,255,.82);
+      color: var(--text-soft);
       line-height: 1.35;
       word-break: break-word;
     }
@@ -273,8 +334,8 @@
     }
 
     .btn-primary {
-      background: rgba(255,255,255,.92);
-      color: #173531;
+      background: var(--primary-btn-bg);
+      color: var(--primary-btn-text);
     }
 
     .btn-primary.playing {
@@ -284,9 +345,9 @@
     }
 
     .btn-secondary {
-      background: rgba(255,255,255,.18);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,.18);
+      background: var(--secondary-btn-bg);
+      color: var(--secondary-btn-text);
+      border: 1px solid var(--soft-border);
     }
 
     .btn-whatsapp {
@@ -308,7 +369,7 @@
 
     .hint {
       text-align: center;
-      color: rgba(255,255,255,.78);
+      color: var(--text-dim);
       font-size: .88rem;
       margin-top: 12px;
       min-height: 18px;
@@ -324,8 +385,8 @@
       margin-top: 12px;
       padding: 14px 16px;
       border-radius: 20px;
-      background: rgba(255,255,255,0.10);
-      border: 1px solid rgba(255,255,255,0.14);
+      background: var(--soft-box);
+      border: 1px solid var(--soft-border);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
@@ -349,7 +410,7 @@
       font-size: 15px;
       font-weight: 700;
       line-height: 1.4;
-      color: #fff;
+      color: var(--text-main);
     }
 
     .program-state {
@@ -360,9 +421,9 @@
       border-radius: 999px;
       font-size: 12px;
       font-weight: 800;
-      background: rgba(255,255,255,.12);
-      color: rgba(255,255,255,.92);
-      border: 1px solid rgba(255,255,255,.12);
+      background: var(--program-default-bg);
+      color: var(--program-default-text);
+      border: 1px solid var(--program-default-border);
     }
 
     .program-state.red {
@@ -400,14 +461,14 @@
       height: 40px;
       border: 0;
       border-radius: 14px;
-      background: rgba(255,255,255,.16);
-      color: #fff;
+      background: var(--soft-button);
+      color: var(--text-main);
       font-size: 1.25rem;
       font-weight: 800;
       cursor: pointer;
       flex-shrink: 0;
-      border: 1px solid rgba(255,255,255,.14);
-      box-shadow: 0 10px 18px rgba(0,0,0,.14);
+      border: 1px solid var(--soft-border);
+      box-shadow: 0 10px 18px var(--shadow-soft);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -416,8 +477,7 @@
 
     .schedule-toggle:hover {
       opacity: .96;
-      background: rgba(255,255,255,.18);
-      box-shadow: 0 12px 20px rgba(0,0,0,.16);
+      box-shadow: 0 12px 20px var(--shadow-soft);
     }
 
     .schedule-toggle:active {
@@ -455,21 +515,21 @@
     .schedule-item-title {
       font-size: .96rem;
       font-weight: 700;
-      color: #fff;
+      color: var(--text-main);
       line-height: 1.35;
     }
 
     .schedule-item-sub {
       margin-top: 4px;
       font-size: .86rem;
-      color: rgba(255,255,255,.78);
+      color: var(--text-dim);
       line-height: 1.4;
     }
 
     .schedule-item-day {
       font-size: .82rem;
       font-weight: 700;
-      color: rgba(255,255,255,.84);
+      color: var(--text-soft);
       background: rgba(255,255,255,.10);
       border: 1px solid rgba(255,255,255,.10);
       border-radius: 999px;
@@ -496,17 +556,16 @@
       font-size: .95rem;
       font-weight: 700;
       cursor: pointer;
-      background: rgba(255,255,255,.14);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,.14);
-      box-shadow: 0 10px 18px rgba(0,0,0,.14);
+      background: var(--soft-button);
+      color: var(--text-main);
+      border: 1px solid var(--soft-border);
+      box-shadow: 0 10px 18px var(--shadow-soft);
       transition: transform .15s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
     }
 
     .notify-btn:hover {
       opacity: .96;
-      background: rgba(255,255,255,.18);
-      box-shadow: 0 12px 20px rgba(0,0,0,.16);
+      box-shadow: 0 12px 20px var(--shadow-soft);
     }
 
     .notify-btn[hidden] {
@@ -515,13 +574,18 @@
 
     @media (max-width: 430px) {
       .live-badge,
-      .share-btn-top {
-        font-size: .76rem;
+      .share-btn-top,
+      .theme-btn-top {
+        font-size: .74rem;
         padding: 7px 10px;
       }
 
+      .theme-btn-top {
+        top: 56px;
+      }
+
       .logo-wrap {
-        margin-top: 26px;
+        margin-top: 68px;
       }
 
       .logo {
@@ -540,6 +604,7 @@
       </div>
 
       <button class="share-btn-top" id="shareBtn" type="button">🔗 Compartir</button>
+      <button class="theme-btn-top" id="themeBtn" type="button">🌙 Oscuro</button>
 
       <div class="logo-wrap">
         <img src="logo.png" alt="FM Apocalipsis 100.7" class="logo" />
@@ -637,6 +702,7 @@
     const notifyBtn = document.getElementById("notifyBtn");
     const liveBadge = document.getElementById("liveBadge");
     const shareBtn = document.getElementById("shareBtn");
+    const themeBtn = document.getElementById("themeBtn");
     const visualizer = document.getElementById("visualizer");
     const scheduleToggle = document.getElementById("scheduleToggle");
     const scheduleList = document.getElementById("scheduleList");
@@ -644,6 +710,7 @@
     const songInfo = document.getElementById("songInfo");
     const songTitle = document.getElementById("songTitle");
     const songArtist = document.getElementById("songArtist");
+    const themeColorMeta = document.getElementById("themeColorMeta");
 
     const STREAM_HOST = "https://radios.solumedia.com:6322";
     const APP_TIMEZONE = "America/Argentina/Buenos_Aires";
@@ -707,6 +774,34 @@
     function isInStandaloneMode() {
       return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
     }
+
+    function applyTheme(mode) {
+      if (mode === "dark") {
+        document.body.classList.add("dark-mode");
+        themeBtn.textContent = "☀️ Claro";
+        themeColorMeta.setAttribute("content", "#10181b");
+        localStorage.setItem("fm_apocalipsis_theme", "dark");
+      } else {
+        document.body.classList.remove("dark-mode");
+        themeBtn.textContent = "🌙 Oscuro";
+        themeColorMeta.setAttribute("content", "#2f5f5a");
+        localStorage.setItem("fm_apocalipsis_theme", "light");
+      }
+    }
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem("fm_apocalipsis_theme");
+      if (savedTheme === "dark") {
+        applyTheme("dark");
+      } else {
+        applyTheme("light");
+      }
+    }
+
+    themeBtn.addEventListener("click", () => {
+      const isDark = document.body.classList.contains("dark-mode");
+      applyTheme(isDark ? "light" : "dark");
+    });
 
     function updateInstallVisibility() {
       const isStandalone =
@@ -1302,6 +1397,7 @@
     });
 
     window.addEventListener("DOMContentLoaded", () => {
+      initTheme();
       updateInstallVisibility();
     });
 
