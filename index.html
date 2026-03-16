@@ -371,6 +371,12 @@
       border-color: rgba(255, 95, 95, .32);
     }
 
+    .program-state.orange {
+      background: rgba(255, 160, 60, 0.25);
+      color: #ffc27a;
+      border-color: rgba(255, 160, 60, 0.45);
+    }
+
     .weather-location,
     .today-program-subtitle,
     .today-program-hosts {
@@ -703,21 +709,30 @@
     }
 
     function updateInstallVisibility() {
-      if (isInStandaloneMode()) {
+      const isStandalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone === true;
+
+      if (isStandalone) {
+        installBtn.style.display = "none";
         installBtn.hidden = true;
+        installHint.textContent = "";
         return;
       }
 
       if (deferredPrompt) {
         installBtn.hidden = false;
+        installBtn.style.display = "block";
         return;
       }
 
       if (isIOS()) {
         installBtn.hidden = false;
+        installBtn.style.display = "block";
         return;
       }
 
+      installBtn.style.display = "none";
       installBtn.hidden = true;
     }
 
@@ -822,7 +837,10 @@
     }
 
     function getStateClass(label) {
-      return (label === "Ahora" || label === "Finalizado") ? "red" : "";
+      if (label === "Ahora") return "red";
+      if (label === "Próximo") return "orange";
+      if (label === "Finalizado") return "red";
+      return "";
     }
 
     function renderProgramacionDeHoy() {
@@ -1249,6 +1267,7 @@
 
     installBtn.addEventListener("click", async () => {
       if (isInStandaloneMode()) {
+        installBtn.style.display = "none";
         installBtn.hidden = true;
         return;
       }
@@ -1277,8 +1296,23 @@
 
     window.addEventListener("appinstalled", () => {
       deferredPrompt = null;
+      installBtn.style.display = "none";
       installBtn.hidden = true;
       installHint.textContent = "App instalada correctamente";
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      updateInstallVisibility();
+    });
+
+    window.addEventListener("focus", () => {
+      updateInstallVisibility();
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        updateInstallVisibility();
+      }
     });
 
     cargarClima();
@@ -1301,6 +1335,7 @@
     setInterval(() => {
       renderProgramacionDeHoy();
       maybeNotifyProgramStart();
+      updateInstallVisibility();
     }, 60000);
 
     if ("serviceWorker" in navigator) {
