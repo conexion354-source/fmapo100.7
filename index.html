@@ -38,6 +38,14 @@
       --shadow-soft: rgba(0,0,0,.14);
       --inner-highlight: rgba(255,255,255,.18);
       --theme-color: #2f5f5a;
+      --danger-bg: rgba(255, 90, 90, .18);
+      --danger-border: rgba(255, 120, 120, .28);
+      --danger-text: #ffd0d0;
+      --event-bg: rgba(255, 170, 70, .18);
+      --event-border: rgba(255, 190, 90, .30);
+      --event-text: #ffe2ad;
+      --badge-bg: #ff4b4b;
+      --badge-text: #ffffff;
     }
 
     body.dark-mode {
@@ -63,6 +71,14 @@
       --shadow-soft: rgba(0,0,0,.24);
       --inner-highlight: rgba(255,255,255,.06);
       --theme-color: #10181b;
+      --danger-bg: rgba(255, 90, 90, .16);
+      --danger-border: rgba(255, 120, 120, .22);
+      --danger-text: #ffd3d3;
+      --event-bg: rgba(255, 170, 70, .16);
+      --event-border: rgba(255, 190, 90, .24);
+      --event-text: #ffe1a8;
+      --badge-bg: #ff5555;
+      --badge-text: #ffffff;
     }
 
     body {
@@ -123,10 +139,7 @@
       transition: background .25s ease, color .25s ease, box-shadow .25s ease, border-color .25s ease, transform .15s ease, opacity .15s ease;
     }
 
-    .live-badge {
-      left: 16px;
-    }
-
+    .live-badge { left: 16px; }
     .share-btn-top {
       right: 16px;
       cursor: pointer;
@@ -147,9 +160,7 @@
     }
 
     .share-btn-top:active,
-    .theme-btn-top:active {
-      transform: scale(.97);
-    }
+    .theme-btn-top:active { transform: scale(.97); }
 
     .live-badge.active {
       background: linear-gradient(135deg, #ff5f5f, #ff2f2f);
@@ -217,6 +228,68 @@
       font-weight: 600;
     }
 
+    .featured-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .featured-card {
+      border-radius: 20px;
+      padding: 14px 16px;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      border: 1px solid;
+    }
+
+    .featured-card[hidden] { display: none; }
+
+    .featured-card.notice {
+      background: var(--danger-bg);
+      border-color: var(--danger-border);
+    }
+
+    .featured-card.event {
+      background: var(--event-bg);
+      border-color: var(--event-border);
+    }
+
+    .featured-label {
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      opacity: .92;
+    }
+
+    .featured-card.notice .featured-label,
+    .featured-card.notice .featured-title,
+    .featured-card.notice .featured-sub {
+      color: var(--danger-text);
+    }
+
+    .featured-card.event .featured-label,
+    .featured-card.event .featured-title,
+    .featured-card.event .featured-sub {
+      color: var(--event-text);
+    }
+
+    .featured-title {
+      font-size: 1rem;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .featured-sub {
+      margin-top: 4px;
+      font-size: .9rem;
+      line-height: 1.4;
+      opacity: .96;
+    }
+
     .song-info {
       margin: 0 auto 14px;
       padding: 14px 16px;
@@ -229,9 +302,7 @@
       text-align: center;
     }
 
-    .song-info[hidden] {
-      display: none;
-    }
+    .song-info[hidden] { display: none; }
 
     .song-label {
       font-size: .82rem;
@@ -269,9 +340,7 @@
       transition: opacity .25s ease;
     }
 
-    .visualizer.active {
-      opacity: 1;
-    }
+    .visualizer.active { opacity: 1; }
 
     .visualizer span {
       width: 4px;
@@ -284,10 +353,7 @@
       box-shadow: 0 0 10px rgba(255,255,255,.14);
     }
 
-    .visualizer.active span {
-      animation-play-state: running;
-    }
-
+    .visualizer.active span { animation-play-state: running; }
     .visualizer span:nth-child(1) { animation-delay: 0s; }
     .visualizer span:nth-child(2) { animation-delay: .12s; }
     .visualizer span:nth-child(3) { animation-delay: .24s; }
@@ -329,9 +395,7 @@
       box-shadow: 0 12px 22px rgba(0,0,0,.2);
     }
 
-    .btn:active {
-      transform: scale(.98);
-    }
+    .btn:active { transform: scale(.98); }
 
     .btn-primary {
       background: var(--primary-btn-bg);
@@ -438,6 +502,12 @@
       border-color: rgba(255, 160, 60, 0.45);
     }
 
+    .program-state.gray {
+      background: rgba(255,255,255,.10);
+      color: rgba(255,255,255,.82);
+      border-color: rgba(255,255,255,.14);
+    }
+
     .weather-location,
     .today-program-subtitle,
     .today-program-hosts {
@@ -480,18 +550,14 @@
       box-shadow: 0 12px 20px var(--shadow-soft);
     }
 
-    .schedule-toggle:active {
-      transform: scale(.97);
-    }
+    .schedule-toggle:active { transform: scale(.97); }
 
     .schedule-list {
       display: block;
       padding: 14px;
     }
 
-    .schedule-list[hidden] {
-      display: none;
-    }
+    .schedule-list[hidden] { display: none; }
 
     .schedule-item {
       display: flex;
@@ -543,9 +609,7 @@
       opacity: 0.7;
     }
 
-    .today-program-widget[hidden] {
-      display: none;
-    }
+    .today-program-widget[hidden] { display: none; }
 
     .notify-btn {
       margin-top: 10px;
@@ -568,8 +632,229 @@
       box-shadow: 0 12px 20px var(--shadow-soft);
     }
 
-    .notify-btn[hidden] {
-      display: none;
+    .notify-btn[hidden] { display: none; }
+
+    .footer-nav {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .footer-nav-btn {
+      position: relative;
+      border: 1px solid var(--soft-border);
+      background: var(--soft-button);
+      color: var(--text-main);
+      border-radius: 18px;
+      padding: 12px 10px;
+      font-size: .94rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 18px var(--shadow-soft);
+      transition: transform .15s ease, opacity .2s ease, box-shadow .2s ease;
+    }
+
+    .footer-nav-btn:hover {
+      opacity: .96;
+      box-shadow: 0 12px 20px var(--shadow-soft);
+    }
+
+    .footer-nav-btn:active { transform: scale(.98); }
+
+    .footer-badge {
+      position: absolute;
+      top: -6px;
+      right: -4px;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      font-size: .75rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(255,255,255,.18);
+      box-shadow: 0 6px 14px rgba(0,0,0,.22);
+    }
+
+    .footer-badge[hidden] { display: none; }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 10, 14, .52);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 50;
+    }
+
+    .modal[hidden] { display: none; }
+
+    .modal-card {
+      width: 100%;
+      max-width: 420px;
+      max-height: 85vh;
+      overflow-y: auto;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 26px;
+      padding: 18px;
+      box-shadow: 0 16px 40px var(--shadow-strong);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .modal-title {
+      margin: 0 0 6px;
+      font-size: 1.18rem;
+      font-weight: 800;
+    }
+
+    .modal-subtitle {
+      margin: 0 0 14px;
+      font-size: .92rem;
+      color: var(--text-soft);
+      line-height: 1.45;
+    }
+
+    .modal-section {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: .88rem;
+      font-weight: 700;
+      color: var(--text-soft);
+    }
+
+    .field,
+    .select,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--soft-border);
+      background: rgba(255,255,255,.10);
+      color: var(--text-main);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-size: .95rem;
+      outline: none;
+    }
+
+    .textarea {
+      min-height: 95px;
+      resize: vertical;
+      font-family: inherit;
+    }
+
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .single-action {
+      margin-top: 12px;
+    }
+
+    .small-btn {
+      border: 0;
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-size: .94rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 18px rgba(0,0,0,.18);
+    }
+
+    .small-btn.primary {
+      background: var(--primary-btn-bg);
+      color: var(--primary-btn-text);
+    }
+
+    .small-btn.secondary {
+      background: var(--secondary-btn-bg);
+      color: var(--secondary-btn-text);
+      border: 1px solid var(--soft-border);
+    }
+
+    .list-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .list-card {
+      border-radius: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--soft-border);
+      background: var(--soft-box);
+    }
+
+    .list-card.notice {
+      background: var(--danger-bg);
+      border-color: var(--danger-border);
+    }
+
+    .list-card.event {
+      background: var(--event-bg);
+      border-color: var(--event-border);
+    }
+
+    .list-card-title {
+      font-size: .95rem;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .list-card-sub {
+      margin-top: 4px;
+      font-size: .88rem;
+      line-height: 1.4;
+      color: var(--text-soft);
+    }
+
+    .list-card-meta {
+      margin-top: 8px;
+      font-size: .78rem;
+      color: var(--text-dim);
+    }
+
+    .list-card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .mini-btn {
+      border: 1px solid var(--soft-border);
+      background: rgba(255,255,255,.10);
+      color: var(--text-main);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: .82rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .empty-text {
+      font-size: .9rem;
+      color: var(--text-dim);
+      text-align: center;
+      padding: 12px 6px 2px;
     }
 
     @media (max-width: 430px) {
@@ -580,14 +865,8 @@
         padding: 7px 10px;
       }
 
-      .theme-btn-top {
-        top: 56px;
-      }
-
-      .logo-wrap {
-        margin-top: 68px;
-      }
-
+      .theme-btn-top { top: 56px; }
+      .logo-wrap { margin-top: 68px; }
       .logo {
         width: 138px;
         max-width: 68%;
@@ -614,6 +893,20 @@
       <p class="subtitle">La voz que viene de lo Alto</p>
 
       <div class="status" id="status">Listo para reproducir</div>
+
+      <div class="featured-stack">
+        <div class="featured-card notice" id="featuredNotice" hidden>
+          <div class="featured-label">📢 Aviso destacado</div>
+          <div class="featured-title" id="featuredNoticeTitle"></div>
+          <div class="featured-sub" id="featuredNoticeSub"></div>
+        </div>
+
+        <div class="featured-card event" id="featuredEvent" hidden>
+          <div class="featured-label">📅 Próximo evento</div>
+          <div class="featured-title" id="featuredEventTitle"></div>
+          <div class="featured-sub" id="featuredEventSub"></div>
+        </div>
+      </div>
 
       <div class="song-info" id="songInfo" hidden>
         <div class="song-label">♪ Sonando ahora</div>
@@ -684,7 +977,117 @@
         </div>
       </div>
 
+      <div class="footer-nav">
+        <button class="footer-nav-btn" id="openAvisosBtn" type="button">
+          📢 Avisos
+          <span class="footer-badge" id="avisosBadge" hidden>0</span>
+        </button>
+
+        <button class="footer-nav-btn" id="openEventosBtn" type="button">
+          📅 Eventos
+          <span class="footer-badge" id="eventosBadge" hidden>0</span>
+        </button>
+
+        <button class="footer-nav-btn" id="openAdminBtn" type="button">
+          🔐 Admin
+        </button>
+      </div>
+
       <div class="hint" id="installHint"></div>
+    </div>
+  </div>
+
+  <!-- Modal Avisos -->
+  <div class="modal" id="avisosModal" hidden>
+    <div class="modal-card">
+      <h2 class="modal-title">Avisos</h2>
+      <p class="modal-subtitle">Aquí se muestran los avisos activos publicados desde administración.</p>
+      <div class="list-stack" id="avisosList"></div>
+      <div class="single-action">
+        <button class="small-btn secondary" id="closeAvisosBtn" type="button">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Eventos -->
+  <div class="modal" id="eventosModal" hidden>
+    <div class="modal-card">
+      <h2 class="modal-title">Eventos</h2>
+      <p class="modal-subtitle">Aquí se muestran los eventos cargados para la audiencia.</p>
+      <div class="list-stack" id="eventosList"></div>
+      <div class="single-action">
+        <button class="small-btn secondary" id="closeEventosBtn" type="button">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Login Admin -->
+  <div class="modal" id="adminLoginModal" hidden>
+    <div class="modal-card">
+      <h2 class="modal-title">Ingreso administrador</h2>
+      <p class="modal-subtitle">Ingresa la contraseña para publicar avisos y eventos.</p>
+
+      <label class="field-label" for="adminPassword">Contraseña</label>
+      <input class="field" id="adminPassword" type="password" placeholder="Ingresa la contraseña" />
+
+      <div class="modal-actions">
+        <button class="small-btn primary" id="adminLoginBtn" type="button">Ingresar</button>
+        <button class="small-btn secondary" id="closeAdminLoginBtn" type="button">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Panel Admin -->
+  <div class="modal" id="adminPanelModal" hidden>
+    <div class="modal-card">
+      <h2 class="modal-title">Panel administrador</h2>
+      <p class="modal-subtitle">Desde aquí puedes publicar avisos y eventos sin romper la estética de la app.</p>
+
+      <div class="modal-section" style="margin-top:0;padding-top:0;border-top:0;">
+        <label class="field-label" for="presetNotice">Avisos preestablecidos</label>
+        <select class="select" id="presetNotice">
+          <option value="">Selecciona un aviso...</option>
+          <option value="Zona Fe · Programación suspendida">Zona Fe · Programación suspendida</option>
+          <option value="Conectados · Programación suspendida">Conectados · Programación suspendida</option>
+          <option value="Radio fuera de servicio por problemas climáticos">Radio fuera de servicio por problemas climáticos</option>
+          <option value="Transmisión temporalmente interrumpida">Transmisión temporalmente interrumpida</option>
+          <option value="Programación especial en curso">Programación especial en curso</option>
+        </select>
+
+        <label class="field-label" for="customNoticeText" style="margin-top:12px;">Detalle del aviso</label>
+        <textarea class="textarea" id="customNoticeText" placeholder="Ejemplo: Hoy no habrá emisión en vivo por mantenimiento técnico."></textarea>
+
+        <div class="modal-actions">
+          <button class="small-btn primary" id="publishNoticeBtn" type="button">Publicar aviso</button>
+          <button class="small-btn secondary" id="clearNoticesBtn" type="button">Borrar avisos</button>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <label class="field-label" for="eventDate">Día del evento</label>
+        <input class="field" id="eventDate" type="text" placeholder="Ejemplo: Miércoles" />
+
+        <label class="field-label" for="eventTime" style="margin-top:12px;">Hora</label>
+        <input class="field" id="eventTime" type="text" placeholder="Ejemplo: 21:30" />
+
+        <label class="field-label" for="eventTitle" style="margin-top:12px;">Título del evento</label>
+        <input class="field" id="eventTitle" type="text" placeholder="Ejemplo: Noche de adoración" />
+
+        <label class="field-label" for="eventDescription" style="margin-top:12px;">Detalle</label>
+        <textarea class="textarea" id="eventDescription" placeholder="Ejemplo: Te esperamos en una noche especial de alabanza y adoración."></textarea>
+
+        <div class="modal-actions">
+          <button class="small-btn primary" id="publishEventBtn" type="button">Publicar evento</button>
+          <button class="small-btn secondary" id="clearEventsBtn" type="button">Borrar eventos</button>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <div class="modal-actions">
+          <button class="small-btn secondary" id="adminLogoutBtn" type="button">Salir</button>
+          <button class="small-btn secondary" id="closeAdminPanelBtn" type="button">Cerrar</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -712,49 +1115,63 @@
     const songArtist = document.getElementById("songArtist");
     const themeColorMeta = document.getElementById("themeColorMeta");
 
+    const featuredNotice = document.getElementById("featuredNotice");
+    const featuredNoticeTitle = document.getElementById("featuredNoticeTitle");
+    const featuredNoticeSub = document.getElementById("featuredNoticeSub");
+    const featuredEvent = document.getElementById("featuredEvent");
+    const featuredEventTitle = document.getElementById("featuredEventTitle");
+    const featuredEventSub = document.getElementById("featuredEventSub");
+
+    const openAvisosBtn = document.getElementById("openAvisosBtn");
+    const openEventosBtn = document.getElementById("openEventosBtn");
+    const openAdminBtn = document.getElementById("openAdminBtn");
+    const avisosBadge = document.getElementById("avisosBadge");
+    const eventosBadge = document.getElementById("eventosBadge");
+
+    const avisosModal = document.getElementById("avisosModal");
+    const eventosModal = document.getElementById("eventosModal");
+    const adminLoginModal = document.getElementById("adminLoginModal");
+    const adminPanelModal = document.getElementById("adminPanelModal");
+
+    const closeAvisosBtn = document.getElementById("closeAvisosBtn");
+    const closeEventosBtn = document.getElementById("closeEventosBtn");
+    const closeAdminLoginBtn = document.getElementById("closeAdminLoginBtn");
+    const closeAdminPanelBtn = document.getElementById("closeAdminPanelBtn");
+
+    const avisosList = document.getElementById("avisosList");
+    const eventosList = document.getElementById("eventosList");
+
+    const adminPassword = document.getElementById("adminPassword");
+    const adminLoginBtn = document.getElementById("adminLoginBtn");
+    const adminLogoutBtn = document.getElementById("adminLogoutBtn");
+
+    const presetNotice = document.getElementById("presetNotice");
+    const customNoticeText = document.getElementById("customNoticeText");
+    const publishNoticeBtn = document.getElementById("publishNoticeBtn");
+    const clearNoticesBtn = document.getElementById("clearNoticesBtn");
+
+    const eventDate = document.getElementById("eventDate");
+    const eventTime = document.getElementById("eventTime");
+    const eventTitle = document.getElementById("eventTitle");
+    const eventDescription = document.getElementById("eventDescription");
+    const publishEventBtn = document.getElementById("publishEventBtn");
+    const clearEventsBtn = document.getElementById("clearEventsBtn");
+
     const STREAM_HOST = "https://radios.solumedia.com:6322";
     const APP_TIMEZONE = "America/Argentina/Buenos_Aires";
+    const ADMIN_PASSWORD = "apo1234";
 
     let deferredPrompt = null;
     let lastProgramNotificationKey = "";
     let notificationsEnabledByUser = false;
+    let adminLoggedIn = false;
 
     const PROGRAMACION = [
-      {
-        days: [1],
-        start: "21:00",
-        end: "23:00",
-        title: "Zona Fe",
-        hosts: "Juan Alarcon y Mauro Polini"
-      },
-      {
-        days: [3],
-        start: "21:00",
-        end: "23:00",
-        title: "Zona Fe",
-        hosts: "Juan Alarcon y Mauro Polini"
-      },
-      {
-        days: [5],
-        start: "20:00",
-        end: "22:00",
-        title: "Conectados",
-        hosts: "José Crespin y Andrea Jimenez"
-      },
-      {
-        days: [6],
-        start: "08:00",
-        end: "10:00",
-        title: "Zona Fe Magazine",
-        hosts: "Juan Alarcon y Mauro Polini"
-      },
-      {
-        days: [0],
-        start: "09:00",
-        end: "11:00",
-        title: "Conectados",
-        hosts: "José Crespin y Andrea Jimenez"
-      }
+      { days: [1], start: "21:00", end: "23:00", title: "Zona Fe", hosts: "Juan Alarcon y Mauro Polini" },
+      { days: [3], start: "21:00", end: "23:00", title: "Zona Fe", hosts: "Juan Alarcon y Mauro Polini" },
+      { days: [5], start: "20:00", end: "22:00", title: "Conectados", hosts: "José Crespin y Andrea Jimenez" },
+      { days: [6], start: "08:00", end: "10:00", title: "Zona Fe Magazine", hosts: "Juan Alarcon y Mauro Polini" },
+      { days: [0], start: "09:00", end: "11:00", title: "Conectados", hosts: "José Crespin y Andrea Jimenez" }
     ];
 
     const DAY_NAMES = {
@@ -791,11 +1208,7 @@
 
     function initTheme() {
       const savedTheme = localStorage.getItem("fm_apocalipsis_theme");
-      if (savedTheme === "dark") {
-        applyTheme("dark");
-      } else {
-        applyTheme("light");
-      }
+      applyTheme(savedTheme === "dark" ? "dark" : "light");
     }
 
     themeBtn.addEventListener("click", () => {
@@ -804,11 +1217,7 @@
     });
 
     function updateInstallVisibility() {
-      const isStandalone =
-        window.matchMedia("(display-mode: standalone)").matches ||
-        window.navigator.standalone === true;
-
-      if (isStandalone) {
+      if (isInStandaloneMode()) {
         installBtn.style.display = "none";
         installBtn.hidden = true;
         installHint.textContent = "";
@@ -856,6 +1265,7 @@
 
     function getNowParts() {
       const now = new Date();
+
       const weekdayName = new Intl.DateTimeFormat("es-AR", {
         timeZone: APP_TIMEZONE,
         weekday: "long"
@@ -888,7 +1298,9 @@
 
     function getTodayPrograms() {
       const { day } = getNowParts();
-      return PROGRAMACION.filter(programa => programa.days.includes(day));
+      return PROGRAMACION
+        .filter(programa => programa.days.includes(day))
+        .sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
     }
 
     function getCurrentProgram() {
@@ -914,7 +1326,6 @@
 
       if (nowMinutes >= startMinutes && nowMinutes < endMinutes) return "Ahora";
       if (nowMinutes < startMinutes) return "Próximo";
-
       return "Finalizado";
     }
 
@@ -924,17 +1335,16 @@
 
       const { time } = getNowParts();
       const nowMinutes = timeToMinutes(time);
-
       const upcoming = programs.find(programa => timeToMinutes(programa.start) > nowMinutes);
-      if (upcoming) return upcoming;
 
+      if (upcoming) return upcoming;
       return programs[programs.length - 1];
     }
 
     function getStateClass(label) {
       if (label === "Ahora") return "red";
       if (label === "Próximo") return "orange";
-      if (label === "Finalizado") return "red";
+      if (label === "Finalizado") return "gray";
       return "";
     }
 
@@ -961,7 +1371,14 @@
     }
 
     function renderScheduleList() {
-      const items = PROGRAMACION.map(programa => `
+      const orderedPrograms = [...PROGRAMACION].sort((a, b) => {
+        const dayA = Math.min(...a.days);
+        const dayB = Math.min(...b.days);
+        if (dayA !== dayB) return dayA - dayB;
+        return timeToMinutes(a.start) - timeToMinutes(b.start);
+      });
+
+      const items = orderedPrograms.map(programa => `
         <div class="schedule-item">
           <div class="schedule-item-main">
             <div class="schedule-item-title">${programa.title}</div>
@@ -981,8 +1398,8 @@
       try {
         const lat = -27.83;
         const lon = -61.13;
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`;
-        const res = await fetch(url);
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=${encodeURIComponent(APP_TIMEZONE)}`;
+        const res = await fetch(url, { cache: "no-store" });
         const data = await res.json();
 
         if (!data.current) return;
@@ -1017,7 +1434,6 @@
         82: "Chubascos fuertes",
         95: "Tormenta"
       };
-
       return clima[code] || "Clima actualizado";
     }
 
@@ -1038,7 +1454,6 @@
       if (!text) return "";
 
       let value = String(text).trim();
-
       value = value.replace(/^current song[:\-\s]*/i, "");
       value = value.replace(/^currentsong[:\-\s]*/i, "");
       value = value.replace(/^song title[:\-\s]*/i, "");
@@ -1056,11 +1471,7 @@
       const clean = cleanMetadataText(text);
 
       if (!clean) {
-        return {
-          full: "",
-          artist: "",
-          title: ""
-        };
+        return { full: "", artist: "", title: "" };
       }
 
       const separators = [" - ", " – ", " — ", " | "];
@@ -1078,11 +1489,7 @@
         }
       }
 
-      return {
-        full: clean,
-        artist: "",
-        title: clean
-      };
+      return { full: clean, artist: "", title: clean };
     }
 
     async function fetchText(url) {
@@ -1211,6 +1618,27 @@
       }
     }
 
+    function updateNotificationButtonText() {
+      if (!("Notification" in window)) {
+        notifyBtn.hidden = true;
+        return;
+      }
+
+      if (Notification.permission === "granted") {
+        notifyBtn.textContent = notificationsEnabledByUser
+          ? "🔔 Avisos activados"
+          : "🔕 Avisos desactivados";
+        return;
+      }
+
+      if (Notification.permission === "denied") {
+        notifyBtn.textContent = "🔕 Avisos bloqueados";
+        return;
+      }
+
+      notifyBtn.textContent = "🔔 Activar avisos de programas";
+    }
+
     function maybeNotifyProgramStart() {
       const currentProgram = getCurrentProgram();
       if (!currentProgram) return;
@@ -1234,39 +1662,39 @@
         return;
       }
 
-      if (localStorage.getItem("fm_apocalipsis_notifications") === "on") {
-        notificationsEnabledByUser = true;
-      }
-
-      if (Notification.permission === "granted") {
-        notifyBtn.textContent = notificationsEnabledByUser ? "🔔 Avisos activados" : "🔔 Activar avisos de programas";
-
-        notifyBtn.addEventListener("click", () => {
-          notificationsEnabledByUser = !notificationsEnabledByUser;
-          localStorage.setItem("fm_apocalipsis_notifications", notificationsEnabledByUser ? "on" : "off");
-          notifyBtn.textContent = notificationsEnabledByUser ? "🔔 Avisos activados" : "🔕 Avisos desactivados";
-        });
-
-        return;
-      }
-
-      if (Notification.permission === "denied") {
-        notifyBtn.textContent = "🔕 Avisos bloqueados";
-        return;
-      }
+      notificationsEnabledByUser = localStorage.getItem("fm_apocalipsis_notifications") === "on";
+      updateNotificationButtonText();
 
       notifyBtn.addEventListener("click", async () => {
-        try {
-          const permission = await Notification.requestPermission();
-          if (permission === "granted") {
-            notificationsEnabledByUser = true;
-            localStorage.setItem("fm_apocalipsis_notifications", "on");
-            notifyBtn.textContent = "🔔 Avisos activados";
-            maybeNotifyProgramStart();
-          } else if (permission === "denied") {
-            notifyBtn.textContent = "🔕 Avisos bloqueados";
-          }
-        } catch (e) {}
+        if (Notification.permission === "denied") {
+          updateNotificationButtonText();
+          return;
+        }
+
+        if (Notification.permission === "default") {
+          try {
+            const permission = await Notification.requestPermission();
+            if (permission === "granted") {
+              notificationsEnabledByUser = true;
+              localStorage.setItem("fm_apocalipsis_notifications", "on");
+              updateNotificationButtonText();
+              maybeNotifyProgramStart();
+            } else {
+              notificationsEnabledByUser = false;
+              localStorage.setItem("fm_apocalipsis_notifications", "off");
+              updateNotificationButtonText();
+            }
+          } catch (e) {}
+          return;
+        }
+
+        notificationsEnabledByUser = !notificationsEnabledByUser;
+        localStorage.setItem("fm_apocalipsis_notifications", notificationsEnabledByUser ? "on" : "off");
+        updateNotificationButtonText();
+
+        if (notificationsEnabledByUser) {
+          maybeNotifyProgramStart();
+        }
       });
     }
 
@@ -1293,6 +1721,245 @@
         } catch (e) {}
       });
     }
+
+    function getAvisos() {
+      try {
+        return JSON.parse(localStorage.getItem("fm_apocalipsis_avisos") || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function setAvisos(data) {
+      localStorage.setItem("fm_apocalipsis_avisos", JSON.stringify(data));
+    }
+
+    function getEventos() {
+      try {
+        return JSON.parse(localStorage.getItem("fm_apocalipsis_eventos") || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function setEventos(data) {
+      localStorage.setItem("fm_apocalipsis_eventos", JSON.stringify(data));
+    }
+
+    function getReadCounts() {
+      try {
+        return JSON.parse(localStorage.getItem("fm_apocalipsis_reads") || '{"avisos":0,"eventos":0}');
+      } catch {
+        return { avisos: 0, eventos: 0 };
+      }
+    }
+
+    function setReadCounts(data) {
+      localStorage.setItem("fm_apocalipsis_reads", JSON.stringify(data));
+    }
+
+    function formatDateTimeForAdmin() {
+      const now = new Date();
+      return new Intl.DateTimeFormat("es-AR", {
+        timeZone: APP_TIMEZONE,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(now);
+    }
+
+    function openModal(modal) {
+      modal.hidden = false;
+    }
+
+    function closeModal(modal) {
+      modal.hidden = true;
+    }
+
+    function closeAllModals() {
+      [avisosModal, eventosModal, adminLoginModal, adminPanelModal].forEach(m => m.hidden = true);
+    }
+
+    function updateBadges() {
+      const avisos = getAvisos();
+      const eventos = getEventos();
+      const reads = getReadCounts();
+
+      const unreadAvisos = Math.max(avisos.length - (reads.avisos || 0), 0);
+      const unreadEventos = Math.max(eventos.length - (reads.eventos || 0), 0);
+
+      avisosBadge.hidden = unreadAvisos <= 0;
+      eventosBadge.hidden = unreadEventos <= 0;
+
+      if (unreadAvisos > 0) avisosBadge.textContent = unreadAvisos;
+      if (unreadEventos > 0) eventosBadge.textContent = unreadEventos;
+    }
+
+    function renderFeatured() {
+      const avisos = getAvisos();
+      const eventos = getEventos();
+
+      if (avisos.length) {
+        const latestNotice = avisos[0];
+        featuredNotice.hidden = false;
+        featuredNoticeTitle.textContent = latestNotice.title;
+        featuredNoticeSub.textContent = latestNotice.description || "Aviso activo para la audiencia";
+      } else {
+        featuredNotice.hidden = true;
+      }
+
+      if (eventos.length) {
+        const latestEvent = eventos[0];
+        featuredEvent.hidden = false;
+        featuredEventTitle.textContent = latestEvent.title;
+        featuredEventSub.textContent = `${latestEvent.date} · ${latestEvent.time}${latestEvent.description ? " · " + latestEvent.description : ""}`;
+      } else {
+        featuredEvent.hidden = true;
+      }
+    }
+
+    function renderAvisosList() {
+      const avisos = getAvisos();
+
+      if (!avisos.length) {
+        avisosList.innerHTML = `<div class="empty-text">No hay avisos publicados.</div>`;
+        return;
+      }
+
+      avisosList.innerHTML = avisos.map((item, index) => `
+        <div class="list-card notice">
+          <div class="list-card-title">${item.title}</div>
+          <div class="list-card-sub">${item.description || "Aviso activo"}</div>
+          <div class="list-card-meta">Publicado: ${item.createdAt}</div>
+          ${adminLoggedIn ? `
+            <div class="list-card-actions">
+              <button class="mini-btn" type="button" onclick="deleteAviso(${index})">Eliminar</button>
+            </div>
+          ` : ``}
+        </div>
+      `).join("");
+    }
+
+    function renderEventosList() {
+      const eventos = getEventos();
+
+      if (!eventos.length) {
+        eventosList.innerHTML = `<div class="empty-text">No hay eventos publicados.</div>`;
+        return;
+      }
+
+      eventosList.innerHTML = eventos.map((item, index) => `
+        <div class="list-card event">
+          <div class="list-card-title">${item.title}</div>
+          <div class="list-card-sub">${item.date} · ${item.time}</div>
+          <div class="list-card-sub">${item.description || "Evento especial FM Apocalipsis"}</div>
+          <div class="list-card-meta">Publicado: ${item.createdAt}</div>
+          ${adminLoggedIn ? `
+            <div class="list-card-actions">
+              <button class="mini-btn" type="button" onclick="deleteEvento(${index})">Eliminar</button>
+            </div>
+          ` : ``}
+        </div>
+      `).join("");
+    }
+
+    function markAvisosAsRead() {
+      const reads = getReadCounts();
+      reads.avisos = getAvisos().length;
+      setReadCounts(reads);
+      updateBadges();
+    }
+
+    function markEventosAsRead() {
+      const reads = getReadCounts();
+      reads.eventos = getEventos().length;
+      setReadCounts(reads);
+      updateBadges();
+    }
+
+    function publishNotice() {
+      const preset = presetNotice.value.trim();
+      const detail = customNoticeText.value.trim();
+
+      if (!preset && !detail) {
+        alert("Debes seleccionar un aviso o escribir un detalle.");
+        return;
+      }
+
+      const title = preset || "Aviso importante";
+      const description = detail || "Sin detalle adicional";
+
+      const avisos = getAvisos();
+      avisos.unshift({
+        title,
+        description,
+        createdAt: formatDateTimeForAdmin()
+      });
+
+      setAvisos(avisos);
+      presetNotice.value = "";
+      customNoticeText.value = "";
+
+      renderAvisosList();
+      renderFeatured();
+      updateBadges();
+      alert("Aviso publicado correctamente.");
+    }
+
+    function publishEvent() {
+      const date = eventDate.value.trim();
+      const time = eventTime.value.trim();
+      const title = eventTitle.value.trim();
+      const description = eventDescription.value.trim();
+
+      if (!date || !time || !title) {
+        alert("Completa día, hora y título del evento.");
+        return;
+      }
+
+      const eventos = getEventos();
+      eventos.unshift({
+        date,
+        time,
+        title,
+        description,
+        createdAt: formatDateTimeForAdmin()
+      });
+
+      setEventos(eventos);
+      eventDate.value = "";
+      eventTime.value = "";
+      eventTitle.value = "";
+      eventDescription.value = "";
+
+      renderEventosList();
+      renderFeatured();
+      updateBadges();
+      alert("Evento publicado correctamente.");
+    }
+
+    function deleteAviso(index) {
+      const avisos = getAvisos();
+      avisos.splice(index, 1);
+      setAvisos(avisos);
+      renderAvisosList();
+      renderFeatured();
+      updateBadges();
+    }
+
+    function deleteEvento(index) {
+      const eventos = getEventos();
+      eventos.splice(index, 1);
+      setEventos(eventos);
+      renderEventosList();
+      renderFeatured();
+      updateBadges();
+    }
+
+    window.deleteAviso = deleteAviso;
+    window.deleteEvento = deleteEvento;
 
     scheduleToggle.addEventListener("click", () => {
       const isHidden = scheduleList.hidden;
@@ -1396,42 +2063,130 @@
       installHint.textContent = "App instalada correctamente";
     });
 
+    openAvisosBtn.addEventListener("click", () => {
+      renderAvisosList();
+      openModal(avisosModal);
+      markAvisosAsRead();
+    });
+
+    openEventosBtn.addEventListener("click", () => {
+      renderEventosList();
+      openModal(eventosModal);
+      markEventosAsRead();
+    });
+
+    openAdminBtn.addEventListener("click", () => {
+      if (adminLoggedIn) {
+        openModal(adminPanelModal);
+      } else {
+        adminPassword.value = "";
+        openModal(adminLoginModal);
+      }
+    });
+
+    closeAvisosBtn.addEventListener("click", () => closeModal(avisosModal));
+    closeEventosBtn.addEventListener("click", () => closeModal(eventosModal));
+    closeAdminLoginBtn.addEventListener("click", () => closeModal(adminLoginModal));
+    closeAdminPanelBtn.addEventListener("click", () => closeModal(adminPanelModal));
+
+    adminLoginBtn.addEventListener("click", () => {
+      if (adminPassword.value === ADMIN_PASSWORD) {
+        adminLoggedIn = true;
+        closeModal(adminLoginModal);
+        openModal(adminPanelModal);
+      } else {
+        alert("Contraseña incorrecta.");
+      }
+    });
+
+    adminLogoutBtn.addEventListener("click", () => {
+      adminLoggedIn = false;
+      closeModal(adminPanelModal);
+    });
+
+    publishNoticeBtn.addEventListener("click", publishNotice);
+    publishEventBtn.addEventListener("click", publishEvent);
+
+    clearNoticesBtn.addEventListener("click", () => {
+      if (confirm("¿Eliminar todos los avisos?")) {
+        setAvisos([]);
+        const reads = getReadCounts();
+        reads.avisos = 0;
+        setReadCounts(reads);
+        renderAvisosList();
+        renderFeatured();
+        updateBadges();
+      }
+    });
+
+    clearEventsBtn.addEventListener("click", () => {
+      if (confirm("¿Eliminar todos los eventos?")) {
+        setEventos([]);
+        const reads = getReadCounts();
+        reads.eventos = 0;
+        setReadCounts(reads);
+        renderEventosList();
+        renderFeatured();
+        updateBadges();
+      }
+    });
+
+    [avisosModal, eventosModal, adminLoginModal, adminPanelModal].forEach(modal => {
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          closeModal(modal);
+        }
+      });
+    });
+
     window.addEventListener("DOMContentLoaded", () => {
       initTheme();
       updateInstallVisibility();
+      renderProgramacionDeHoy();
+      cargarClima();
+      initNotificationButton();
+      initShareButton();
+      maybeNotifyProgramStart();
+      renderFeatured();
+      renderAvisosList();
+      renderEventosList();
+      updateBadges();
+
+      if (isIOS() && !isInStandaloneMode()) {
+        installHint.textContent = "En iPhone se instala desde Compartir → Añadir a pantalla de inicio";
+      }
     });
 
     window.addEventListener("focus", () => {
       updateInstallVisibility();
+      renderProgramacionDeHoy();
+      renderFeatured();
+      updateBadges();
     });
 
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden) {
         updateInstallVisibility();
+        renderProgramacionDeHoy();
+        renderFeatured();
+        updateBadges();
       }
     });
 
-    cargarClima();
-    renderProgramacionDeHoy();
-    initNotificationButton();
-    initShareButton();
-    maybeNotifyProgramStart();
-    updateInstallVisibility();
-
-    if (isIOS() && !isInStandaloneMode()) {
-      installHint.textContent = "En iPhone se instala desde Compartir → Añadir a pantalla de inicio";
-    }
-
     setInterval(cargarClima, 600000);
+
     setInterval(() => {
       if (!radio.paused) {
         cargarStatsRadio();
       }
     }, 30000);
+
     setInterval(() => {
       renderProgramacionDeHoy();
       maybeNotifyProgramStart();
       updateInstallVisibility();
+      renderFeatured();
+      updateBadges();
     }, 60000);
 
     if ("serviceWorker" in navigator) {
