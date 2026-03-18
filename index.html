@@ -140,6 +140,7 @@
     }
 
     .live-badge { left: 16px; }
+
     .share-btn-top {
       right: 16px;
       cursor: pointer;
@@ -857,6 +858,12 @@
       padding: 12px 6px 2px;
     }
 
+    .admin-status {
+      margin-top: 10px;
+      font-size: .86rem;
+      color: var(--text-soft);
+    }
+
     @media (max-width: 430px) {
       .live-badge,
       .share-btn-top,
@@ -915,11 +922,7 @@
       </div>
 
       <div class="visualizer" id="visualizer" aria-hidden="true">
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span><span></span><span></span>
       </div>
 
       <audio id="radio" preload="none" playsinline>
@@ -997,7 +1000,6 @@
     </div>
   </div>
 
-  <!-- Modal Avisos -->
   <div class="modal" id="avisosModal" hidden>
     <div class="modal-card">
       <h2 class="modal-title">Avisos</h2>
@@ -1009,7 +1011,6 @@
     </div>
   </div>
 
-  <!-- Modal Eventos -->
   <div class="modal" id="eventosModal" hidden>
     <div class="modal-card">
       <h2 class="modal-title">Eventos</h2>
@@ -1021,14 +1022,16 @@
     </div>
   </div>
 
-  <!-- Modal Login Admin -->
   <div class="modal" id="adminLoginModal" hidden>
     <div class="modal-card">
       <h2 class="modal-title">Ingreso administrador</h2>
-      <p class="modal-subtitle">Ingresa la contraseña para publicar avisos y eventos.</p>
+      <p class="modal-subtitle">Ingresa el usuario y contraseña de Firebase.</p>
 
-      <label class="field-label" for="adminPassword">Contraseña</label>
-      <input class="field" id="adminPassword" type="password" placeholder="Ingresa la contraseña" />
+      <label class="field-label" for="adminEmail">Correo</label>
+      <input class="field" id="adminEmail" type="email" value="fm100.7@admin.com" placeholder="Correo administrador" />
+
+      <label class="field-label" for="adminPassword" style="margin-top:12px;">Contraseña</label>
+      <input class="field" id="adminPassword" type="password" placeholder="Contraseña" />
 
       <div class="modal-actions">
         <button class="small-btn primary" id="adminLoginBtn" type="button">Ingresar</button>
@@ -1037,13 +1040,13 @@
     </div>
   </div>
 
-  <!-- Modal Panel Admin -->
   <div class="modal" id="adminPanelModal" hidden>
     <div class="modal-card">
       <h2 class="modal-title">Panel administrador</h2>
-      <p class="modal-subtitle">Desde aquí puedes publicar avisos y eventos sin romper la estética de la app.</p>
+      <p class="modal-subtitle">Publica avisos y eventos para todos los usuarios en tiempo real.</p>
+      <div class="admin-status" id="adminStatusText"></div>
 
-      <div class="modal-section" style="margin-top:0;padding-top:0;border-top:0;">
+      <div class="modal-section" style="margin-top:12px;">
         <label class="field-label" for="presetNotice">Avisos preestablecidos</label>
         <select class="select" id="presetNotice">
           <option value="">Selecciona un aviso...</option>
@@ -1074,7 +1077,7 @@
         <input class="field" id="eventTitle" type="text" placeholder="Ejemplo: Noche de adoración" />
 
         <label class="field-label" for="eventDescription" style="margin-top:12px;">Detalle</label>
-        <textarea class="textarea" id="eventDescription" placeholder="Ejemplo: Te esperamos en una noche especial de alabanza y adoración."></textarea>
+        <textarea class="textarea" id="eventDescription" placeholder="Ejemplo: Te esperamos para compartir juntos."></textarea>
 
         <div class="modal-actions">
           <button class="small-btn primary" id="publishEventBtn" type="button">Publicar evento</button>
@@ -1091,7 +1094,41 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      deleteDoc,
+      doc,
+      onSnapshot,
+      query,
+      orderBy,
+      serverTimestamp,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA7B7nGT2KED6dY48ZOXNFWfDI9Ev9RY48",
+      authDomain: "radioadmin-b5491.firebaseapp.com",
+      projectId: "radioadmin-b5491",
+      storageBucket: "radioadmin-b5491.firebasestorage.app",
+      messagingSenderId: "834356965308",
+      appId: "1:834356965308:web:8f66245b4b106d59f445b9",
+      measurementId: "G-XH8FGYGYX6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
     const radio = document.getElementById("radio");
     const statusEl = document.getElementById("status");
     const playBtn = document.getElementById("playBtn");
@@ -1141,9 +1178,11 @@
     const avisosList = document.getElementById("avisosList");
     const eventosList = document.getElementById("eventosList");
 
+    const adminEmail = document.getElementById("adminEmail");
     const adminPassword = document.getElementById("adminPassword");
     const adminLoginBtn = document.getElementById("adminLoginBtn");
     const adminLogoutBtn = document.getElementById("adminLogoutBtn");
+    const adminStatusText = document.getElementById("adminStatusText");
 
     const presetNotice = document.getElementById("presetNotice");
     const customNoticeText = document.getElementById("customNoticeText");
@@ -1159,12 +1198,14 @@
 
     const STREAM_HOST = "https://radios.solumedia.com:6322";
     const APP_TIMEZONE = "America/Argentina/Buenos_Aires";
-    const ADMIN_PASSWORD = "apo1234";
 
     let deferredPrompt = null;
     let lastProgramNotificationKey = "";
     let notificationsEnabledByUser = false;
     let adminLoggedIn = false;
+
+    let avisosData = [];
+    let eventosData = [];
 
     const PROGRAMACION = [
       { days: [1], start: "21:00", end: "23:00", title: "Zona Fe", hosts: "Juan Alarcon y Mauro Polini" },
@@ -1470,9 +1511,7 @@
     function parseSongData(text) {
       const clean = cleanMetadataText(text);
 
-      if (!clean) {
-        return { full: "", artist: "", title: "" };
-      }
+      if (!clean) return { full: "", artist: "", title: "" };
 
       const separators = [" - ", " – ", " — ", " | "];
 
@@ -1722,30 +1761,6 @@
       });
     }
 
-    function getAvisos() {
-      try {
-        return JSON.parse(localStorage.getItem("fm_apocalipsis_avisos") || "[]");
-      } catch {
-        return [];
-      }
-    }
-
-    function setAvisos(data) {
-      localStorage.setItem("fm_apocalipsis_avisos", JSON.stringify(data));
-    }
-
-    function getEventos() {
-      try {
-        return JSON.parse(localStorage.getItem("fm_apocalipsis_eventos") || "[]");
-      } catch {
-        return [];
-      }
-    }
-
-    function setEventos(data) {
-      localStorage.setItem("fm_apocalipsis_eventos", JSON.stringify(data));
-    }
-
     function getReadCounts() {
       try {
         return JSON.parse(localStorage.getItem("fm_apocalipsis_reads") || '{"avisos":0,"eventos":0}');
@@ -1758,18 +1773,6 @@
       localStorage.setItem("fm_apocalipsis_reads", JSON.stringify(data));
     }
 
-    function formatDateTimeForAdmin() {
-      const now = new Date();
-      return new Intl.DateTimeFormat("es-AR", {
-        timeZone: APP_TIMEZONE,
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit"
-      }).format(now);
-    }
-
     function openModal(modal) {
       modal.hidden = false;
     }
@@ -1778,17 +1781,10 @@
       modal.hidden = true;
     }
 
-    function closeAllModals() {
-      [avisosModal, eventosModal, adminLoginModal, adminPanelModal].forEach(m => m.hidden = true);
-    }
-
     function updateBadges() {
-      const avisos = getAvisos();
-      const eventos = getEventos();
       const reads = getReadCounts();
-
-      const unreadAvisos = Math.max(avisos.length - (reads.avisos || 0), 0);
-      const unreadEventos = Math.max(eventos.length - (reads.eventos || 0), 0);
+      const unreadAvisos = Math.max(avisosData.length - (reads.avisos || 0), 0);
+      const unreadEventos = Math.max(eventosData.length - (reads.eventos || 0), 0);
 
       avisosBadge.hidden = unreadAvisos <= 0;
       eventosBadge.hidden = unreadEventos <= 0;
@@ -1798,88 +1794,111 @@
     }
 
     function renderFeatured() {
-      const avisos = getAvisos();
-      const eventos = getEventos();
-
-      if (avisos.length) {
-        const latestNotice = avisos[0];
+      if (avisosData.length) {
+        const latestNotice = avisosData[0];
         featuredNotice.hidden = false;
-        featuredNoticeTitle.textContent = latestNotice.title;
+        featuredNoticeTitle.textContent = latestNotice.title || "Aviso importante";
         featuredNoticeSub.textContent = latestNotice.description || "Aviso activo para la audiencia";
       } else {
         featuredNotice.hidden = true;
       }
 
-      if (eventos.length) {
-        const latestEvent = eventos[0];
+      if (eventosData.length) {
+        const latestEvent = eventosData[0];
         featuredEvent.hidden = false;
-        featuredEventTitle.textContent = latestEvent.title;
-        featuredEventSub.textContent = `${latestEvent.date} · ${latestEvent.time}${latestEvent.description ? " · " + latestEvent.description : ""}`;
+        featuredEventTitle.textContent = latestEvent.title || "Evento";
+        featuredEventSub.textContent = `${latestEvent.dateText || ""}${latestEvent.timeText ? " · " + latestEvent.timeText : ""}${latestEvent.description ? " · " + latestEvent.description : ""}`;
       } else {
         featuredEvent.hidden = true;
       }
     }
 
-    function renderAvisosList() {
-      const avisos = getAvisos();
+    function formatFirestoreDate(item) {
+      if (item.createdAt?.toDate) {
+        return new Intl.DateTimeFormat("es-AR", {
+          timeZone: APP_TIMEZONE,
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        }).format(item.createdAt.toDate());
+      }
+      return "Ahora";
+    }
 
-      if (!avisos.length) {
+    function renderAvisosList() {
+      if (!avisosData.length) {
         avisosList.innerHTML = `<div class="empty-text">No hay avisos publicados.</div>`;
         return;
       }
 
-      avisosList.innerHTML = avisos.map((item, index) => `
+      avisosList.innerHTML = avisosData.map((item) => `
         <div class="list-card notice">
-          <div class="list-card-title">${item.title}</div>
+          <div class="list-card-title">${item.title || "Aviso importante"}</div>
           <div class="list-card-sub">${item.description || "Aviso activo"}</div>
-          <div class="list-card-meta">Publicado: ${item.createdAt}</div>
+          <div class="list-card-meta">Publicado: ${formatFirestoreDate(item)}</div>
           ${adminLoggedIn ? `
             <div class="list-card-actions">
-              <button class="mini-btn" type="button" onclick="deleteAviso(${index})">Eliminar</button>
+              <button class="mini-btn" type="button" data-delete-aviso="${item.id}">Eliminar</button>
             </div>
           ` : ``}
         </div>
       `).join("");
+
+      avisosList.querySelectorAll("[data-delete-aviso]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-delete-aviso");
+          if (!id) return;
+          await deleteDoc(doc(db, "avisos", id));
+        });
+      });
     }
 
     function renderEventosList() {
-      const eventos = getEventos();
-
-      if (!eventos.length) {
+      if (!eventosData.length) {
         eventosList.innerHTML = `<div class="empty-text">No hay eventos publicados.</div>`;
         return;
       }
 
-      eventosList.innerHTML = eventos.map((item, index) => `
+      eventosList.innerHTML = eventosData.map((item) => `
         <div class="list-card event">
-          <div class="list-card-title">${item.title}</div>
-          <div class="list-card-sub">${item.date} · ${item.time}</div>
+          <div class="list-card-title">${item.title || "Evento"}</div>
+          <div class="list-card-sub">${item.dateText || ""}${item.timeText ? " · " + item.timeText : ""}</div>
           <div class="list-card-sub">${item.description || "Evento especial FM Apocalipsis"}</div>
-          <div class="list-card-meta">Publicado: ${item.createdAt}</div>
+          <div class="list-card-meta">Publicado: ${formatFirestoreDate(item)}</div>
           ${adminLoggedIn ? `
             <div class="list-card-actions">
-              <button class="mini-btn" type="button" onclick="deleteEvento(${index})">Eliminar</button>
+              <button class="mini-btn" type="button" data-delete-evento="${item.id}">Eliminar</button>
             </div>
           ` : ``}
         </div>
       `).join("");
+
+      eventosList.querySelectorAll("[data-delete-evento]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-delete-evento");
+          if (!id) return;
+          await deleteDoc(doc(db, "eventos", id));
+        });
+      });
     }
 
     function markAvisosAsRead() {
       const reads = getReadCounts();
-      reads.avisos = getAvisos().length;
+      reads.avisos = avisosData.length;
       setReadCounts(reads);
       updateBadges();
     }
 
     function markEventosAsRead() {
       const reads = getReadCounts();
-      reads.eventos = getEventos().length;
+      reads.eventos = eventosData.length;
       setReadCounts(reads);
       updateBadges();
     }
 
-    function publishNotice() {
+    async function publishNotice() {
       const preset = presetNotice.value.trim();
       const detail = customNoticeText.value.trim();
 
@@ -1891,75 +1910,83 @@
       const title = preset || "Aviso importante";
       const description = detail || "Sin detalle adicional";
 
-      const avisos = getAvisos();
-      avisos.unshift({
+      await addDoc(collection(db, "avisos"), {
         title,
         description,
-        createdAt: formatDateTimeForAdmin()
+        createdAt: serverTimestamp(),
+        active: true
       });
 
-      setAvisos(avisos);
       presetNotice.value = "";
       customNoticeText.value = "";
-
-      renderAvisosList();
-      renderFeatured();
-      updateBadges();
       alert("Aviso publicado correctamente.");
     }
 
-    function publishEvent() {
-      const date = eventDate.value.trim();
-      const time = eventTime.value.trim();
+    async function publishEvent() {
+      const dateText = eventDate.value.trim();
+      const timeText = eventTime.value.trim();
       const title = eventTitle.value.trim();
       const description = eventDescription.value.trim();
 
-      if (!date || !time || !title) {
+      if (!dateText || !timeText || !title) {
         alert("Completa día, hora y título del evento.");
         return;
       }
 
-      const eventos = getEventos();
-      eventos.unshift({
-        date,
-        time,
+      await addDoc(collection(db, "eventos"), {
+        dateText,
+        timeText,
         title,
         description,
-        createdAt: formatDateTimeForAdmin()
+        createdAt: serverTimestamp(),
+        active: true
       });
 
-      setEventos(eventos);
       eventDate.value = "";
       eventTime.value = "";
       eventTitle.value = "";
       eventDescription.value = "";
-
-      renderEventosList();
-      renderFeatured();
-      updateBadges();
       alert("Evento publicado correctamente.");
     }
 
-    function deleteAviso(index) {
-      const avisos = getAvisos();
-      avisos.splice(index, 1);
-      setAvisos(avisos);
+    async function clearAllDocs(collectionName) {
+      const snap = await getDocs(collection(db, collectionName));
+      const deletes = [];
+      snap.forEach(item => {
+        deletes.push(deleteDoc(doc(db, collectionName, item.id)));
+      });
+      await Promise.all(deletes);
+    }
+
+    function watchFirestore() {
+      const avisosQuery = query(collection(db, "avisos"), orderBy("createdAt", "desc"));
+      const eventosQuery = query(collection(db, "eventos"), orderBy("createdAt", "desc"));
+
+      onSnapshot(avisosQuery, (snapshot) => {
+        avisosData = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+        renderFeatured();
+        renderAvisosList();
+        updateBadges();
+      });
+
+      onSnapshot(eventosQuery, (snapshot) => {
+        eventosData = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+        renderFeatured();
+        renderEventosList();
+        updateBadges();
+      });
+    }
+
+    function updateAdminUI(user) {
+      adminLoggedIn = !!user;
+      adminStatusText.textContent = user ? `Sesión iniciada: ${user.email}` : "Sesión cerrada";
       renderAvisosList();
-      renderFeatured();
-      updateBadges();
-    }
-
-    function deleteEvento(index) {
-      const eventos = getEventos();
-      eventos.splice(index, 1);
-      setEventos(eventos);
       renderEventosList();
-      renderFeatured();
-      updateBadges();
     }
 
-    window.deleteAviso = deleteAviso;
-    window.deleteEvento = deleteEvento;
+    onAuthStateChanged(auth, (user) => {
+      updateAdminUI(user);
+    });
 
     scheduleToggle.addEventListener("click", () => {
       const isHidden = scheduleList.hidden;
@@ -2089,45 +2116,66 @@
     closeAdminLoginBtn.addEventListener("click", () => closeModal(adminLoginModal));
     closeAdminPanelBtn.addEventListener("click", () => closeModal(adminPanelModal));
 
-    adminLoginBtn.addEventListener("click", () => {
-      if (adminPassword.value === ADMIN_PASSWORD) {
-        adminLoggedIn = true;
+    adminLoginBtn.addEventListener("click", async () => {
+      const email = adminEmail.value.trim();
+      const password = adminPassword.value;
+
+      if (!email || !password) {
+        alert("Completa correo y contraseña.");
+        return;
+      }
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
         closeModal(adminLoginModal);
         openModal(adminPanelModal);
-      } else {
-        alert("Contraseña incorrecta.");
+      } catch (error) {
+        alert("No se pudo iniciar sesión. Verifica correo y contraseña.");
       }
     });
 
-    adminLogoutBtn.addEventListener("click", () => {
-      adminLoggedIn = false;
+    adminLogoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
       closeModal(adminPanelModal);
     });
 
-    publishNoticeBtn.addEventListener("click", publishNotice);
-    publishEventBtn.addEventListener("click", publishEvent);
-
-    clearNoticesBtn.addEventListener("click", () => {
-      if (confirm("¿Eliminar todos los avisos?")) {
-        setAvisos([]);
-        const reads = getReadCounts();
-        reads.avisos = 0;
-        setReadCounts(reads);
-        renderAvisosList();
-        renderFeatured();
-        updateBadges();
+    publishNoticeBtn.addEventListener("click", async () => {
+      try {
+        await publishNotice();
+      } catch (error) {
+        alert("No se pudo publicar el aviso.");
       }
     });
 
-    clearEventsBtn.addEventListener("click", () => {
-      if (confirm("¿Eliminar todos los eventos?")) {
-        setEventos([]);
+    publishEventBtn.addEventListener("click", async () => {
+      try {
+        await publishEvent();
+      } catch (error) {
+        alert("No se pudo publicar el evento.");
+      }
+    });
+
+    clearNoticesBtn.addEventListener("click", async () => {
+      if (!confirm("¿Eliminar todos los avisos?")) return;
+      try {
+        await clearAllDocs("avisos");
+        const reads = getReadCounts();
+        reads.avisos = 0;
+        setReadCounts(reads);
+      } catch (error) {
+        alert("No se pudieron borrar los avisos.");
+      }
+    });
+
+    clearEventsBtn.addEventListener("click", async () => {
+      if (!confirm("¿Eliminar todos los eventos?")) return;
+      try {
+        await clearAllDocs("eventos");
         const reads = getReadCounts();
         reads.eventos = 0;
         setReadCounts(reads);
-        renderEventosList();
-        renderFeatured();
-        updateBadges();
+      } catch (error) {
+        alert("No se pudieron borrar los eventos.");
       }
     });
 
@@ -2151,6 +2199,7 @@
       renderAvisosList();
       renderEventosList();
       updateBadges();
+      watchFirestore();
 
       if (isIOS() && !isInStandaloneMode()) {
         installHint.textContent = "En iPhone se instala desde Compartir → Añadir a pantalla de inicio";
