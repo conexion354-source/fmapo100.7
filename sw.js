@@ -1,6 +1,5 @@
-const CACHE_NAME = "fm-apocalipsis-v6";
-
-const ASSETS_TO_CACHE = [
+const CACHE_NAME = "fm-apocalipsis-v10";
+const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.json",
@@ -10,52 +9,35 @@ const ASSETS_TO_CACHE = [
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
-  );
   self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
+  );
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
+        keys
+          .filter((key) => key !== CACHE_NAME)
+          .map((key) => caches.delete(key))
       )
-    )
+    ).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   const url = new URL(request.url);
 
-  if (request.method !== "GET") return;
-
-  if (
-    request.url.includes("radios.solumedia.com") ||
-    request.url.includes("api.open-meteo.com") ||
-    request.url.includes("openweathermap.org")
-  ) {
-    event.respondWith(
-      fetch(request).catch(() => caches.match(request))
-    );
-    return;
-  }
-
-  if (request.mode === "navigate") {
+  // Para HTML: siempre buscar primero en red
+  if (request.mode === "navigate" || request.destination === "document") {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put("./index.html", responseClone);
-          });
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put("./index.html", copy));
           return response;
         })
         .catch(() => caches.match("./index.html"))
@@ -63,37 +45,28 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // No cachear llamadas a Firebase ni APIs
+  if (
+    url.hostname.includes("googleapis.com") ||
+    url.hostname.includes("gstatic.com") ||
+    url.hostname.includes("firebase") ||
+    url.hostname.includes("open-meteo.com") ||
+    url.hostname.includes("solumedia.com")
+  ) {
+    event.respondWith(
+      fetch(request).catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  // Resto: cache first
   event.respondWith(
-    caches.match(request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-
-      return fetch(request)
-        .then((networkResponse) => {
-          if (
-            !networkResponse ||
-            networkResponse.status !== 200 ||
-            networkResponse.type !== "basic"
-          ) {
-            return networkResponse;
-          }
-
-          const responseClone = networkResponse.clone();
-
-          if (url.origin === self.location.origin) {
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, responseClone);
-            });
-          }
-
-          return networkResponse;
-        })
-        .catch(() => {
-          if (request.destination === "image") {
-            return caches.match("./logo.png");
-          }
-        });
+    caches.match(request).then((cached) => {
+      return cached || fetch(request).then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        return response;
+      });
     })
   );
 });
