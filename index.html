@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>FM Apocalipsis 100.7</title>
 
   <meta name="theme-color" content="#2f5f5a" id="themeColorMeta" />
@@ -20,29 +20,29 @@
       --bg-main-end: #2f5f5a;
       --text-main: #ffffff;
       --text-soft: rgba(255,255,255,.82);
-      --text-dim: rgba(255,255,255,.78);
+      --text-dim: rgba(255,255,255,.72);
       --card-bg: rgba(255,255,255,0.12);
-      --card-border: rgba(255,255,255,0.22);
+      --card-border: rgba(255,255,255,0.18);
       --soft-box: rgba(255,255,255,0.10);
-      --soft-border: rgba(255,255,255,0.14);
-      --soft-button: rgba(255,255,255,.16);
-      --primary-btn-bg: rgba(255,255,255,.92);
+      --soft-border: rgba(255,255,255,0.12);
+      --soft-button: rgba(255,255,255,.14);
+      --primary-btn-bg: rgba(255,255,255,.94);
       --primary-btn-text: #173531;
-      --secondary-btn-bg: rgba(255,255,255,.18);
+      --secondary-btn-bg: rgba(255,255,255,.16);
       --secondary-btn-text: #fff;
       --status-text: #eaf7f4;
       --program-default-bg: rgba(255,255,255,.12);
       --program-default-text: rgba(255,255,255,.92);
       --program-default-border: rgba(255,255,255,.12);
-      --shadow-strong: rgba(0,0,0,.22);
-      --shadow-soft: rgba(0,0,0,.14);
+      --shadow-strong: rgba(0,0,0,.18);
+      --shadow-soft: rgba(0,0,0,.12);
       --inner-highlight: rgba(255,255,255,.18);
       --theme-color: #2f5f5a;
-      --danger-bg: rgba(255, 90, 90, .18);
-      --danger-border: rgba(255, 120, 120, .28);
+      --danger-bg: rgba(255, 90, 90, .16);
+      --danger-border: rgba(255, 120, 120, .24);
       --danger-text: #ffd0d0;
-      --event-bg: rgba(255, 170, 70, .18);
-      --event-border: rgba(255, 190, 90, .30);
+      --event-bg: rgba(255, 170, 70, .16);
+      --event-border: rgba(255, 190, 90, .24);
       --event-text: #ffe2ad;
       --badge-bg: #ff4b4b;
       --badge-text: #ffffff;
@@ -53,12 +53,12 @@
       --bg-main-end: #0b1013;
       --text-main: #f4f7f8;
       --text-soft: rgba(244,247,248,.84);
-      --text-dim: rgba(244,247,248,.72);
-      --card-bg: rgba(18,24,27,0.72);
-      --card-border: rgba(255,255,255,0.08);
-      --soft-box: rgba(255,255,255,0.06);
-      --soft-border: rgba(255,255,255,0.09);
-      --soft-button: rgba(255,255,255,.10);
+      --text-dim: rgba(244,247,248,.68);
+      --card-bg: rgba(18,24,27,0.74);
+      --card-border: rgba(255,255,255,0.07);
+      --soft-box: rgba(255,255,255,0.05);
+      --soft-border: rgba(255,255,255,0.08);
+      --soft-button: rgba(255,255,255,.09);
       --primary-btn-bg: #f4f7f8;
       --primary-btn-text: #0f171a;
       --secondary-btn-bg: rgba(255,255,255,.09);
@@ -66,98 +66,108 @@
       --status-text: #dce7ea;
       --program-default-bg: rgba(255,255,255,.08);
       --program-default-text: rgba(244,247,248,.92);
-      --program-default-border: rgba(255,255,255,.10);
-      --shadow-strong: rgba(0,0,0,.42);
-      --shadow-soft: rgba(0,0,0,.24);
-      --inner-highlight: rgba(255,255,255,.06);
+      --program-default-border: rgba(255,255,255,.08);
+      --shadow-strong: rgba(0,0,0,.32);
+      --shadow-soft: rgba(0,0,0,.20);
+      --inner-highlight: rgba(255,255,255,.05);
       --theme-color: #10181b;
-      --danger-bg: rgba(255, 90, 90, .16);
-      --danger-border: rgba(255, 120, 120, .22);
+      --danger-bg: rgba(255, 90, 90, .14);
+      --danger-border: rgba(255, 120, 120, .18);
       --danger-text: #ffd3d3;
-      --event-bg: rgba(255, 170, 70, .16);
-      --event-border: rgba(255, 190, 90, .24);
+      --event-bg: rgba(255, 170, 70, .14);
+      --event-border: rgba(255, 190, 90, .20);
       --event-text: #ffe1a8;
       --badge-bg: #ff5555;
       --badge-text: #ffffff;
     }
 
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
     body {
       margin: 0;
-      min-height: 100vh;
+      min-height: 100dvh;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(255,255,255,.18), transparent 30%),
-        radial-gradient(circle at top right, rgba(255,255,255,.08), transparent 25%),
+        radial-gradient(circle at top left, rgba(255,255,255,.16), transparent 28%),
+        radial-gradient(circle at top right, rgba(255,255,255,.06), transparent 22%),
         linear-gradient(180deg, var(--bg-main-start) 0%, var(--bg-main-end) 100%);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)) 10px;
       color: var(--text-main);
       transition: background .25s ease, color .25s ease;
     }
 
     .app {
       width: 100%;
-      max-width: 420px;
+      max-width: 390px;
+      height: min(100dvh - 20px, 844px);
     }
 
     .player {
       position: relative;
       background: var(--card-bg);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--card-border);
-      border-radius: 30px;
-      padding: 20px;
+      border-radius: 26px;
+      padding: 12px;
       box-shadow:
-        0 12px 35px var(--shadow-strong),
+        0 10px 28px var(--shadow-strong),
         inset 0 1px 0 var(--inner-highlight);
       transition: background .25s ease, border-color .25s ease, box-shadow .25s ease;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .top-actions {
+      display: grid;
+      grid-template-columns: auto 1fr auto auto;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
     }
 
     .live-badge,
     .share-btn-top,
     .theme-btn-top {
-      position: absolute;
-      top: 16px;
       display: inline-flex;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
       border-radius: 999px;
-      padding: 8px 12px;
-      font-size: .82rem;
+      padding: 7px 10px;
+      font-size: .74rem;
       font-weight: 800;
       letter-spacing: .02em;
       z-index: 2;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       background: var(--soft-button);
       color: var(--program-default-text);
       border: 1px solid var(--soft-border);
-      box-shadow: 0 8px 18px var(--shadow-soft);
+      box-shadow: 0 6px 14px var(--shadow-soft);
       transition: background .25s ease, color .25s ease, box-shadow .25s ease, border-color .25s ease, transform .15s ease, opacity .15s ease;
     }
 
-    .live-badge { left: 16px; }
-
-    .share-btn-top {
-      right: 16px;
-      cursor: pointer;
-      border: 0;
-    }
-
+    .share-btn-top,
     .theme-btn-top {
-      right: 16px;
-      top: 58px;
       cursor: pointer;
       border: 0;
+      justify-self: end;
     }
 
     .share-btn-top:hover,
     .theme-btn-top:hover {
       opacity: .96;
-      box-shadow: 0 10px 20px var(--shadow-soft);
+      box-shadow: 0 8px 16px var(--shadow-soft);
     }
 
     .share-btn-top:active,
@@ -166,83 +176,264 @@
     .live-badge.active {
       background: linear-gradient(135deg, #ff5f5f, #ff2f2f);
       color: #fff;
-      border: 1px solid rgba(255,255,255,.18);
-      box-shadow: 0 8px 18px rgba(255, 59, 59, .25);
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 8px 18px rgba(255, 59, 59, .24);
     }
 
     .live-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: currentColor;
       opacity: .9;
-      box-shadow: 0 0 0 4px rgba(255,255,255,.08);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.08);
     }
 
     .live-badge.active .live-dot {
       background: #fff;
-      box-shadow: 0 0 0 4px rgba(255,255,255,.16);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.14);
       animation: pulse 1.6s infinite;
     }
 
     @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(255,255,255,.55); }
+      0% { box-shadow: 0 0 0 0 rgba(255,255,255,.5); }
       70% { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
       100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
     }
 
-    .logo-wrap {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 12px;
-      margin-top: 58px;
+    .hero {
+      display: grid;
+      grid-template-columns: 78px 1fr;
+      gap: 10px;
+      align-items: center;
+      min-height: 78px;
     }
 
     .logo {
-      width: 150px;
-      max-width: 72%;
-      border-radius: 20px;
-      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+      width: 78px;
+      height: 78px;
+      object-fit: contain;
+      border-radius: 18px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.15);
     }
 
+    .title-wrap { min-width: 0; }
+
     .title {
-      text-align: center;
       margin: 0;
-      font-size: 1.7rem;
+      font-size: 1.22rem;
       font-weight: 800;
       letter-spacing: -.02em;
+      line-height: 1.1;
     }
 
     .subtitle {
-      text-align: center;
-      margin: 6px 0 14px;
+      margin: 4px 0 0;
       color: var(--text-soft);
-      font-size: .98rem;
+      font-size: .84rem;
+      line-height: 1.25;
     }
 
-    .status {
-      text-align: center;
-      margin-bottom: 10px;
-      font-size: .95rem;
-      color: var(--status-text);
-      min-height: 22px;
-      font-weight: 600;
-    }
-
-    .featured-stack {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
+    .status-card,
+    .mini-card,
     .featured-card {
-      border-radius: 20px;
-      padding: 14px 16px;
+      border-radius: 18px;
+      padding: 10px 12px;
+      background: var(--soft-box);
+      border: 1px solid var(--soft-border);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
-      border: 1px solid;
+      min-width: 0;
+    }
+
+    .status-card {
+      display: grid;
+      gap: 8px;
+    }
+
+    .status {
+      font-size: .88rem;
+      color: var(--status-text);
+      min-height: 18px;
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .song-info {
+      text-align: center;
+      min-height: 36px;
+    }
+
+    .song-info[hidden] { display: none; }
+
+    .song-label {
+      font-size: .7rem;
+      font-weight: 800;
+      letter-spacing: .03em;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .song-title {
+      font-size: .92rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.2;
+      word-break: break-word;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .song-artist {
+      margin-top: 2px;
+      font-size: .8rem;
+      color: var(--text-soft);
+      line-height: 1.2;
+      word-break: break-word;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .visualizer {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 4px;
+      height: 18px;
+      margin: 0 auto;
+      opacity: .28;
+      transition: opacity .25s ease;
+    }
+
+    .visualizer.active { opacity: 1; }
+
+    .visualizer span {
+      width: 4px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      transform-origin: bottom center;
+      animation: sound 1s ease-in-out infinite;
+      animation-play-state: paused;
+      box-shadow: 0 0 8px rgba(255,255,255,.12);
+    }
+
+    .visualizer.active span { animation-play-state: running; }
+    .visualizer span:nth-child(1) { animation-delay: 0s; }
+    .visualizer span:nth-child(2) { animation-delay: .12s; }
+    .visualizer span:nth-child(3) { animation-delay: .24s; }
+    .visualizer span:nth-child(4) { animation-delay: .36s; }
+    .visualizer span:nth-child(5) { animation-delay: .48s; }
+
+    @keyframes sound {
+      0%, 100% { height: 6px; opacity: .7; }
+      25% { height: 17px; opacity: 1; }
+      50% { height: 11px; opacity: .85; }
+      75% { height: 14px; opacity: 1; }
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .btn,
+    .notify-btn,
+    .footer-nav-btn,
+    .schedule-toggle {
+      border: 0;
+      border-radius: 16px;
+      font-weight: 800;
+      transition: transform .15s ease, opacity .15s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
+      box-shadow: 0 8px 16px rgba(0,0,0,.14);
+    }
+
+    .btn {
+      padding: 11px 12px;
+      font-size: .92rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 44px;
+    }
+
+    .btn:hover,
+    .notify-btn:hover,
+    .footer-nav-btn:hover,
+    .schedule-toggle:hover {
+      opacity: .97;
+      box-shadow: 0 10px 18px rgba(0,0,0,.16);
+    }
+
+    .btn:active,
+    .notify-btn:active,
+    .footer-nav-btn:active,
+    .schedule-toggle:active { transform: scale(.98); }
+
+    .btn-primary {
+      background: var(--primary-btn-bg);
+      color: var(--primary-btn-text);
+    }
+
+    .btn-primary.playing {
+      background: linear-gradient(135deg, #ff5f5f, #ff2f2f);
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(255, 95, 95, .28);
+    }
+
+    .btn-secondary {
+      background: var(--secondary-btn-bg);
+      color: var(--secondary-btn-text);
+      border: 1px solid var(--soft-border);
+    }
+
+    .shortcut-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .btn-whatsapp {
+      background: linear-gradient(135deg, #33d17a, #1faa59);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.10);
+    }
+
+    .btn-youtube {
+      background: linear-gradient(135deg, #ff8f8f, #ff6666);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.10);
+    }
+
+    .notify-btn {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: .84rem;
+      cursor: pointer;
+      background: var(--soft-button);
+      color: var(--text-main);
+      border: 1px solid var(--soft-border);
+      min-height: 40px;
+    }
+
+    .notify-btn[hidden] { display: none; }
+
+    .featured-grid,
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
     }
 
     .featured-card[hidden] { display: none; }
@@ -258,11 +449,11 @@
     }
 
     .featured-label {
-      font-size: .78rem;
+      font-size: .66rem;
       font-weight: 800;
       letter-spacing: .04em;
       text-transform: uppercase;
-      margin-bottom: 6px;
+      margin-bottom: 5px;
       opacity: .92;
     }
 
@@ -279,283 +470,128 @@
     }
 
     .featured-title {
-      font-size: 1rem;
+      font-size: .84rem;
       font-weight: 800;
-      line-height: 1.35;
+      line-height: 1.2;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .featured-sub {
       margin-top: 4px;
-      font-size: .9rem;
-      line-height: 1.4;
+      font-size: .74rem;
+      line-height: 1.2;
       opacity: .96;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
-    .song-info {
-      margin: 0 auto 14px;
-      padding: 14px 16px;
-      border-radius: 20px;
-      background: var(--soft-box);
-      border: 1px solid var(--soft-border);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
-      text-align: center;
-    }
-
-    .song-info[hidden] { display: none; }
-
-    .song-label {
-      font-size: .82rem;
-      font-weight: 800;
-      letter-spacing: .03em;
-      color: var(--text-dim);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-    }
-
-    .song-title {
-      font-size: 1rem;
-      font-weight: 800;
-      color: var(--text-main);
-      line-height: 1.35;
-      word-break: break-word;
-    }
-
-    .song-artist {
-      margin-top: 4px;
-      font-size: .92rem;
-      color: var(--text-soft);
-      line-height: 1.35;
-      word-break: break-word;
-    }
-
-    .visualizer {
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: 4px;
-      height: 26px;
-      margin: 0 auto 18px;
-      opacity: .28;
-      transition: opacity .25s ease;
-    }
-
-    .visualizer.active { opacity: 1; }
-
-    .visualizer span {
-      width: 4px;
-      height: 8px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.92);
-      transform-origin: bottom center;
-      animation: sound 1s ease-in-out infinite;
-      animation-play-state: paused;
-      box-shadow: 0 0 10px rgba(255,255,255,.14);
-    }
-
-    .visualizer.active span { animation-play-state: running; }
-    .visualizer span:nth-child(1) { animation-delay: 0s; }
-    .visualizer span:nth-child(2) { animation-delay: .12s; }
-    .visualizer span:nth-child(3) { animation-delay: .24s; }
-    .visualizer span:nth-child(4) { animation-delay: .36s; }
-    .visualizer span:nth-child(5) { animation-delay: .48s; }
-
-    @keyframes sound {
-      0%, 100% { height: 8px; opacity: .7; }
-      25% { height: 24px; opacity: 1; }
-      50% { height: 14px; opacity: .85; }
-      75% { height: 20px; opacity: 1; }
-    }
-
-    .controls {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-
-    .btn {
-      border: 0;
-      border-radius: 18px;
-      padding: 14px 16px;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform .15s ease, opacity .15s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
-      box-shadow: 0 10px 18px rgba(0,0,0,.18);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
-
-    .btn:hover {
-      opacity: .97;
-      box-shadow: 0 12px 22px rgba(0,0,0,.2);
-    }
-
-    .btn:active { transform: scale(.98); }
-
-    .btn-primary {
-      background: var(--primary-btn-bg);
-      color: var(--primary-btn-text);
-    }
-
-    .btn-primary.playing {
-      background: linear-gradient(135deg, #ff5f5f, #ff2f2f);
-      color: #fff;
-      box-shadow: 0 12px 22px rgba(255, 95, 95, .32);
-    }
-
-    .btn-secondary {
-      background: var(--secondary-btn-bg);
-      color: var(--secondary-btn-text);
-      border: 1px solid var(--soft-border);
-    }
-
-    .btn-whatsapp {
-      background: linear-gradient(135deg, #33d17a, #1faa59);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,.12);
-    }
-
-    .btn-youtube {
-      background: linear-gradient(135deg, #ff8f8f, #ff6666);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,.12);
-    }
-
-    .full {
-      width: 100%;
-      margin-top: 10px;
-    }
-
-    .hint {
-      text-align: center;
-      color: var(--text-dim);
-      font-size: .88rem;
-      margin-top: 12px;
-      min-height: 18px;
-    }
-
-    .weather-widget,
-    .today-program-widget,
-    .schedule-list {
+    .mini-card {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
-      margin-top: 12px;
-      padding: 14px 16px;
-      border-radius: 20px;
-      background: var(--soft-box);
-      border: 1px solid var(--soft-border);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      gap: 8px;
+      min-height: 72px;
     }
 
-    .weather-left,
-    .today-program-left {
+    .mini-left {
       flex: 1;
       min-width: 0;
     }
 
-    .program-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
+    .mini-title {
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .03em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 4px;
     }
 
-    .weather-main,
-    .today-program-title {
-      font-size: 15px;
+    .mini-main {
+      font-size: .86rem;
       font-weight: 700;
-      line-height: 1.4;
+      line-height: 1.2;
       color: var(--text-main);
+    }
+
+    .mini-sub {
+      margin-top: 3px;
+      font-size: .74rem;
+      color: var(--text-soft);
+      line-height: 1.15;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .program-state {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 4px 10px;
+      padding: 4px 9px;
       border-radius: 999px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 800;
       background: var(--program-default-bg);
       color: var(--program-default-text);
       border: 1px solid var(--program-default-border);
+      margin-top: 5px;
     }
 
     .program-state.red {
       background: rgba(255, 59, 59, .18);
       color: #ffb0b0;
-      border-color: rgba(255, 95, 95, .32);
+      border-color: rgba(255, 95, 95, .28);
     }
 
     .program-state.orange {
-      background: rgba(255, 160, 60, 0.25);
+      background: rgba(255, 160, 60, 0.22);
       color: #ffc27a;
-      border-color: rgba(255, 160, 60, 0.45);
+      border-color: rgba(255, 160, 60, 0.34);
     }
 
     .program-state.gray {
       background: rgba(255,255,255,.10);
       color: rgba(255,255,255,.82);
-      border-color: rgba(255,255,255,.14);
-    }
-
-    .weather-location,
-    .today-program-subtitle,
-    .today-program-hosts {
-      font-size: 13px;
-      opacity: 0.82;
-      margin-top: 4px;
+      border-color: rgba(255,255,255,.12);
     }
 
     .weather-right img {
-      width: 50px;
-      height: 50px;
+      width: 38px;
+      height: 38px;
       object-fit: contain;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: block;
       flex-shrink: 0;
     }
 
     .schedule-toggle {
-      width: 40px;
-      height: 40px;
-      border: 0;
-      border-radius: 14px;
+      width: 34px;
+      height: 34px;
       background: var(--soft-button);
       color: var(--text-main);
-      font-size: 1.25rem;
-      font-weight: 800;
+      font-size: 1rem;
       cursor: pointer;
       flex-shrink: 0;
       border: 1px solid var(--soft-border);
-      box-shadow: 0 10px 18px var(--shadow-soft);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      transition: transform .15s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
     }
-
-    .schedule-toggle:hover {
-      opacity: .96;
-      box-shadow: 0 12px 20px var(--shadow-soft);
-    }
-
-    .schedule-toggle:active { transform: scale(.97); }
 
     .schedule-list {
       display: block;
-      padding: 14px;
+      padding: 10px;
+      border-radius: 18px;
+      background: var(--soft-box);
+      border: 1px solid var(--soft-border);
+      max-height: 170px;
+      overflow: auto;
     }
 
     .schedule-list[hidden] { display: none; }
@@ -564,82 +600,45 @@
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 12px;
-      padding: 10px 4px;
-      border-bottom: 1px solid rgba(255,255,255,.10);
+      gap: 10px;
+      padding: 8px 2px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
 
-    .schedule-item:last-child {
-      border-bottom: 0;
-      padding-bottom: 4px;
-    }
+    .schedule-item:last-child { border-bottom: 0; }
 
-    .schedule-item-main {
-      min-width: 0;
-      flex: 1;
-    }
+    .schedule-item-main { min-width: 0; flex: 1; }
 
     .schedule-item-title {
-      font-size: .96rem;
+      font-size: .82rem;
       font-weight: 700;
       color: var(--text-main);
-      line-height: 1.35;
+      line-height: 1.2;
     }
 
     .schedule-item-sub {
-      margin-top: 4px;
-      font-size: .86rem;
+      margin-top: 3px;
+      font-size: .74rem;
       color: var(--text-dim);
-      line-height: 1.4;
+      line-height: 1.2;
     }
 
     .schedule-item-day {
-      font-size: .82rem;
+      font-size: .7rem;
       font-weight: 700;
       color: var(--text-soft);
-      background: rgba(255,255,255,.10);
-      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.08);
       border-radius: 999px;
-      padding: 6px 10px;
+      padding: 5px 8px;
       white-space: nowrap;
       flex-shrink: 0;
     }
 
-    .dot {
-      margin: 0 5px;
-      opacity: 0.7;
-    }
-
-    .today-program-widget[hidden] { display: none; }
-
-    .notify-btn {
-      margin-top: 10px;
-      width: 100%;
-      border: 0;
-      border-radius: 18px;
-      padding: 12px 14px;
-      font-size: .95rem;
-      font-weight: 700;
-      cursor: pointer;
-      background: var(--soft-button);
-      color: var(--text-main);
-      border: 1px solid var(--soft-border);
-      box-shadow: 0 10px 18px var(--shadow-soft);
-      transition: transform .15s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
-    }
-
-    .notify-btn:hover {
-      opacity: .96;
-      box-shadow: 0 12px 20px var(--shadow-soft);
-    }
-
-    .notify-btn[hidden] { display: none; }
-
     .footer-nav {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 16px;
+      gap: 8px;
     }
 
     .footer-nav-btn {
@@ -647,42 +646,47 @@
       border: 1px solid var(--soft-border);
       background: var(--soft-button);
       color: var(--text-main);
-      border-radius: 18px;
-      padding: 12px 10px;
-      font-size: .94rem;
-      font-weight: 800;
+      padding: 10px 8px;
+      font-size: .8rem;
       cursor: pointer;
-      box-shadow: 0 10px 18px var(--shadow-soft);
-      transition: transform .15s ease, opacity .2s ease, box-shadow .2s ease;
+      min-height: 44px;
     }
-
-    .footer-nav-btn:hover {
-      opacity: .96;
-      box-shadow: 0 12px 20px var(--shadow-soft);
-    }
-
-    .footer-nav-btn:active { transform: scale(.98); }
 
     .footer-badge {
       position: absolute;
-      top: -6px;
-      right: -4px;
-      min-width: 22px;
-      height: 22px;
-      padding: 0 6px;
+      top: -5px;
+      right: -3px;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 5px;
       border-radius: 999px;
       background: var(--badge-bg);
       color: var(--badge-text);
-      font-size: .75rem;
+      font-size: .7rem;
       font-weight: 800;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border: 2px solid rgba(255,255,255,.18);
-      box-shadow: 0 6px 14px rgba(0,0,0,.22);
+      border: 2px solid rgba(255,255,255,.16);
+      box-shadow: 0 5px 12px rgba(0,0,0,.18);
     }
 
     .footer-badge[hidden] { display: none; }
+
+    .hint {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: .74rem;
+      min-height: 14px;
+      line-height: 1.15;
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+    }
 
     .modal {
       position: fixed;
@@ -693,7 +697,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 14px;
       z-index: 50;
     }
 
@@ -702,12 +706,12 @@
     .modal-card {
       width: 100%;
       max-width: 420px;
-      max-height: 85vh;
+      max-height: 82vh;
       overflow-y: auto;
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 26px;
-      padding: 18px;
+      border-radius: 24px;
+      padding: 16px;
       box-shadow: 0 16px 40px var(--shadow-strong);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
@@ -715,27 +719,27 @@
 
     .modal-title {
       margin: 0 0 6px;
-      font-size: 1.18rem;
+      font-size: 1.08rem;
       font-weight: 800;
     }
 
     .modal-subtitle {
-      margin: 0 0 14px;
-      font-size: .92rem;
+      margin: 0 0 12px;
+      font-size: .88rem;
       color: var(--text-soft);
-      line-height: 1.45;
+      line-height: 1.4;
     }
 
     .modal-section {
-      margin-top: 14px;
-      padding-top: 14px;
+      margin-top: 12px;
+      padding-top: 12px;
       border-top: 1px solid rgba(255,255,255,.08);
     }
 
     .field-label {
       display: block;
-      margin-bottom: 7px;
-      font-size: .88rem;
+      margin-bottom: 6px;
+      font-size: .84rem;
       font-weight: 700;
       color: var(--text-soft);
     }
@@ -747,14 +751,14 @@
       border: 1px solid var(--soft-border);
       background: rgba(255,255,255,.10);
       color: var(--text-main);
-      border-radius: 16px;
-      padding: 12px 14px;
-      font-size: .95rem;
+      border-radius: 14px;
+      padding: 11px 13px;
+      font-size: .92rem;
       outline: none;
     }
 
     .textarea {
-      min-height: 95px;
+      min-height: 90px;
       resize: vertical;
       font-family: inherit;
     }
@@ -762,22 +766,20 @@
     .modal-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .single-action {
+      gap: 8px;
       margin-top: 12px;
     }
 
+    .single-action { margin-top: 10px; }
+
     .small-btn {
       border: 0;
-      border-radius: 16px;
-      padding: 12px 14px;
-      font-size: .94rem;
+      border-radius: 14px;
+      padding: 11px 13px;
+      font-size: .9rem;
       font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 10px 18px rgba(0,0,0,.18);
+      box-shadow: 0 8px 16px rgba(0,0,0,.16);
     }
 
     .small-btn.primary {
@@ -794,13 +796,13 @@
     .list-stack {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-top: 12px;
+      gap: 8px;
+      margin-top: 10px;
     }
 
     .list-card {
-      border-radius: 18px;
-      padding: 12px 14px;
+      border-radius: 16px;
+      padding: 10px 12px;
       border: 1px solid var(--soft-border);
       background: var(--soft-box);
     }
@@ -816,187 +818,193 @@
     }
 
     .list-card-title {
-      font-size: .95rem;
+      font-size: .9rem;
       font-weight: 800;
-      line-height: 1.35;
+      line-height: 1.25;
     }
 
     .list-card-sub {
       margin-top: 4px;
-      font-size: .88rem;
-      line-height: 1.4;
+      font-size: .82rem;
+      line-height: 1.3;
       color: var(--text-soft);
     }
 
     .list-card-meta {
-      margin-top: 8px;
-      font-size: .78rem;
+      margin-top: 7px;
+      font-size: .74rem;
       color: var(--text-dim);
     }
 
     .list-card-actions {
       display: flex;
       gap: 8px;
-      margin-top: 10px;
+      margin-top: 9px;
     }
 
     .mini-btn {
       border: 1px solid var(--soft-border);
       background: rgba(255,255,255,.10);
       color: var(--text-main);
-      border-radius: 12px;
+      border-radius: 11px;
       padding: 8px 10px;
-      font-size: .82rem;
+      font-size: .8rem;
       font-weight: 800;
       cursor: pointer;
     }
 
     .empty-text {
-      font-size: .9rem;
+      font-size: .86rem;
       color: var(--text-dim);
       text-align: center;
-      padding: 12px 6px 2px;
+      padding: 10px 6px 2px;
     }
 
     .admin-status {
-      margin-top: 10px;
-      font-size: .86rem;
+      margin-top: 8px;
+      font-size: .82rem;
       color: var(--text-soft);
     }
 
-    @media (max-width: 430px) {
-      .live-badge,
-      .share-btn-top,
-      .theme-btn-top {
-        font-size: .74rem;
-        padding: 7px 10px;
-      }
-
-      .theme-btn-top { top: 56px; }
-      .logo-wrap { margin-top: 68px; }
-      .logo {
-        width: 138px;
-        max-width: 68%;
-      }
+    @media (max-height: 760px) {
+      .app { height: min(100dvh - 14px, 760px); }
+      .player { padding: 10px; gap: 7px; border-radius: 22px; }
+      .hero { grid-template-columns: 64px 1fr; min-height: 64px; }
+      .logo { width: 64px; height: 64px; border-radius: 16px; }
+      .title { font-size: 1.08rem; }
+      .subtitle { font-size: .78rem; }
+      .status-card, .mini-card, .featured-card { padding: 8px 10px; border-radius: 16px; }
+      .btn { min-height: 40px; padding: 10px; font-size: .86rem; }
+      .footer-nav-btn { min-height: 40px; font-size: .76rem; }
+      .featured-label { font-size: .62rem; }
+      .featured-title { font-size: .8rem; }
+      .featured-sub, .mini-sub { font-size: .7rem; }
+      .schedule-list { max-height: 130px; }
     }
   </style>
 </head>
 <body>
   <div class="app">
     <div class="player">
-      <div class="live-badge" id="liveBadge">
-        <span class="live-dot"></span>
-        <span>EN VIVO</span>
+      <div class="top-actions">
+        <div class="live-badge" id="liveBadge">
+          <span class="live-dot"></span>
+          <span>EN VIVO</span>
+        </div>
+        <div></div>
+        <button class="share-btn-top" id="shareBtn" type="button">🔗</button>
+        <button class="theme-btn-top" id="themeBtn" type="button">🌙</button>
       </div>
 
-      <button class="share-btn-top" id="shareBtn" type="button">🔗 Compartir</button>
-      <button class="theme-btn-top" id="themeBtn" type="button">🌙 Oscuro</button>
-
-      <div class="logo-wrap">
+      <div class="hero">
         <img src="logo.png" alt="FM Apocalipsis 100.7" class="logo" />
-      </div>
-
-      <h1 class="title">FM Apocalipsis 100.7</h1>
-      <p class="subtitle">La voz que viene de lo Alto</p>
-
-      <div class="status" id="status">Listo para reproducir</div>
-
-      <div class="featured-stack">
-        <div class="featured-card notice" id="featuredNotice" hidden>
-          <div class="featured-label">📢 Aviso destacado</div>
-          <div class="featured-title" id="featuredNoticeTitle"></div>
-          <div class="featured-sub" id="featuredNoticeSub"></div>
-        </div>
-
-        <div class="featured-card event" id="featuredEvent" hidden>
-          <div class="featured-label">📅 Próximo evento</div>
-          <div class="featured-title" id="featuredEventTitle"></div>
-          <div class="featured-sub" id="featuredEventSub"></div>
+        <div class="title-wrap">
+          <h1 class="title">FM Apocalipsis 100.7</h1>
+          <p class="subtitle">La voz que viene de lo Alto</p>
         </div>
       </div>
 
-      <div class="song-info" id="songInfo" hidden>
-        <div class="song-label">♪ Sonando ahora</div>
-        <div class="song-title" id="songTitle">--</div>
-        <div class="song-artist" id="songArtist">--</div>
-      </div>
+      <div class="stack" style="flex:1; min-height:0;">
+        <div class="status-card">
+          <div class="status" id="status">Listo para reproducir</div>
 
-      <div class="visualizer" id="visualizer" aria-hidden="true">
-        <span></span><span></span><span></span><span></span><span></span>
-      </div>
-
-      <audio id="radio" preload="none" playsinline>
-        <source src="https://radios.solumedia.com:6322/stream" type="audio/mpeg" />
-      </audio>
-
-      <div class="controls">
-        <button class="btn btn-primary" id="playBtn" type="button">▶ Play</button>
-        <button class="btn btn-secondary" id="pauseBtn" type="button">⏸ Pausa</button>
-      </div>
-
-      <button class="btn btn-primary full" id="installBtn" hidden type="button">📲 Instalar App</button>
-      <button class="notify-btn" id="notifyBtn" type="button">🔔 Activar avisos de programas</button>
-
-      <a
-        class="btn btn-whatsapp full"
-        href="https://chat.whatsapp.com/FQnkIaic0ZEKR5nYNmheOV?mode=hq2tswi"
-        target="_blank"
-        rel="noopener noreferrer"
-      >💬 Unirse al grupo de WhatsApp</a>
-
-      <a
-        class="btn btn-youtube full"
-        href="https://www.youtube.com/@zonafe"
-        target="_blank"
-        rel="noopener noreferrer"
-      >▶ Mira Zona Fe en vivo</a>
-
-      <div class="today-program-widget" id="todayProgramWidget" hidden>
-        <div class="today-program-left">
-          <div class="program-header">
-            <div class="today-program-title" id="todayProgramTitle">Programa</div>
-            <span class="program-state" id="programState">Próximo</span>
+          <div class="song-info" id="songInfo" hidden>
+            <div class="song-label">Sonando ahora</div>
+            <div class="song-title" id="songTitle">--</div>
+            <div class="song-artist" id="songArtist">--</div>
           </div>
-          <div class="today-program-subtitle" id="todayProgramTime"></div>
-          <div class="today-program-hosts" id="todayProgramHosts"></div>
-        </div>
-        <button class="schedule-toggle" id="scheduleToggle" type="button">+</button>
-      </div>
 
-      <div class="schedule-list" id="scheduleList" hidden></div>
-
-      <div class="weather-widget">
-        <div class="weather-left">
-          <div class="weather-main">
-            Actualmente hace <span id="weatherTemp">--°</span>
-            <span class="dot">·</span>
-            <span id="weatherText">Cargando clima...</span>
+          <div class="visualizer" id="visualizer" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
           </div>
-          <div class="weather-location">Santa Sylvina, Chaco</div>
+
+          <audio id="radio" preload="none" playsinline>
+            <source src="https://radios.solumedia.com:6322/stream" type="audio/mpeg" />
+          </audio>
+
+          <div class="controls">
+            <button class="btn btn-primary" id="playBtn" type="button">▶ Play</button>
+            <button class="btn btn-secondary" id="pauseBtn" type="button">⏸ Pausa</button>
+          </div>
         </div>
 
-        <div class="weather-right">
-          <img id="weatherIcon" src="https://openweathermap.org/img/wn/02d@2x.png" alt="Clima actual" />
+        <div class="featured-grid">
+          <div class="featured-card notice" id="featuredNotice" hidden>
+            <div class="featured-label">📢 Aviso</div>
+            <div class="featured-title" id="featuredNoticeTitle"></div>
+            <div class="featured-sub" id="featuredNoticeSub"></div>
+          </div>
+
+          <div class="featured-card event" id="featuredEvent" hidden>
+            <div class="featured-label">📅 Evento</div>
+            <div class="featured-title" id="featuredEventTitle"></div>
+            <div class="featured-sub" id="featuredEventSub"></div>
+          </div>
         </div>
+
+        <div class="info-grid">
+          <div class="mini-card">
+            <div class="mini-left">
+              <div class="mini-title">Clima</div>
+              <div class="mini-main">
+                <span id="weatherTemp">--°</span> · <span id="weatherText">Cargando...</span>
+              </div>
+              <div class="mini-sub">Santa Sylvina, Chaco</div>
+            </div>
+            <div class="weather-right">
+              <img id="weatherIcon" src="https://openweathermap.org/img/wn/02d@2x.png" alt="Clima actual" />
+            </div>
+          </div>
+
+          <div class="mini-card" id="todayProgramWidget" hidden>
+            <div class="mini-left">
+              <div class="mini-title">Programa</div>
+              <div class="mini-main" id="todayProgramTitle">Programa</div>
+              <div class="mini-sub" id="todayProgramTime"></div>
+              <div class="mini-sub" id="todayProgramHosts"></div>
+              <span class="program-state" id="programState">Próximo</span>
+            </div>
+            <button class="schedule-toggle" id="scheduleToggle" type="button">+</button>
+          </div>
+        </div>
+
+        <div class="schedule-list" id="scheduleList" hidden></div>
+
+        <button class="notify-btn" id="notifyBtn" type="button">🔔 Activar avisos de programas</button>
+        <button class="btn btn-secondary" id="installBtn" hidden type="button">📲 Instalar App</button>
+
+        <div class="shortcut-grid">
+          <a
+            class="btn btn-whatsapp"
+            href="https://chat.whatsapp.com/FQnkIaic0ZEKR5nYNmheOV?mode=hq2tswi"
+            target="_blank"
+            rel="noopener noreferrer"
+          >💬 WhatsApp</a>
+
+          <a
+            class="btn btn-youtube"
+            href="https://www.youtube.com/@zonafe"
+            target="_blank"
+            rel="noopener noreferrer"
+          >▶ YouTube</a>
+        </div>
+
+        <div class="footer-nav">
+          <button class="footer-nav-btn" id="openAvisosBtn" type="button">
+            📢 Avisos
+            <span class="footer-badge" id="avisosBadge" hidden>0</span>
+          </button>
+
+          <button class="footer-nav-btn" id="openEventosBtn" type="button">
+            📅 Eventos
+            <span class="footer-badge" id="eventosBadge" hidden>0</span>
+          </button>
+
+          <button class="footer-nav-btn" id="openAdminBtn" type="button">🔐 Admin</button>
+        </div>
+
+        <div class="hint" id="installHint"></div>
       </div>
-
-      <div class="footer-nav">
-        <button class="footer-nav-btn" id="openAvisosBtn" type="button">
-          📢 Avisos
-          <span class="footer-badge" id="avisosBadge" hidden>0</span>
-        </button>
-
-        <button class="footer-nav-btn" id="openEventosBtn" type="button">
-          📅 Eventos
-          <span class="footer-badge" id="eventosBadge" hidden>0</span>
-        </button>
-
-        <button class="footer-nav-btn" id="openAdminBtn" type="button">
-          🔐 Admin
-        </button>
-      </div>
-
-      <div class="hint" id="installHint"></div>
     </div>
   </div>
 
@@ -1203,7 +1211,6 @@
     let lastProgramNotificationKey = "";
     let notificationsEnabledByUser = false;
     let adminLoggedIn = false;
-
     let avisosData = [];
     let eventosData = [];
 
@@ -1236,12 +1243,12 @@
     function applyTheme(mode) {
       if (mode === "dark") {
         document.body.classList.add("dark-mode");
-        themeBtn.textContent = "☀️ Claro";
+        themeBtn.textContent = "☀️";
         themeColorMeta.setAttribute("content", "#10181b");
         localStorage.setItem("fm_apocalipsis_theme", "dark");
       } else {
         document.body.classList.remove("dark-mode");
-        themeBtn.textContent = "🌙 Oscuro";
+        themeBtn.textContent = "🌙";
         themeColorMeta.setAttribute("content", "#2f5f5a");
         localStorage.setItem("fm_apocalipsis_theme", "light");
       }
@@ -1291,13 +1298,8 @@
       visualizer.classList.remove("active");
     }
 
-    function activarEnVivo() {
-      liveBadge.classList.add("active");
-    }
-
-    function desactivarEnVivo() {
-      liveBadge.classList.remove("active");
-    }
+    function activarEnVivo() { liveBadge.classList.add("active"); }
+    function desactivarEnVivo() { liveBadge.classList.remove("active"); }
 
     function timeToMinutes(time) {
       const [hours, minutes] = time.split(":").map(Number);
@@ -1306,7 +1308,6 @@
 
     function getNowParts() {
       const now = new Date();
-
       const weekdayName = new Intl.DateTimeFormat("es-AR", {
         timeZone: APP_TIMEZONE,
         weekday: "long"
@@ -1331,17 +1332,12 @@
         sabado: 6
       };
 
-      return {
-        day: dayMap[weekdayName],
-        time: timeString
-      };
+      return { day: dayMap[weekdayName], time: timeString };
     }
 
     function getTodayPrograms() {
       const { day } = getNowParts();
-      return PROGRAMACION
-        .filter(programa => programa.days.includes(day))
-        .sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
+      return PROGRAMACION.filter(programa => programa.days.includes(day)).sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
     }
 
     function getCurrentProgram() {
@@ -1359,12 +1355,9 @@
     function getProgramLabel(programa) {
       const { day, time } = getNowParts();
       const nowMinutes = timeToMinutes(time);
-
       if (!programa.days.includes(day)) return "";
-
       const startMinutes = timeToMinutes(programa.start);
       const endMinutes = timeToMinutes(programa.end);
-
       if (nowMinutes >= startMinutes && nowMinutes < endMinutes) return "Ahora";
       if (nowMinutes < startMinutes) return "Próximo";
       return "Finalizado";
@@ -1373,11 +1366,9 @@
     function getMainProgramForToday(programs) {
       const currentProgram = getCurrentProgram();
       if (currentProgram) return currentProgram;
-
       const { time } = getNowParts();
       const nowMinutes = timeToMinutes(time);
       const upcoming = programs.find(programa => timeToMinutes(programa.start) > nowMinutes);
-
       if (upcoming) return upcoming;
       return programs[programs.length - 1];
     }
@@ -1391,7 +1382,6 @@
 
     function renderProgramacionDeHoy() {
       const programs = getTodayPrograms();
-
       if (!programs.length) {
         todayProgramWidget.hidden = true;
         scheduleList.hidden = true;
@@ -1407,7 +1397,6 @@
       todayProgramHosts.textContent = principal.hosts || "FM Apocalipsis 100.7";
       programState.textContent = label || "Próximo";
       programState.className = "program-state" + (getStateClass(label) ? ` ${getStateClass(label)}` : "");
-
       renderScheduleList();
     }
 
@@ -1423,10 +1412,7 @@
         <div class="schedule-item">
           <div class="schedule-item-main">
             <div class="schedule-item-title">${programa.title}</div>
-            <div class="schedule-item-sub">
-              ${programa.start} a ${programa.end} hs<br>
-              ${programa.hosts || "FM Apocalipsis 100.7"}
-            </div>
+            <div class="schedule-item-sub">${programa.start} a ${programa.end} hs<br>${programa.hosts || "FM Apocalipsis 100.7"}</div>
           </div>
           <div class="schedule-item-day">${programa.days.map(day => DAY_NAMES[day]).join(" / ")}</div>
         </div>
@@ -1442,12 +1428,9 @@
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=${encodeURIComponent(APP_TIMEZONE)}`;
         const res = await fetch(url, { cache: "no-store" });
         const data = await res.json();
-
         if (!data.current) return;
-
         const temp = Math.round(data.current.temperature_2m);
         const code = data.current.weather_code;
-
         document.getElementById("weatherTemp").textContent = temp + "°";
         document.getElementById("weatherText").textContent = traducirClima(code);
         document.getElementById("weatherIcon").src = iconoClima(code);
@@ -1457,25 +1440,8 @@
     }
 
     function traducirClima(code) {
-      const clima = {
-        0: "Despejado",
-        1: "Mayormente despejado",
-        2: "Parcialmente nublado",
-        3: "Nublado",
-        45: "Niebla",
-        48: "Niebla",
-        51: "Llovizna leve",
-        53: "Llovizna",
-        55: "Llovizna fuerte",
-        61: "Lluvia",
-        63: "Lluvia moderada",
-        65: "Lluvia fuerte",
-        80: "Chubascos",
-        81: "Chubascos moderados",
-        82: "Chubascos fuertes",
-        95: "Tormenta"
-      };
-      return clima[code] || "Clima actualizado";
+      const clima = { 0: "Despejado", 1: "Mayormente despejado", 2: "Parcialmente nublado", 3: "Nublado", 45: "Niebla", 48: "Niebla", 51: "Llovizna leve", 53: "Llovizna", 55: "Llovizna fuerte", 61: "Lluvia", 63: "Lluvia moderada", 65: "Lluvia fuerte", 80: "Chubascos", 81: "Chubascos moderados", 82: "Chubascos fuertes", 95: "Tormenta" };
+      return clima[code] || "Actualizado";
     }
 
     function iconoClima(code) {
@@ -1493,7 +1459,6 @@
 
     function cleanMetadataText(text) {
       if (!text) return "";
-
       let value = String(text).trim();
       value = value.replace(/^current song[:\-\s]*/i, "");
       value = value.replace(/^currentsong[:\-\s]*/i, "");
@@ -1501,33 +1466,23 @@
       value = value.replace(/^streamtitle[:\-\s]*/i, "");
       value = value.replace(/^title[:\-\s]*/i, "");
       value = value.replace(/<[^>]*>/g, "").trim();
-
       if (!value) return "";
       if (value.length > 120) return value.slice(0, 120).trim();
-
       return value;
     }
 
     function parseSongData(text) {
       const clean = cleanMetadataText(text);
-
       if (!clean) return { full: "", artist: "", title: "" };
-
       const separators = [" - ", " – ", " — ", " | "];
-
       for (const sep of separators) {
         if (clean.includes(sep)) {
           const parts = clean.split(sep);
           if (parts.length >= 2) {
-            return {
-              full: clean,
-              artist: parts[0].trim(),
-              title: parts.slice(1).join(sep).trim()
-            };
+            return { full: clean, artist: parts[0].trim(), title: parts.slice(1).join(sep).trim() };
           }
         }
       }
-
       return { full: clean, artist: "", title: clean };
     }
 
@@ -1545,60 +1500,24 @@
 
     function extractFromJson(data) {
       if (!data) return "";
-
-      const directFields = [
-        data.title,
-        data.songtitle,
-        data.currentsong,
-        data.current_song,
-        data.song,
-        data.nowplaying,
-        data.now_playing
-      ];
-
+      const directFields = [data.title, data.songtitle, data.currentsong, data.current_song, data.song, data.nowplaying, data.now_playing];
       for (const item of directFields) {
         const cleaned = cleanMetadataText(item);
         if (cleaned) return cleaned;
       }
-
-      const nestedCandidates = [
-        data?.stats?.songtitle,
-        data?.stats?.title,
-        data?.streamstatus?.songtitle,
-        data?.streamstatus?.title,
-        data?.icestats?.source?.title
-      ];
-
+      const nestedCandidates = [data?.stats?.songtitle, data?.stats?.title, data?.streamstatus?.songtitle, data?.streamstatus?.title, data?.icestats?.source?.title];
       for (const item of nestedCandidates) {
         const cleaned = cleanMetadataText(item);
         if (cleaned) return cleaned;
       }
-
       return "";
     }
 
     function extractFromText(text) {
       if (!text) return "";
-
       const cleanedFull = cleanMetadataText(text);
-      if (
-        cleanedFull &&
-        !cleanedFull.includes("{") &&
-        !cleanedFull.includes("[") &&
-        cleanedFull.length < 120
-      ) {
-        return cleanedFull;
-      }
-
-      const patterns = [
-        /StreamTitle='([^']+)'/i,
-        /"title"\s*:\s*"([^"]+)"/i,
-        /"songtitle"\s*:\s*"([^"]+)"/i,
-        /current song[:\s-]+(.+)/i,
-        /currentsong[:\s-]+(.+)/i,
-        /song title[:\s-]+(.+)/i
-      ];
-
+      if (cleanedFull && !cleanedFull.includes("{") && !cleanedFull.includes("[") && cleanedFull.length < 120) return cleanedFull;
+      const patterns = [/StreamTitle='([^']+)'/i, /"title"\s*:\s*"([^"]+)"/i, /"songtitle"\s*:\s*"([^"]+)"/i, /current song[:\s-]+(.+)/i, /currentsong[:\s-]+(.+)/i, /song title[:\s-]+(.+)/i];
       for (const pattern of patterns) {
         const match = text.match(pattern);
         if (match && match[1]) {
@@ -1606,7 +1525,6 @@
           if (cleaned) return cleaned;
         }
       }
-
       return "";
     }
 
@@ -1624,26 +1542,21 @@
         async () => extractFromText(await fetchText(`${STREAM_HOST}/played?sid=1&type=json&count=1`)),
         async () => extractFromText(await fetchText(`${STREAM_HOST}/played?sid=0&type=json&count=1`))
       ];
-
       for (const attempt of attempts) {
         try {
           const result = await attempt();
           if (result) return result;
         } catch (e) {}
       }
-
       return "";
     }
 
     async function cargarStatsRadio() {
       if (radio.paused) return;
-
       try {
         const nowPlaying = await getStreamingMetadata();
         const parsed = parseSongData(nowPlaying);
-
         statusEl.textContent = parsed.full || getFallbackStatusText();
-
         if (parsed.full) {
           songInfo.hidden = false;
           songTitle.textContent = parsed.title || parsed.full;
@@ -1662,19 +1575,14 @@
         notifyBtn.hidden = true;
         return;
       }
-
       if (Notification.permission === "granted") {
-        notifyBtn.textContent = notificationsEnabledByUser
-          ? "🔔 Avisos activados"
-          : "🔕 Avisos desactivados";
+        notifyBtn.textContent = notificationsEnabledByUser ? "🔔 Avisos activados" : "🔕 Avisos desactivados";
         return;
       }
-
       if (Notification.permission === "denied") {
         notifyBtn.textContent = "🔕 Avisos bloqueados";
         return;
       }
-
       notifyBtn.textContent = "🔔 Activar avisos de programas";
     }
 
@@ -1684,14 +1592,9 @@
       if (!("Notification" in window)) return;
       if (Notification.permission !== "granted") return;
       if (!notificationsEnabledByUser) return;
-
       const todayKey = `${getNowParts().day}-${currentProgram.start}-${currentProgram.title}`;
       if (lastProgramNotificationKey === todayKey) return;
-
-      new Notification("FM Apocalipsis 100.7", {
-        body: `${currentProgram.title} ya está en vivo${currentProgram.hosts ? " · " + currentProgram.hosts : ""}`
-      });
-
+      new Notification("FM Apocalipsis 100.7", { body: `${currentProgram.title} ya está en vivo${currentProgram.hosts ? " · " + currentProgram.hosts : ""}` });
       lastProgramNotificationKey = todayKey;
     }
 
@@ -1700,16 +1603,13 @@
         notifyBtn.hidden = true;
         return;
       }
-
       notificationsEnabledByUser = localStorage.getItem("fm_apocalipsis_notifications") === "on";
       updateNotificationButtonText();
-
       notifyBtn.addEventListener("click", async () => {
         if (Notification.permission === "denied") {
           updateNotificationButtonText();
           return;
         }
-
         if (Notification.permission === "default") {
           try {
             const permission = await Notification.requestPermission();
@@ -1726,14 +1626,10 @@
           } catch (e) {}
           return;
         }
-
         notificationsEnabledByUser = !notificationsEnabledByUser;
         localStorage.setItem("fm_apocalipsis_notifications", notificationsEnabledByUser ? "on" : "off");
         updateNotificationButtonText();
-
-        if (notificationsEnabledByUser) {
-          maybeNotifyProgramStart();
-        }
+        if (notificationsEnabledByUser) maybeNotifyProgramStart();
       });
     }
 
@@ -1744,17 +1640,14 @@
           text: "Escuchá FM Apocalipsis 100.7 - La voz que viene de lo Alto",
           url: window.location.href
         };
-
         try {
           if (navigator.share) {
             await navigator.share(shareData);
           } else if (navigator.clipboard) {
             await navigator.clipboard.writeText(window.location.href);
-            installHint.textContent = "Enlace copiado para compartir";
+            installHint.textContent = "Enlace copiado";
             setTimeout(() => {
-              if (installHint.textContent === "Enlace copiado para compartir") {
-                installHint.textContent = "";
-              }
+              if (installHint.textContent === "Enlace copiado") installHint.textContent = "";
             }, 2500);
           }
         } catch (e) {}
@@ -1762,33 +1655,20 @@
     }
 
     function getReadCounts() {
-      try {
-        return JSON.parse(localStorage.getItem("fm_apocalipsis_reads") || '{"avisos":0,"eventos":0}');
-      } catch {
-        return { avisos: 0, eventos: 0 };
-      }
+      try { return JSON.parse(localStorage.getItem("fm_apocalipsis_reads") || '{"avisos":0,"eventos":0}'); }
+      catch { return { avisos: 0, eventos: 0 }; }
     }
 
-    function setReadCounts(data) {
-      localStorage.setItem("fm_apocalipsis_reads", JSON.stringify(data));
-    }
-
-    function openModal(modal) {
-      modal.hidden = false;
-    }
-
-    function closeModal(modal) {
-      modal.hidden = true;
-    }
+    function setReadCounts(data) { localStorage.setItem("fm_apocalipsis_reads", JSON.stringify(data)); }
+    function openModal(modal) { modal.hidden = false; }
+    function closeModal(modal) { modal.hidden = true; }
 
     function updateBadges() {
       const reads = getReadCounts();
       const unreadAvisos = Math.max(avisosData.length - (reads.avisos || 0), 0);
       const unreadEventos = Math.max(eventosData.length - (reads.eventos || 0), 0);
-
       avisosBadge.hidden = unreadAvisos <= 0;
       eventosBadge.hidden = unreadEventos <= 0;
-
       if (unreadAvisos > 0) avisosBadge.textContent = unreadAvisos;
       if (unreadEventos > 0) eventosBadge.textContent = unreadEventos;
     }
@@ -1832,20 +1712,14 @@
         avisosList.innerHTML = `<div class="empty-text">No hay avisos publicados.</div>`;
         return;
       }
-
       avisosList.innerHTML = avisosData.map((item) => `
         <div class="list-card notice">
           <div class="list-card-title">${item.title || "Aviso importante"}</div>
           <div class="list-card-sub">${item.description || "Aviso activo"}</div>
           <div class="list-card-meta">Publicado: ${formatFirestoreDate(item)}</div>
-          ${adminLoggedIn ? `
-            <div class="list-card-actions">
-              <button class="mini-btn" type="button" data-delete-aviso="${item.id}">Eliminar</button>
-            </div>
-          ` : ``}
+          ${adminLoggedIn ? `<div class="list-card-actions"><button class="mini-btn" type="button" data-delete-aviso="${item.id}">Eliminar</button></div>` : ``}
         </div>
       `).join("");
-
       avisosList.querySelectorAll("[data-delete-aviso]").forEach(btn => {
         btn.addEventListener("click", async () => {
           const id = btn.getAttribute("data-delete-aviso");
@@ -1860,21 +1734,15 @@
         eventosList.innerHTML = `<div class="empty-text">No hay eventos publicados.</div>`;
         return;
       }
-
       eventosList.innerHTML = eventosData.map((item) => `
         <div class="list-card event">
           <div class="list-card-title">${item.title || "Evento"}</div>
           <div class="list-card-sub">${item.dateText || ""}${item.timeText ? " · " + item.timeText : ""}</div>
           <div class="list-card-sub">${item.description || "Evento especial FM Apocalipsis"}</div>
           <div class="list-card-meta">Publicado: ${formatFirestoreDate(item)}</div>
-          ${adminLoggedIn ? `
-            <div class="list-card-actions">
-              <button class="mini-btn" type="button" data-delete-evento="${item.id}">Eliminar</button>
-            </div>
-          ` : ``}
+          ${adminLoggedIn ? `<div class="list-card-actions"><button class="mini-btn" type="button" data-delete-evento="${item.id}">Eliminar</button></div>` : ``}
         </div>
       `).join("");
-
       eventosList.querySelectorAll("[data-delete-evento]").forEach(btn => {
         btn.addEventListener("click", async () => {
           const id = btn.getAttribute("data-delete-evento");
@@ -1901,22 +1769,13 @@
     async function publishNotice() {
       const preset = presetNotice.value.trim();
       const detail = customNoticeText.value.trim();
-
       if (!preset && !detail) {
         alert("Debes seleccionar un aviso o escribir un detalle.");
         return;
       }
-
       const title = preset || "Aviso importante";
       const description = detail || "Sin detalle adicional";
-
-      await addDoc(collection(db, "avisos"), {
-        title,
-        description,
-        createdAt: serverTimestamp(),
-        active: true
-      });
-
+      await addDoc(collection(db, "avisos"), { title, description, createdAt: serverTimestamp(), active: true });
       presetNotice.value = "";
       customNoticeText.value = "";
       alert("Aviso publicado correctamente.");
@@ -1927,21 +1786,11 @@
       const timeText = eventTime.value.trim();
       const title = eventTitle.value.trim();
       const description = eventDescription.value.trim();
-
       if (!dateText || !timeText || !title) {
         alert("Completa día, hora y título del evento.");
         return;
       }
-
-      await addDoc(collection(db, "eventos"), {
-        dateText,
-        timeText,
-        title,
-        description,
-        createdAt: serverTimestamp(),
-        active: true
-      });
-
+      await addDoc(collection(db, "eventos"), { dateText, timeText, title, description, createdAt: serverTimestamp(), active: true });
       eventDate.value = "";
       eventTime.value = "";
       eventTitle.value = "";
@@ -1952,23 +1801,19 @@
     async function clearAllDocs(collectionName) {
       const snap = await getDocs(collection(db, collectionName));
       const deletes = [];
-      snap.forEach(item => {
-        deletes.push(deleteDoc(doc(db, collectionName, item.id)));
-      });
+      snap.forEach(item => deletes.push(deleteDoc(doc(db, collectionName, item.id))));
       await Promise.all(deletes);
     }
 
     function watchFirestore() {
       const avisosQuery = query(collection(db, "avisos"), orderBy("createdAt", "desc"));
       const eventosQuery = query(collection(db, "eventos"), orderBy("createdAt", "desc"));
-
       onSnapshot(avisosQuery, (snapshot) => {
         avisosData = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
         renderFeatured();
         renderAvisosList();
         updateBadges();
       });
-
       onSnapshot(eventosQuery, (snapshot) => {
         eventosData = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
         renderFeatured();
@@ -1984,9 +1829,7 @@
       renderEventosList();
     }
 
-    onAuthStateChanged(auth, (user) => {
-      updateAdminUI(user);
-    });
+    onAuthStateChanged(auth, (user) => updateAdminUI(user));
 
     scheduleToggle.addEventListener("click", () => {
       const isHidden = scheduleList.hidden;
@@ -2014,9 +1857,7 @@
       desactivarEnVivo();
     });
 
-    radio.addEventListener("waiting", () => {
-      statusEl.textContent = "Conectando...";
-    });
+    radio.addEventListener("waiting", () => { statusEl.textContent = "Conectando..."; });
 
     radio.addEventListener("playing", async () => {
       activarEstadoPlay();
@@ -2060,27 +1901,21 @@
         installBtn.hidden = true;
         return;
       }
-
       if (deferredPrompt) {
         deferredPrompt.prompt();
         try {
           const choiceResult = await deferredPrompt.userChoice;
-          if (choiceResult.outcome === "accepted") {
-            installHint.textContent = "Instalación iniciada";
-          }
+          if (choiceResult.outcome === "accepted") installHint.textContent = "Instalación iniciada";
         } catch (e) {}
-
         deferredPrompt = null;
         updateInstallVisibility();
         return;
       }
-
       if (isIOS() && !isInStandaloneMode()) {
         installHint.textContent = "En iPhone: Compartir → Añadir a pantalla de inicio";
         return;
       }
-
-      installHint.textContent = "Si no aparece el aviso, usa el menú del navegador para instalar.";
+      installHint.textContent = "Usa el menú del navegador para instalar.";
     });
 
     window.addEventListener("appinstalled", () => {
@@ -2090,22 +1925,12 @@
       installHint.textContent = "App instalada correctamente";
     });
 
-    openAvisosBtn.addEventListener("click", () => {
-      renderAvisosList();
-      openModal(avisosModal);
-      markAvisosAsRead();
-    });
-
-    openEventosBtn.addEventListener("click", () => {
-      renderEventosList();
-      openModal(eventosModal);
-      markEventosAsRead();
-    });
+    openAvisosBtn.addEventListener("click", () => { renderAvisosList(); openModal(avisosModal); markAvisosAsRead(); });
+    openEventosBtn.addEventListener("click", () => { renderEventosList(); openModal(eventosModal); markEventosAsRead(); });
 
     openAdminBtn.addEventListener("click", () => {
-      if (adminLoggedIn) {
-        openModal(adminPanelModal);
-      } else {
+      if (adminLoggedIn) openModal(adminPanelModal);
+      else {
         adminPassword.value = "";
         openModal(adminLoginModal);
       }
@@ -2119,12 +1944,10 @@
     adminLoginBtn.addEventListener("click", async () => {
       const email = adminEmail.value.trim();
       const password = adminPassword.value;
-
       if (!email || !password) {
         alert("Completa correo y contraseña.");
         return;
       }
-
       try {
         await signInWithEmailAndPassword(auth, email, password);
         closeModal(adminLoginModal);
@@ -2140,19 +1963,13 @@
     });
 
     publishNoticeBtn.addEventListener("click", async () => {
-      try {
-        await publishNotice();
-      } catch (error) {
-        alert("No se pudo publicar el aviso.");
-      }
+      try { await publishNotice(); }
+      catch (error) { alert("No se pudo publicar el aviso."); }
     });
 
     publishEventBtn.addEventListener("click", async () => {
-      try {
-        await publishEvent();
-      } catch (error) {
-        alert("No se pudo publicar el evento.");
-      }
+      try { await publishEvent(); }
+      catch (error) { alert("No se pudo publicar el evento."); }
     });
 
     clearNoticesBtn.addEventListener("click", async () => {
@@ -2181,9 +1998,7 @@
 
     [avisosModal, eventosModal, adminLoginModal, adminPanelModal].forEach(modal => {
       modal.addEventListener("click", (e) => {
-        if (e.target === modal) {
-          closeModal(modal);
-        }
+        if (e.target === modal) closeModal(modal);
       });
     });
 
@@ -2200,7 +2015,6 @@
       renderEventosList();
       updateBadges();
       watchFirestore();
-
       if (isIOS() && !isInStandaloneMode()) {
         installHint.textContent = "En iPhone se instala desde Compartir → Añadir a pantalla de inicio";
       }
@@ -2223,13 +2037,7 @@
     });
 
     setInterval(cargarClima, 600000);
-
-    setInterval(() => {
-      if (!radio.paused) {
-        cargarStatsRadio();
-      }
-    }, 30000);
-
+    setInterval(() => { if (!radio.paused) cargarStatsRadio(); }, 30000);
     setInterval(() => {
       renderProgramacionDeHoy();
       maybeNotifyProgramStart();
