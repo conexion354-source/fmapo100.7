@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="description" content="FM Apocalipsis 100.7 - Radio en vivo" />
+    <title>FM Apocalipsis 100.7</title>
+
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" href="logo.png" />
+    <link rel="apple-touch-icon" href="icons/icon-192.png" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { darkMode: 'class' };
+    </script>
+
+    <style>
+      html, body, #root {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+      body {
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: #0a0a0a;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script>
+      window.react = window.React;
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+    <script>
+      /*
+        Firebase config:
+        1) Entra a Firebase Console > Configuración del proyecto > Tus apps > Configuración SDK.
+        2) Copia esos valores en window.__firebase_config.
+      */
+      window.__firebase_config = {
+        apiKey: "AIzaSyA08xzcxTLjZT3kh5e5A57pBvHRlwETe-w",
+        authDomain: "fmapolipsischat.firebaseapp.com",
+        projectId: "fmapolipsischat",
+        storageBucket: "fmapolipsischat.firebasestorage.app",
+        messagingSenderId: "41472374951",
+        appId: "1:41472374951:web:27a9ba0cd3e6f590a84382"
+      };
+
+      // Opcional: separa data entre entornos/apps.
+      window.__app_id = "radio-apocalipsis-default";
+
+      // Opcional: token custom si usas backend propio.
+      // window.__initial_auth_token = "PEGAR_TOKEN";
+    </script>
+    <script src="https://unpkg.com/lucide-react@0.468.0/dist/umd/lucide-react.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel" data-presets="env,react">
+      const { useState, useRef, useEffect, useMemo } = React;
+      const {
+        Play,
+        Pause,
+        Radio,
+        Volume2,
+        VolumeX,
+        MessageCircle,
+        MoreVertical,
+        Minus,
+        CalendarDays,
+        MonitorPlay,
+        Youtube,
+        Facebook,
+        Users,
+        Sun,
+        Moon,
+        Clock,
+        RefreshCw,
+        Bell,
+        BellRing,
+        Share2,
+        Download,
+        AlertTriangle,
+        Send,
+        User
+      } = LucideReact;
+
+      const rawFirebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config)
+        ? __firebase_config
+        : (window.__firebase_config || null);
+      const initialAuthToken = (typeof __initial_auth_token !== 'undefined' && __initial_auth_token)
+        ? __initial_auth_token
+        : (window.__initial_auth_token || null);
+      const appId = (typeof __app_id !== 'undefined' && __app_id)
+        ? __app_id
+        : (window.__app_id || 'radio-apocalipsis-default');
+
+      let parsedFirebaseConfig = null;
+      try {
+        if (rawFirebaseConfig) {
+          parsedFirebaseConfig = typeof rawFirebaseConfig === 'string'
+            ? JSON.parse(rawFirebaseConfig)
+            : rawFirebaseConfig;
+        }
+      } catch (e) {
+        parsedFirebaseConfig = null;
+      }
+
+      const firebaseAvailable = typeof firebase !== 'undefined';
+      let firebaseApp = null;
+      if (firebaseAvailable && parsedFirebaseConfig) {
+        firebaseApp = firebase.apps && firebase.apps.length ? firebase.app() : firebase.initializeApp(parsedFirebaseConfig);
+      }
+      const auth = firebaseApp ? firebase.auth(firebaseApp) : null;
+      const db = firebaseApp ? firebase.firestore(firebaseApp) : null;
+
+      const TikTokIcon = ({ size = 24, className = "" }) => (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+          <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+        </svg>
+      );
+
+      function App() {
+        const [isPlaying, setIsPlaying] = useState(false);
+        const [activeTab, setActiveTab] = useState('home');
+        const [volume, setVolume] = useState(80);
+        const [isMuted, setIsMuted] = useState(false);
+        const [selectedDay, setSelectedDay] = useState('L');
+        const [nowPlaying, setNowPlaying] = useState('');
+        const [listeners, setListeners] = useState(0);
+        const [streamError, setStreamError] = useState(false);
+
+        const [user, setUser] = useState(null);
+        const [messages, setMessages] = useState([]);
+        const [newMessage, setNewMessage] = useState('');
+        const [userName, setUserName] = useState('');
+        const [isSettingName, setIsSettingName] = useState(false);
+        const [unreadCount, setUnreadCount] = useState(0);
+        const chatEndRef = useRef(null);
+
+        const [scheduleData, setScheduleData] = useState({
+          'L': [], 'M': [], 'X': [], 'J': [], 'V': [], 'S': [], 'D': []
+        });
+        const [promoGifs, setPromoGifs] = useState([]);
+
+        const [currentAdIndex, setCurrentAdIndex] = useState(0);
+        const [notificationsEnabled, setNotificationsEnabled] = useState({});
+        const [toastMsg, setToastMsg] = useState(null);
+        const [themeMode, setThemeMode] = useState('auto');
+        const [isDark, setIsDark] = useState(true);
+        const [currentProgram, setCurrentProgram] = useState(null);
+
+        const [deferredPrompt, setDeferredPrompt] = useState(null);
+        const [isInstallable, setIsInstallable] = useState(false);
+
+        const audioRef = useRef(null);
+        const streamUrl = "https://radios.solumedia.com:6322/stream";
+        const googleSheetsCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-N3so4cbqVC-4RfmlqZlRZapDugeYTSfrAjDKj8UghSOuqrvipAXXTQBCV5WEIoSajBhLoYfk5cO/pub?output=csv";
+
+        const getMessagesCollectionRef = () => {
+          if (!db) return null;
+          return db
+            .collection('artifacts')
+            .doc(appId)
+            .collection('public')
+            .doc('data')
+            .collection('messages');
+        };
+
+        const formatMsgDate = (timestamp) => {
+          if (!timestamp) return "";
+          const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+          return new Intl.DateTimeFormat('es-AR', { hour: '2-digit', minute: '2-digit' }).format(date);
+        };
+
+        useEffect(() => {
+          if (!auth) return;
+          const initAuth = async () => {
+            try {
+              if (initialAuthToken) {
+                await auth.signInWithCustomToken(initialAuthToken);
+              } else {
+                await auth.signInAnonymously();
+              }
+            } catch (error) {
+              console.error("Error de autenticación:", error);
+            }
+          };
+          initAuth();
+          const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+            setUser(currentUser);
+            if (currentUser?.displayName) setUserName(currentUser.displayName);
+          });
+          return () => unsubscribe();
+        }, []);
+
+        useEffect(() => {
+          if (!user || !db) return;
+          const messagesCollection = getMessagesCollectionRef();
+          if (!messagesCollection) return;
+          const unsubscribe = messagesCollection.onSnapshot((snapshot) => {
+            const msgs = snapshot.docs.map((docItem) => ({ id: docItem.id, ...docItem.data() }));
+            msgs.sort((a, b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0));
+
+            if (activeTab !== 'chat' && msgs.length > messages.length && messages.length > 0) {
+              setUnreadCount((prev) => prev + (msgs.length - messages.length));
+            }
+
+            setMessages(msgs.slice(-50));
+          }, (error) => {
+            console.error("Error cargando chat:", error);
+          });
+          return () => unsubscribe();
+        }, [user, activeTab, messages.length]);
+
+        useEffect(() => {
+          if (activeTab === 'chat') setUnreadCount(0);
+        }, [activeTab]);
+
+        useEffect(() => {
+          chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, [messages, activeTab]);
+
+        const showToast = (msg) => {
+          setToastMsg(msg);
+          setTimeout(() => setToastMsg(null), 3000);
+        };
+
+        const handleSendMessage = async (e) => {
+          e.preventDefault();
+          if (!newMessage.trim() || !user) return;
+          if (!userName) {
+            setIsSettingName(true);
+            return;
+          }
+          if (!db) {
+            showToast('Chat no disponible en este entorno.');
+            return;
+          }
+          try {
+            const messagesCollection = getMessagesCollectionRef();
+            await messagesCollection.add({
+              text: newMessage,
+              sender: userName,
+              userId: user.uid,
+              timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            setNewMessage('');
+          } catch (error) {
+            showToast("Error al enviar mensaje");
+          }
+        };
+
+        const saveUserName = async () => {
+          if (userName.trim()) {
+            if (auth?.currentUser) {
+              try {
+                await auth.currentUser.updateProfile({ displayName: userName.trim() });
+              } catch (_) {
+              }
+            }
+            setIsSettingName(false);
+            showToast(`¡Hola ${userName}!`);
+          }
+        };
+
+        useEffect(() => {
+          const handleBeforeInstallPrompt = (e) => {
+            e.preventDefault();
+            setDeferredPrompt(e);
+            setIsInstallable(true);
+          };
+          window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+          return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        }, []);
+
+        const handleInstallClick = async () => {
+          if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') setIsInstallable(false);
+            setDeferredPrompt(null);
+          }
+        };
+
+        const handleShare = async () => {
+          const shareData = {
+            title: 'FM Apocalipsis 100.7',
+            text: '¡Escucha nuestra radio en vivo y mira nuestro chat!',
+            url: window.location.href
+          };
+          if (navigator.share) {
+            try { await navigator.share(shareData); } catch (err) {}
+          } else {
+            try {
+              const textArea = document.createElement("textarea");
+              textArea.value = window.location.href;
+              document.body.appendChild(textArea);
+              textArea.select();
+              document.execCommand('copy');
+              document.body.removeChild(textArea);
+              showToast('¡Enlace copiado!');
+            } catch (err) {}
+          }
+        };
+
+        useEffect(() => {
+          const fetchSchedule = async () => {
+            try {
+              const response = await fetch(googleSheetsCsvUrl);
+              const text = await response.text();
+              const rows = [];
+              let quote = false, row = 0, col = 0;
+              for (let c = 0; c < text.length; c++) {
+                let cc = text[c], nc = text[c+1];
+                rows[row] = rows[row] || [];
+                rows[row][col] = rows[row][col] || '';
+                if (cc === '"' && quote && nc === '"') { rows[row][col] += cc; ++c; continue; }
+                if (cc === '"') { quote = !quote; continue; }
+                if (cc === ',' && !quote) { ++col; continue; }
+                if (cc === '\r' && nc === '\n' && !quote) { ++row; col = 0; ++c; continue; }
+                if (cc === '\n' && !quote) { ++row; col = 0; continue; }
+                if (cc === '\r' && !quote) { ++row; col = 0; continue; }
+                rows[row][col] += cc;
+              }
+
+              const newSchedule = { 'L': [], 'M': [], 'X': [], 'J': [], 'V': [], 'S': [], 'D': [] };
+              const newGifs = [];
+              for (let i = 1; i < rows.length; i++) {
+                const r = rows[i];
+                if (r.length >= 4 && r[0]) {
+                  const dia = r[0].trim().toUpperCase();
+                  if (dia === 'IMG') {
+                    const imgUrl = r[3] ? r[3].trim() : '';
+                    if (imgUrl && !newGifs.includes(imgUrl)) newGifs.push(imgUrl);
+                    continue;
+                  }
+                  if (r.length >= 4) {
+                    const title = r[3] ? r[3].trim() : '';
+                    if (title !== '') {
+                      const imageUrl = r.length >= 7 && r[6] ? r[6].trim() : null;
+                      if (imageUrl && !newGifs.includes(imageUrl)) newGifs.push(imageUrl);
+                      if (newSchedule[dia]) {
+                        newSchedule[dia].push({
+                          start: r[1] ? r[1].trim() : '',
+                          end: r[2] ? r[2].trim() : '',
+                          title: title,
+                          hosts: r.length >= 5 && r[4] ? r[4].trim() : '',
+                          image: imageUrl
+                        });
+                      }
+                    }
+                  }
+                }
+              }
+              setScheduleData(newSchedule);
+              if (newGifs.length > 0) setPromoGifs(newGifs);
+            } catch (error) {
+              console.error(error);
+            }
+          };
+          fetchSchedule();
+          const interval = setInterval(fetchSchedule, 30000);
+          return () => clearInterval(interval);
+        }, []);
+
+        useEffect(() => {
+          const checkCurrentProgram = () => {
+            const now = new Date();
+            const todayLetter = ['D', 'L', 'M', 'X', 'J', 'V', 'S'][now.getDay()];
+            const timeNumber = now.getHours() + (now.getMinutes() / 60);
+            const todaysPrograms = scheduleData[todayLetter];
+            let activeProgram = null;
+            if (todaysPrograms) {
+              for (const prog of todaysPrograms) {
+                if (!prog.start || !prog.end) continue;
+                const [hS, mS] = prog.start.split(':');
+                const startNum = parseInt(hS) + (parseInt(mS || 0) / 60);
+                const [hE, mE] = prog.end.split(':');
+                const endNum = parseInt(hE) + (parseInt(mE || 0) / 60);
+                if (startNum > endNum ? (timeNumber >= startNum || timeNumber < endNum) : (timeNumber >= startNum && timeNumber < endNum)) {
+                  activeProgram = prog;
+                  break;
+                }
+              }
+            }
+            setCurrentProgram(activeProgram);
+          };
+          checkCurrentProgram();
+          const timerId = setInterval(checkCurrentProgram, 60000);
+          return () => clearInterval(timerId);
+        }, [scheduleData]);
+
+        const displayGifs = useMemo(() => {
+          let gifs = [...promoGifs];
+          if (currentProgram && currentProgram.image && !gifs.includes(currentProgram.image)) {
+            gifs = [currentProgram.image, ...gifs];
+          }
+          return gifs;
+        }, [promoGifs, currentProgram]);
+
+        const safeAdIndex = displayGifs.length > 0 ? currentAdIndex % displayGifs.length : 0;
+        const currentDisplayedImage = displayGifs[safeAdIndex];
+        const isShowingLivePromo = currentProgram && currentProgram.image && currentDisplayedImage === currentProgram.image;
+
+        const syncToLive = () => {
+          if (audioRef.current) {
+            setIsPlaying(false);
+            setStreamError(false);
+            audioRef.current.src = streamUrl;
+            audioRef.current.load();
+            audioRef.current.play()
+              .then(() => {
+                setIsPlaying(true);
+                setupMediaSession();
+              })
+              .catch((e) => {
+                if (e.name !== 'AbortError') {
+                  setStreamError(true);
+                  setIsPlaying(false);
+                }
+              });
+          }
+        };
+
+        const togglePlay = () => isPlaying ? (audioRef.current.pause(), setIsPlaying(false)) : syncToLive();
+
+        const handleVolumeChange = (e) => {
+          const v = e.target.value;
+          setVolume(v);
+          if (audioRef.current) audioRef.current.volume = v / 100;
+        };
+
+        const setupMediaSession = () => {
+          if ('mediaSession' in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+              title: currentProgram ? currentProgram.title : (nowPlaying || 'FM Apocalipsis 100.7'),
+              artist: 'FM Apocalipsis 100.7',
+              artwork: currentDisplayedImage ? [{ src: currentDisplayedImage, sizes: '512x512', type: 'image/jpeg' }] : []
+            });
+          }
+        };
+
+        const toggleThemeMode = () => {
+          if (themeMode === 'auto') setThemeMode('light');
+          else if (themeMode === 'light') setThemeMode('dark');
+          else setThemeMode('auto');
+        };
+
+        useEffect(() => {
+          const applyTheme = () => {
+            if (themeMode === 'dark') setIsDark(true);
+            else if (themeMode === 'light') setIsDark(false);
+            else setIsDark(new Date().getHours() >= 18 || new Date().getHours() < 6);
+          };
+          applyTheme();
+        }, [themeMode]);
+
+        useEffect(() => {
+          const fetchMetadata = async () => {
+            try {
+              const r = await fetch('https://radios.solumedia.com:6322/stats?sid=1&json=1');
+              if (r.ok) {
+                const d = await r.json();
+                setNowPlaying(d.songtitle || '');
+                setListeners(d.currentlisteners || 0);
+              }
+            } catch (e) {
+              setNowPlaying('');
+            }
+          };
+          fetchMetadata();
+          const interval = setInterval(fetchMetadata, 15000);
+          return () => clearInterval(interval);
+        }, []);
+
+        const liveItems = [
+          {
+            name: 'YouTube',
+            url: 'https://www.youtube.com/@zonafe',
+            icon: <Youtube size={28} />,
+            iconWrap: 'w-14 h-14 rounded-2xl flex items-center justify-center text-red-600 bg-red-50 dark:bg-red-500/10',
+            dot: 'w-2 h-2 rounded-full bg-red-500 animate-pulse'
+          },
+          {
+            name: 'Facebook',
+            url: 'https://www.facebook.com/zonafe25',
+            icon: <Facebook size={28} />,
+            iconWrap: 'w-14 h-14 rounded-2xl flex items-center justify-center text-blue-600 bg-blue-50 dark:bg-blue-500/10',
+            dot: 'w-2 h-2 rounded-full bg-blue-500 animate-pulse'
+          },
+          {
+            name: 'TikTok',
+            url: 'https://tiktok.com/@tu_cuenta',
+            icon: <TikTokIcon size={26} />,
+            iconWrap: 'w-14 h-14 rounded-2xl flex items-center justify-center text-pink-600 bg-pink-50 dark:bg-pink-500/10',
+            dot: 'w-2 h-2 rounded-full bg-pink-500 animate-pulse'
+          }
+        ];
+
+        return (
+          <div className={`flex justify-center items-center h-[100dvh] w-full font-sans transition-colors duration-500 overflow-hidden ${isDark ? 'dark bg-[#0a0a0a]' : 'bg-gray-200'}`}>
+            <div className="w-full h-full sm:max-w-md bg-white dark:bg-slate-950 sm:h-[90vh] sm:rounded-[2.5rem] shadow-none sm:shadow-2xl overflow-hidden relative flex flex-col border-0 sm:border border-gray-300 dark:border-slate-800/60 transition-colors duration-500">
+              <div className={`absolute top-0 inset-x-0 h-96 blur-[100px] rounded-full pointer-events-none transition-colors duration-1000 ${isDark ? 'bg-amber-500/10' : 'bg-blue-500/10'}`} />
+
+              <audio ref={audioRef} src={streamUrl} playsInline onError={() => { setStreamError(true); setIsPlaying(false); }} />
+
+              <div className={`absolute top-4 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full text-xs font-medium shadow-lg transition-all duration-300 w-max max-w-[90%] text-center ${toastMsg ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'} ${isDark ? 'bg-amber-500 text-slate-950' : 'bg-blue-600 text-white'}`}>
+                {toastMsg}
+              </div>
+
+              <div className="pt-[env(safe-area-inset-top,1.5rem)] sm:pt-8 pb-3 px-6 relative z-10 flex justify-between items-center backdrop-blur-sm shrink-0">
+                <div className="flex items-center gap-3 flex-1 overflow-hidden pr-2">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-lg shrink-0 transition-colors ${isDark ? 'bg-gradient-to-tr from-amber-600 to-amber-300' : 'bg-gradient-to-tr from-blue-600 to-blue-400'}`}>
+                    <Radio size={16} className={isDark ? 'text-slate-950' : 'text-white'} strokeWidth={2.5} />
+                  </div>
+                  <div className="overflow-hidden flex flex-col w-full">
+                    <h1 className="text-base font-bold tracking-wide text-blue-600 dark:text-blue-400 truncate">FM Apocalipsis 100.7</h1>
+                    {currentProgram ? (
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-red-500 flex items-center gap-1">
+                        <span className="relative flex h-1.5 w-1.5">
+                          <span className="animate-ping absolute h-full w-full rounded-full opacity-75 bg-red-400"></span>
+                          <span className="relative rounded-full h-1.5 w-1.5 bg-red-500"></span>
+                        </span>
+                        <span className="truncate">En Vivo: {currentProgram.title}</span>
+                      </span>
+                    ) : <p className="text-[11px] text-gray-500 dark:text-slate-400 truncate">La voz que viene de lo alto</p>}
+                  </div>
+                </div>
+
+                <div className="flex gap-1 shrink-0 items-center">
+                  {isInstallable && (
+                    <button onClick={handleInstallClick} className="flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white text-[10px] font-bold uppercase rounded-full shadow-lg transition-transform active:scale-95">
+                      <Download size={14} /> <span>Instalar</span>
+                    </button>
+                  )}
+                  <button onClick={handleShare} className="p-2 text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800/50 rounded-full">
+                    <Share2 size={18} />
+                  </button>
+                  <button onClick={toggleThemeMode} className="p-2 text-gray-500 dark:text-slate-400 hover:bg-gray-100 dark:hover:bg-slate-800/50 rounded-full">
+                    {themeMode === 'auto' ? <Clock size={20} /> : themeMode === 'dark' ? <Moon size={20} /> : <Sun size={20} />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-hidden pb-[calc(env(safe-area-inset-bottom,0px)+72px)] relative z-10 flex flex-col">
+                {activeTab === 'home' && (
+                  <div className="flex-1 flex flex-col items-center justify-between px-6 pt-0 pb-2 h-full">
+                    <div className="flex-1 min-h-0 w-full flex items-center justify-center mt-2 mb-2">
+                      <div className="relative h-full aspect-square max-h-[35vh] sm:max-h-[300px] rounded-3xl overflow-hidden shadow-2xl bg-slate-200 dark:bg-slate-900 ring-1 ring-black/5 transition-all">
+                        {isShowingLivePromo && <div className="absolute top-3 right-3 z-20 bg-red-600/80 text-white text-[8px] font-bold px-2 py-1 rounded-md uppercase shadow-lg">En Vivo</div>}
+                        {displayGifs.length > 0 ? displayGifs.map((gif, idx) => (
+                          <img key={idx} src={gif} alt="Visual" onError={(e) => { e.target.style.display = 'none'; }} className={`absolute w-full h-full object-cover transition-all duration-1000 ${safeAdIndex === idx ? 'opacity-100 scale-100' : 'opacity-0 scale-105'}`} />
+                        )) : <div className="w-full h-full flex items-center justify-center text-gray-400 opacity-50"><Radio size={48} /></div>}
+                        <div className={`absolute inset-0 ${isDark ? 'bg-gradient-to-t from-slate-950/90' : 'bg-gradient-to-t from-black/60'} via-transparent to-transparent`}></div>
+                      </div>
+                    </div>
+
+                    <div className="w-full px-2 text-center mt-auto shrink-0">
+                      {streamError ? (
+                        <div className="w-full max-w-[300px] mx-auto bg-red-500/10 dark:bg-red-500/20 border border-red-500/20 rounded-2xl p-3 flex items-center gap-3 backdrop-blur-md shadow-lg animate-pulse">
+                          <div className="bg-red-500/20 p-2 rounded-full"><AlertTriangle size={20} className="text-red-600 dark:text-red-400" /></div>
+                          <div className="text-left">
+                            <h3 className="text-red-600 dark:text-red-400 font-bold text-[11px] uppercase tracking-wider">Señal no disponible</h3>
+                            <p className="text-[9px] text-red-600/80 dark:text-red-400/80">Inclemencias del tiempo o mantenimiento. Intente más tarde.</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="min-h-[50px] flex flex-col justify-center items-center">
+                          <h2 className={`text-lg font-bold transition-colors line-clamp-2 ${isDark ? 'text-slate-100' : 'text-gray-900'}`}>{currentProgram ? currentProgram.title : nowPlaying}</h2>
+                          {currentProgram && <span className="text-xs text-gray-500 dark:text-slate-400 font-medium">Con {currentProgram.hosts}</span>}
+                        </div>
+                      )}
+
+                      <div className={`flex items-center justify-center gap-[5px] h-6 mt-1 transition-all duration-700 ${isPlaying ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}`}>
+                        {[0.4, 0.1, 0.6, 0.0, 0.5, 0.2, 0.7].map((d, i) => (
+                          <div key={i} className={`w-1 rounded-full ${isDark ? 'bg-amber-500' : 'bg-blue-500'}`} style={{ height: isPlaying ? '100%' : '4px', animation: isPlaying ? `eqBounce 1.2s ease-in-out infinite ${d}s` : 'none', boxShadow: `0 0 10px ${isDark ? '#f59e0b' : '#3b82f6'}44` }}></div>
+                        ))}
+                      </div>
+
+                      <div className="mt-3">
+                        <div className="h-1 w-full bg-gray-300 dark:bg-slate-800 rounded-full overflow-hidden">
+                          <div className={`h-full w-1/3 transition-all duration-500 ${isPlaying ? (isDark ? 'bg-amber-500' : 'bg-blue-600') : 'bg-gray-400'}`}></div>
+                        </div>
+                        <div className="flex justify-between items-center mt-3 px-1">
+                          <button onClick={syncToLive} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all ${isPlaying ? 'bg-red-500/10 text-red-600' : 'bg-gray-200 text-gray-500'}`}>
+                            <span className={`h-2 w-2 rounded-full ${isPlaying ? 'bg-red-600 animate-pulse' : 'bg-gray-500'}`}></span> EN VIVO
+                          </button>
+                          <div className="flex items-center gap-3 text-[10px] font-medium text-gray-500">
+                            <span className="flex items-center gap-1"><Users size={12} /> {listeners}</span>
+                            <span className={isPlaying ? 'text-amber-500 animate-pulse' : ''}>{isPlaying ? 'SONANDO' : 'PAUSADO'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button onClick={togglePlay} className={`w-16 h-16 flex items-center justify-center rounded-full mt-4 shadow-xl transition-all active:scale-90 ${isDark ? 'bg-slate-100 text-slate-950 shadow-white/5' : 'bg-blue-600 text-white shadow-blue-500/20'}`}>
+                      {isPlaying ? <Pause size={28} /> : <Play size={32} className="ml-1" />}
+                    </button>
+
+                    <div className="flex items-center w-full max-w-[280px] gap-4 text-gray-500 mt-2 mb-2 shrink-0">
+                      <button onClick={() => { setIsMuted(!isMuted); if (audioRef.current) audioRef.current.muted = !isMuted; }}>
+                        {isMuted || volume == 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                      </button>
+                      <input type="range" min="0" max="100" value={isMuted ? 0 : volume} onChange={handleVolumeChange} className="w-full h-1 bg-gray-300 dark:bg-slate-800 rounded-full appearance-none cursor-pointer accent-blue-600 dark:accent-amber-500" />
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'chat' && (
+                  <div className="flex-1 flex flex-col h-full overflow-hidden bg-gray-50 dark:bg-slate-950/30">
+                    <div className="px-6 pt-2 pb-4 shrink-0">
+                      <h2 className="text-3xl font-light text-gray-900 dark:text-slate-100">Chat en vivo</h2>
+                      <p className="text-gray-500 text-sm">Saluda a los conductores y oyentes.</p>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto px-6 py-2 space-y-4 custom-scrollbar">
+                      {messages.length === 0 ? (
+                        <div className="h-full flex flex-col items-center justify-center text-gray-400 opacity-50 space-y-2">
+                          <MessageCircle size={40} />
+                          <p className="text-xs">¡Sé el primero en saludar!</p>
+                        </div>
+                      ) : (
+                        messages.map((msg) => (
+                          <div key={msg.id} className={`flex flex-col ${msg.userId === user?.uid ? 'items-end' : 'items-start'}`}>
+                            <span className="text-[10px] text-gray-500 mb-0.5 px-1">{msg.sender}</span>
+                            <div className={`max-w-[85%] px-4 py-2 rounded-2xl text-sm shadow-sm ${
+                              msg.userId === user?.uid
+                                ? (isDark ? 'bg-amber-500 text-slate-950' : 'bg-blue-600 text-white')
+                                : (isDark ? 'bg-slate-800 text-slate-100' : 'bg-white text-gray-800 border border-gray-100')
+                            }`}>
+                              {msg.text}
+                            </div>
+                            <span className="text-[9px] text-gray-400 mt-1 px-1">{formatMsgDate(msg.timestamp)}</span>
+                          </div>
+                        ))
+                      )}
+                      <div ref={chatEndRef} />
+                    </div>
+
+                    <form onSubmit={handleSendMessage} className="p-4 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 flex gap-2 items-center">
+                      <input
+                        type="text"
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        placeholder={userName ? "Escribe un mensaje..." : "Toca para identificarte"}
+                        onClick={() => !userName && setIsSettingName(true)}
+                        readOnly={!userName}
+                        className="flex-1 bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white px-4 py-2.5 rounded-full text-sm outline-none focus:ring-2 focus:ring-blue-500/50"
+                      />
+                      <button type="submit" className={`p-2.5 rounded-full transition-all ${isDark ? 'bg-amber-500 text-slate-950' : 'bg-blue-600 text-white'} active:scale-90`}>
+                        <Send size={18} />
+                      </button>
+                    </form>
+                  </div>
+                )}
+
+                {activeTab === 'live' && (
+                  <div className="flex-1 flex flex-col px-6 pt-2 pb-4 h-full overflow-hidden">
+                    <h2 className="text-3xl font-light dark:text-slate-100 mb-6">Ver en Vivo</h2>
+                    <div className="space-y-4 overflow-y-auto pr-1 custom-scrollbar">
+                      {liveItems.map((social, i) => (
+                        <a key={i} href={social.url} target="_blank" rel="noopener noreferrer" className="bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-800 p-4 rounded-3xl flex items-center gap-5 hover:scale-[1.02] transition-transform shadow-sm">
+                          <div className={social.iconWrap}>{social.icon}</div>
+                          <div className="flex-1">
+                            <h3 className="text-lg font-medium dark:text-slate-100">{social.name}</h3>
+                            <p className="text-xs text-gray-500 dark:text-slate-400">Transmisión oficial</p>
+                          </div>
+                          <div className={social.dot}></div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === 'schedule' && (
+                  <div className="flex-1 flex flex-col px-6 pt-2 pb-2 h-full overflow-hidden">
+                    <div className="mb-4 shrink-0">
+                      <h2 className="text-3xl font-light text-slate-900 dark:text-slate-100 transition-colors">Programación</h2>
+                      <p className="text-gray-500 dark:text-slate-500 text-sm transition-colors">Horarios de esta semana.</p>
+                    </div>
+                    <div className="flex justify-between items-center mb-4 bg-gray-100 dark:bg-slate-900/50 p-1.5 rounded-2xl shrink-0 overflow-x-auto custom-scrollbar">
+                      {['L','M','X','J','V','S','D'].map((dayId) => (
+                        <button key={dayId} onClick={() => setSelectedDay(dayId)} className={`flex-1 py-2 min-w-[40px] rounded-xl text-xs font-medium transition-all ${selectedDay === dayId ? (isDark ? 'bg-amber-500 text-slate-950 shadow-lg' : 'bg-blue-600 text-white shadow-md') : 'text-gray-500 hover:bg-gray-200 dark:hover:bg-slate-800 dark:text-slate-400'}`}>
+                          {dayId === 'X' ? 'MI' : dayId}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar space-y-3 pb-4">
+                      {scheduleData[selectedDay]?.length > 0 ? scheduleData[selectedDay].map((p, idx) => (
+                        <div key={idx} className={`p-4 rounded-2xl border transition-all flex items-center gap-4 ${currentProgram?.title === p.title ? 'bg-amber-500/10 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.1)]' : 'bg-gray-50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-800'}`}>
+                          <div className="flex flex-col items-center min-w-[50px]">
+                            <span className={`text-xs font-bold ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{p.start}</span>
+                            <Minus size={10} className="opacity-30 dark:text-slate-500" />
+                            <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{p.end}</span>
+                          </div>
+
+                          {p.image && <img src={p.image} alt={p.title} className="w-10 h-10 rounded-lg object-cover ring-1 ring-black/5 dark:ring-white/10 shadow-sm" />}
+
+                          <div className="flex-1 overflow-hidden">
+                            <h3 className={`text-sm font-bold truncate transition-colors ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>{p.title}</h3>
+                            <p className={`text-[10px] truncate transition-colors ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>{p.hosts}</p>
+                          </div>
+
+                          <button onClick={() => showToast(`Alerta: ${p.title}`)} className={`p-2 rounded-full transition-colors ${isDark ? 'text-slate-500 hover:text-amber-500' : 'text-gray-400 hover:text-blue-600'}`}>
+                            <Bell size={18} />
+                          </button>
+                        </div>
+                      )) : <p className="text-center text-gray-400 dark:text-slate-500 text-sm py-10">Sin programación para hoy.</p>}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {isSettingName && (
+                <div className="absolute inset-0 z-[60] flex items-center justify-center p-6 bg-black/60 backdrop-blur-md">
+                  <div className="w-full max-w-xs bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 shadow-2xl scale-in border dark:border-white/5">
+                    <div className="w-16 h-16 bg-blue-500/20 dark:bg-amber-500/20 text-blue-600 dark:text-amber-500 rounded-full flex items-center justify-center mb-6 mx-auto">
+                      <User size={32} />
+                    </div>
+                    <h3 className="text-xl font-bold text-center mb-2 dark:text-white">¿Quién eres?</h3>
+                    <p className="text-xs text-gray-500 text-center mb-6">Elige un nombre para participar en el chat.</p>
+                    <input
+                      type="text"
+                      maxLength={15}
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                      placeholder="Escribe tu apodo aquí..."
+                      className="w-full bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white px-4 py-3 rounded-2xl text-sm mb-4 outline-none border-2 border-transparent focus:border-blue-500 dark:focus:border-amber-500 transition-all"
+                    />
+                    <button
+                      onClick={saveUserName}
+                      className="w-full py-3 bg-blue-600 dark:bg-amber-500 text-white dark:text-slate-950 font-bold rounded-2xl hover:opacity-90 active:scale-95 transition-all shadow-lg"
+                    >
+                      Comenzar a chatear
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="absolute bottom-0 w-full bg-white/90 dark:bg-slate-950/80 backdrop-blur-xl border-t border-gray-200 dark:border-slate-800/80 pt-3 pb-[env(safe-area-inset-bottom,12px)] px-8 flex justify-between items-center z-20 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] transition-colors">
+                <NavButton icon={<Radio size={22} />} label="Radio" isActive={activeTab === 'home'} onClick={() => setActiveTab('home')} isDark={isDark} />
+                <NavButton icon={<MessageCircle size={22} />} label="Chat" isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} isDark={isDark} badge={unreadCount} />
+                <NavButton icon={<MonitorPlay size={22} />} label="En Vivo" isActive={activeTab === 'live'} onClick={() => setActiveTab('live')} isDark={isDark} />
+                <NavButton icon={<CalendarDays size={22} />} label="Horarios" isActive={activeTab === 'schedule'} onClick={() => setActiveTab('schedule')} isDark={isDark} />
+              </div>
+            </div>
+
+            <style dangerouslySetInnerHTML={{__html: `
+              .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+              .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+              .custom-scrollbar::-webkit-scrollbar-thumb { background-color: ${isDark ? '#334155' : '#cbd5e1'}; border-radius: 20px; }
+              @keyframes eqBounce { 0%, 100% { height: 4px; } 50% { height: 24px; } }
+              .scale-in { animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+              @keyframes scaleIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+            `}} />
+          </div>
+        );
+      }
+
+      function NavButton({ icon, label, isActive, onClick, isDark, badge }) {
+        return (
+          <button onClick={onClick} className="flex flex-col items-center justify-center p-2 transition-all duration-300 relative group">
+            <div className={`mb-1 transition-transform duration-300 ${isActive ? '-translate-y-1 scale-110' : 'group-hover:scale-105'} ${isActive ? (isDark ? 'text-amber-500' : 'text-blue-600') : 'text-gray-500'}`}>
+              {icon}
+            </div>
+            <span className={`text-[9px] font-medium transition-all duration-300 ${isActive ? 'opacity-100' : 'opacity-70'} ${isActive ? (isDark ? 'text-amber-500' : 'text-blue-600') : 'text-gray-500'}`}>
+              {label}
+            </span>
+
+            {badge > 0 && (
+              <div className="absolute top-1 right-1 bg-red-500 text-white text-[8px] font-black h-4 w-4 flex items-center justify-center rounded-full border-2 border-white dark:border-slate-950 animate-bounce shadow-lg">
+                {badge > 9 ? '9+' : badge}
+              </div>
+            )}
+
+            {isActive && (
+              <div className={`absolute -bottom-1 h-1 w-1 rounded-full ${isDark ? 'bg-amber-500' : 'bg-blue-600'}`}></div>
+            )}
+          </button>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(<App />);
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').catch(() => {});
+        });
+      }
+    </script>
+  </body>
+</html>
