@@ -222,6 +222,16 @@
         const streamUrl = "https://radios.solumedia.com:6322/stream";
         const googleSheetsCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-N3so4cbqVC-4RfmlqZlRZapDugeYTSfrAjDKj8UghSOuqrvipAXXTQBCV5WEIoSajBhLoYfk5cO/pub?output=csv";
 
+        const timeToMinutes = (value) => {
+          if (!value) return Number.MAX_SAFE_INTEGER;
+          const match = String(value).trim().match(/^(\d{1,2})(?::(\d{1,2}))?/);
+          if (!match) return Number.MAX_SAFE_INTEGER;
+          const hours = Number.parseInt(match[1], 10);
+          const minutes = Number.parseInt(match[2] || '0', 10);
+          if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return Number.MAX_SAFE_INTEGER;
+          return (hours * 60) + minutes;
+        };
+
         const formatMsgDate = (timestamp) => {
           if (!timestamp) return "";
           try {
@@ -537,6 +547,9 @@
                   }
                 }
               }
+              Object.keys(newSchedule).forEach((day) => {
+                newSchedule[day].sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
+              });
               setScheduleData(newSchedule);
               if (newGifs.length > 0) setPromoGifs(newGifs);
             } catch (error) {
@@ -624,9 +637,13 @@
         const togglePlay = () => isPlaying ? (audioRef.current.pause(), setIsPlaying(false)) : syncToLive();
 
         const handleVolumeChange = (e) => {
-          const v = e.target.value;
+          const v = Number(e.target.value);
           setVolume(v);
-          if (audioRef.current) audioRef.current.volume = v / 100;
+          if (v > 0 && isMuted) setIsMuted(false);
+          if (audioRef.current) {
+            audioRef.current.volume = v / 100;
+            audioRef.current.muted = v === 0 ? true : false;
+          }
         };
 
         const setupMediaSession = () => {
@@ -920,13 +937,24 @@
                     </div>
 
                     <div className={`flex items-center w-full max-w-[280px] gap-4 text-gray-500 dark:text-slate-500 shrink-0 ${isCompactHomeLayout ? 'mt-1 mb-2' : 'mt-2 mb-4'}`}>
-                      <button onClick={() => { setIsMuted(!isMuted); if (audioRef.current) audioRef.current.muted = !isMuted; }} className="hover:text-gray-800 dark:hover:text-slate-300 transition-colors">
+                      <button onClick={() => { const nextMuted = !isMuted; setIsMuted(nextMuted); if (audioRef.current) audioRef.current.muted = nextMuted; }} className="hover:text-gray-800 dark:hover:text-slate-300 transition-colors">
                         {isMuted || volume == 0 ? <VolumeX size={18} strokeWidth={1.5} /> : <Volume2 size={18} strokeWidth={1.5} />}
                       </button>
-                      <div className="relative w-full h-1 bg-gray-300 dark:bg-slate-800 rounded-full flex items-center group">
-                        <input type="range" min="0" max="100" value={isMuted ? 0 : volume} onChange={handleVolumeChange} className="absolute z-10 w-full h-full opacity-0 cursor-pointer" />
-                        <div className={`h-full rounded-full pointer-events-none transition-colors ${isDark ? 'bg-slate-400 group-hover:bg-amber-400' : 'bg-gray-500 group-hover:bg-blue-500'}`} style={{ width: `${isMuted ? 0 : volume}%` }}></div>
-                        <div className="absolute h-3 w-3 bg-white rounded-full shadow-md pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" style={{ left: `calc(${isMuted ? 0 : volume}% - 6px)` }}></div>
+                      <div className="relative w-full h-8 flex items-center group">
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={volume}
+                          onChange={handleVolumeChange}
+                          onInput={handleVolumeChange}
+                          aria-label="Volumen"
+                          className="absolute inset-0 z-10 w-full h-full opacity-0 cursor-pointer"
+                        />
+                        <div className="relative w-full h-1 bg-gray-300 dark:bg-slate-800 rounded-full overflow-hidden pointer-events-none">
+                          <div className={`h-full rounded-full transition-colors ${isDark ? 'bg-slate-400 group-hover:bg-amber-400' : 'bg-gray-500 group-hover:bg-blue-500'}`} style={{ width: `${isMuted ? 0 : volume}%` }}></div>
+                        </div>
+                        <div className="absolute top-1/2 -translate-y-1/2 h-4 w-4 bg-white rounded-full shadow-md pointer-events-none opacity-100 transition-transform group-hover:scale-110" style={{ left: `calc(${isMuted ? 0 : volume}% - 8px)` }}></div>
                       </div>
                     </div>
                   </div>
@@ -1029,7 +1057,7 @@
                   <div className="flex-1 flex flex-col px-6 pt-2 pb-2 h-full overflow-hidden">
                     <div className="mb-4 shrink-0">
                       <h2 className="text-3xl font-light text-slate-900 dark:text-slate-100 transition-colors">Programación</h2>
-                      <p className="text-gray-500 dark:text-slate-500 text-sm transition-colors">Horarios de esta semana.</p>
+                      <p className="text-gray-500 dark:text-slate-500 text-sm transition-colors">Programación semanal.</p>
                     </div>
                     <div className="flex justify-between items-center mb-4 bg-gray-100 dark:bg-slate-900/50 p-1.5 rounded-2xl shrink-0 overflow-x-auto custom-scrollbar">
                       {['L','M','X','J','V','S','D'].map((dayId) => (
@@ -1113,7 +1141,7 @@
                 <NavButton icon={<Radio size={22} />} label="Radio" isActive={activeTab === 'home'} onClick={() => setActiveTab('home')} isDark={isDark} />
                 <NavButton icon={<MessageCircle size={22} />} label="Chat" isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} isDark={isDark} badge={unreadCount} />
                 <NavButton icon={<MonitorPlay size={22} />} label="En Vivo" isActive={activeTab === 'live'} onClick={() => setActiveTab('live')} isDark={isDark} />
-                <NavButton icon={<CalendarDays size={22} />} label="Horarios" isActive={activeTab === 'schedule'} onClick={() => setActiveTab('schedule')} isDark={isDark} />
+                <NavButton icon={<CalendarDays size={22} />} label="Programación" isActive={activeTab === 'schedule'} onClick={() => setActiveTab('schedule')} isDark={isDark} />
               </div>
             </div>
 
