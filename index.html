@@ -184,7 +184,13 @@
         const [user, setUser] = useState(null);
         const [messages, setMessages] = useState([]);
         const [newMessage, setNewMessage] = useState('');
-        const [userName, setUserName] = useState('');
+        const [userName, setUserName] = useState(() => {
+          try {
+            return window.localStorage.getItem('fm-chat-apodo') || '';
+          } catch (_) {
+            return '';
+          }
+        });
         const [isSettingName, setIsSettingName] = useState(false);
         const [unreadCount, setUnreadCount] = useState(0);
         const [isInputFocused, setIsInputFocused] = useState(false);
@@ -230,6 +236,29 @@
           const minutes = Number.parseInt(match[2] || '0', 10);
           if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return Number.MAX_SAFE_INTEGER;
           return (hours * 60) + minutes;
+        };
+
+        const normalizeHeader = (value) => String(value || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .trim()
+          .toLowerCase();
+
+        const findColumnIndex = (headers, aliases) => {
+          const normalizedAliases = aliases.map(normalizeHeader);
+          return headers.findIndex((header) => normalizedAliases.includes(normalizeHeader(header)));
+        };
+
+        const normalizeWhatsAppPhone = (value) => {
+          const digits = String(value || '').replace(/\D/g, '');
+          return digits.length >= 8 ? digits : '';
+        };
+
+        const getWhatsAppUrl = (program) => {
+          const phone = normalizeWhatsAppPhone(program?.phone);
+          if (!phone) return '';
+          const message = encodeURIComponent(`Hola, escucho ${program?.title || 'el programa'} por FM Apocalipsis 100.7`);
+          return `https://wa.me/${phone}?text=${message}`;
         };
 
         const formatMsgDate = (timestamp) => {
@@ -314,7 +343,13 @@
           if (!auth) return;
           const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
-            if (currentUser?.displayName) setUserName(currentUser.displayName);
+            if (currentUser?.displayName) {
+              setUserName(currentUser.displayName);
+              try {
+                window.localStorage.setItem('fm-chat-apodo', currentUser.displayName);
+              } catch (_) {
+              }
+            }
           });
           return () => unsubscribe();
         }, []);
@@ -377,7 +412,8 @@
         const handleSendMessage = async (e) => {
           e.preventDefault();
           if (!newMessage.trim() || !user || !db) return;
-          if (!userName) {
+          const savedName = userName.trim();
+          if (!savedName) {
             setIsSettingName(true);
             return;
           }
@@ -385,7 +421,7 @@
             const messagesCollection = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
             await addDoc(messagesCollection, {
               text: String(newMessage),
-              sender: String(userName),
+              sender: String(savedName),
               userId: user.uid,
               timestamp: serverTimestamp()
             });
@@ -396,9 +432,15 @@
         };
 
         const saveUserName = () => {
-          if (userName.trim()) {
+          const savedName = userName.trim();
+          if (savedName) {
+            setUserName(savedName);
+            try {
+              window.localStorage.setItem('fm-chat-apodo', savedName);
+            } catch (_) {
+            }
             setIsSettingName(false);
-            showToast(`¡Hola ${userName}!`);
+            showToast(`¡Hola ${savedName}!`);
           }
         };
 
@@ -522,6 +564,10 @@
 
               const newSchedule = { 'L': [], 'M': [], 'X': [], 'J': [], 'V': [], 'S': [], 'D': [] };
               const newGifs = [];
+              const headers = rows[0] || [];
+              const hostsIndex = findColumnIndex(headers, ['conductores', 'conductor', 'hosts', 'locutores']);
+              const imageIndex = findColumnIndex(headers, ['imagen', 'image', 'foto', 'flyer', 'promo']);
+              const phoneIndex = findColumnIndex(headers, ['telefono', 'teléfono', 'numero', 'número', 'numero telefono', 'número telefono', 'numero de telefono', 'número de teléfono', 'whatsapp', 'wsp', 'celular', 'contacto']);
               for (let i = 1; i < rows.length; i++) {
                 const r = rows[i];
                 if (r && r.length >= 4 && r[0]) {
@@ -533,15 +579,21 @@
                   }
                   const title = r[3] ? r[3].trim() : '';
                   if (title !== '') {
-                    const imageUrl = r.length >= 7 && r[6] ? r[6].trim() : null;
+                    const imageUrl = imageIndex >= 0
+                      ? (r[imageIndex] ? r[imageIndex].trim() : null)
+                      : (r.length >= 7 && r[6] ? r[6].trim() : null);
+                    const phone = phoneIndex >= 0
+                      ? (r[phoneIndex] ? r[phoneIndex].trim() : '')
+                      : (r.length >= 8 && r[7] ? r[7].trim() : '');
                     if (imageUrl && !newGifs.includes(imageUrl)) newGifs.push(imageUrl);
                     if (newSchedule[dia]) {
                       newSchedule[dia].push({
                         start: r[1]?.trim(),
                         end: r[2]?.trim(),
                         title,
-                        hosts: r[4]?.trim(),
-                        image: imageUrl
+                        hosts: hostsIndex >= 0 ? r[hostsIndex]?.trim() : r[4]?.trim(),
+                        image: imageUrl,
+                        phone
                       });
                     }
                   }
@@ -613,6 +665,7 @@
         const metadataText = (currentProgram?.title && String(currentProgram.title).trim())
           ? String(currentProgram.title).trim()
           : ((nowPlaying && nowPlaying.trim()) ? nowPlaying.trim() : 'FM Apocalipsis 100.7');
+        const currentWhatsAppUrl = getWhatsAppUrl(currentProgram);
 
         const syncToLive = () => {
           if (audioRef.current) {
@@ -927,6 +980,17 @@
                             </span>
                           </div>
                         </div>
+                        {currentWhatsAppUrl && (
+                          <a
+                            href={currentWhatsAppUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`mt-3 w-full flex items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-bold shadow-sm active:scale-95 transition-all ${isDark ? 'bg-green-500/15 text-green-400 hover:bg-green-500/25' : 'bg-green-600 text-white hover:bg-green-700'}`}
+                          >
+                            <MessageCircle size={16} />
+                            WhatsApp del programa
+                          </a>
+                        )}
                       </div>
                     </div>
 
@@ -1021,11 +1085,12 @@
                         onFocus={() => {
                           setIsInputFocused(true);
                           setShowEmojis(false);
+                          if (!userName.trim()) setIsSettingName(true);
                         }}
                         onBlur={() => setTimeout(() => setIsInputFocused(false), 200)}
-                        placeholder={userName ? "Di algo..." : "Toca para identificarte"}
-                        onClick={() => !userName && setIsSettingName(true)}
-                        readOnly={!userName}
+                        placeholder={userName.trim() ? "Di algo..." : "Toca para identificarte"}
+                        onClick={() => !userName.trim() && setIsSettingName(true)}
+                        readOnly={!userName.trim()}
                         className="flex-1 bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white px-4 py-2.5 rounded-full text-[16px] sm:text-sm outline-none focus:ring-2 focus:ring-blue-500/50"
                       />
                       <button type="submit" className={`p-2.5 rounded-full transition-all ${isDark ? 'bg-amber-500 text-slate-950' : 'bg-blue-600 text-white'} active:scale-90`}>
@@ -1079,7 +1144,7 @@
                           <div className="flex-1 overflow-hidden pr-2">
                             <h3 className={`text-sm font-medium truncate flex items-center gap-2 ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
                               {p.title}
-                              {currentProgram?.title === p.title && (
+                              {currentProgram?.title === p.title && currentProgram?.start === p.start && (
                                 <span className="flex h-2 w-2 relative shrink-0">
                                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-amber-400"></span>
                                   <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
@@ -1088,9 +1153,21 @@
                             </h3>
                             <p className={`text-xs mt-0.5 leading-snug ${isDark ? 'text-slate-400' : 'text-gray-600'}`}>{p.hosts}</p>
                           </div>
-                          <button onClick={() => showToast(`Recordatorio para: ${p.title}`)} className={`p-2 rounded-full transition-colors ${isDark ? 'text-slate-500 hover:text-amber-500' : 'text-gray-400 hover:text-blue-600'}`}>
-                            <Bell size={18} />
-                          </button>
+                          {currentProgram?.title === p.title && currentProgram?.start === p.start && getWhatsAppUrl(p) ? (
+                            <a
+                              href={getWhatsAppUrl(p)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 rounded-full bg-green-600 text-white shadow-md shadow-green-600/20 active:scale-90 transition-all"
+                              aria-label={`WhatsApp de ${p.title}`}
+                            >
+                              <MessageCircle size={18} />
+                            </a>
+                          ) : (
+                            <button onClick={() => showToast(`Recordatorio para: ${p.title}`)} className={`p-2 rounded-full transition-colors ${isDark ? 'text-slate-500 hover:text-amber-500' : 'text-gray-400 hover:text-blue-600'}`}>
+                              <Bell size={18} />
+                            </button>
+                          )}
                         </div>
                       )) : <p className="text-center text-gray-400 dark:text-slate-500 text-sm py-10 font-medium">Sin programación para hoy.</p>}
                     </div>
