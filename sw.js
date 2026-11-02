@@ -1,4 +1,4 @@
-const CACHE_NAME = "fm-apocalipsis-v58";
+const CACHE_NAME = "fm-apocalipsis-v59";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -30,11 +30,12 @@ self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
   const requestUrl = new URL(event.request.url);
+  if (requestUrl.origin !== self.location.origin) return;
 
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        if (requestUrl.origin === self.location.origin && response.ok) {
+        if (response.ok) {
           const copy = response.clone();
           caches.open(CACHE_NAME)
             .then((cache) => cache.put(event.request, copy))
@@ -43,6 +44,6 @@ self.addEventListener("fetch", (event) => {
         return response;
       })
       .catch(() => caches.match(event.request)
-        .then((cached) => cached || caches.match("./index.html")))
+        .then((cached) => cached || (event.request.mode === "navigate" ? caches.match("./index.html") : Response.error())))
   );
 });
