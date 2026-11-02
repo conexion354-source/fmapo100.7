@@ -177,8 +177,6 @@
         const [volume, setVolume] = useState(80);
         const [isMuted, setIsMuted] = useState(false);
         const [selectedDay, setSelectedDay] = useState('L');
-        const [nowPlaying, setNowPlaying] = useState('');
-        const [listeners, setListeners] = useState(0);
         const [streamError, setStreamError] = useState(false);
 
         const [user, setUser] = useState(null);
@@ -225,7 +223,7 @@
         const [isAppInstalled, setIsAppInstalled] = useState(() => isStandaloneDisplayMode());
 
         const audioRef = useRef(null);
-        const streamUrl = "https://radios.solumedia.com:6322/stream";
+        const streamUrl = "https://uk14freenew.listen2myradio.com/live.mp3?typeportmount=s2_4705_stream_749143556";
         const googleSheetsCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-N3so4cbqVC-4RfmlqZlRZapDugeYTSfrAjDKj8UghSOuqrvipAXXTQBCV5WEIoSajBhLoYfk5cO/pub?output=csv";
 
         const timeToMinutes = (value) => {
@@ -664,7 +662,7 @@
         const showInstallCta = isInstallable && !isAppInstalled;
         const metadataText = (currentProgram?.title && String(currentProgram.title).trim())
           ? String(currentProgram.title).trim()
-          : ((nowPlaying && nowPlaying.trim()) ? nowPlaying.trim() : 'FM Apocalipsis 100.7');
+          : 'FM Apocalipsis 100.7';
         const currentWhatsAppUrl = getWhatsAppUrl(currentProgram);
 
         const syncToLive = () => {
@@ -747,88 +745,6 @@
             document.removeEventListener('visibilitychange', applyTheme);
           };
         }, [themeMode]);
-
-        useEffect(() => {
-          let cancelled = false;
-          let jsonpId = 0;
-
-          const parseAndApplyStats = (d) => {
-            if (!d || typeof d !== 'object' || cancelled) return;
-            const pickTitle = [d.songtitle, d.servertitle, d.title, d.currenttrack]
-              .find((v) => typeof v === 'string' && v.trim() && v.trim().toLowerCase() !== 'no name');
-            const listenersRaw = d.currentlisteners ?? d.listeners ?? d.listener_count ?? d.listener;
-            const nextListeners = Number.parseInt(String(listenersRaw ?? ''), 10);
-
-            setNowPlaying(pickTitle ? String(pickTitle).trim() : '');
-            setListeners(Number.isFinite(nextListeners) ? nextListeners : 0);
-          };
-
-          const fetchStatsJsonp = () => new Promise((resolve, reject) => {
-            const callbackName = `__fmStatsCb_${Date.now()}_${jsonpId++}`;
-            const script = document.createElement('script');
-            let timeoutId = null;
-
-            const cleanup = () => {
-              if (timeoutId) clearTimeout(timeoutId);
-              if (window[callbackName]) {
-                try {
-                  delete window[callbackName];
-                } catch (_) {
-                  window[callbackName] = undefined;
-                }
-              }
-              if (script.parentNode) script.parentNode.removeChild(script);
-            };
-
-            window[callbackName] = (payload) => {
-              cleanup();
-              resolve(payload);
-            };
-
-            script.async = true;
-            script.onerror = () => {
-              cleanup();
-              reject(new Error('jsonp_error'));
-            };
-            script.src = `https://radios.solumedia.com:6322/stats?sid=1&json=1&callback=${callbackName}&_=${Date.now()}`;
-
-            timeoutId = window.setTimeout(() => {
-              cleanup();
-              reject(new Error('jsonp_timeout'));
-            }, 8000);
-
-            document.head.appendChild(script);
-          });
-
-          const fetchMetadata = async () => {
-            let data = null;
-
-            try {
-              const r = await fetch('https://radios.solumedia.com:6322/stats?sid=1&json=1', {
-                cache: 'no-store',
-                mode: 'cors'
-              });
-              if (r.ok) data = await r.json();
-            } catch (_) {
-            }
-
-            if (!data) {
-              try {
-                data = await fetchStatsJsonp();
-              } catch (_) {
-              }
-            }
-
-            if (data) parseAndApplyStats(data);
-          };
-
-          fetchMetadata();
-          const interval = setInterval(fetchMetadata, 15000);
-          return () => {
-            cancelled = true;
-            clearInterval(interval);
-          };
-        }, []);
 
         const liveItems = [
           {
@@ -972,9 +888,6 @@
                           </button>
 
                           <div className="flex items-center gap-3">
-                            <span className={`flex items-center gap-1 text-[10px] font-medium transition-colors duration-500 ${isPlaying ? 'text-gray-600 dark:text-slate-400' : 'text-gray-400 dark:text-slate-600'}`}>
-                              <Users size={12} /> {listeners}
-                            </span>
                             <span className={`text-[10px] font-medium tracking-wider transition-colors duration-500 ${isPlaying ? (isDark ? 'text-amber-500 animate-pulse' : 'text-blue-600 animate-pulse') : 'text-gray-500 dark:text-slate-500'}`}>
                               {isPlaying ? 'SONANDO' : 'PAUSADO'}
                             </span>
