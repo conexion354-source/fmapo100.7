@@ -178,6 +178,7 @@
         const [isMuted, setIsMuted] = useState(false);
         const [selectedDay, setSelectedDay] = useState('L');
         const [streamError, setStreamError] = useState(false);
+        const [nowPlaying, setNowPlaying] = useState('');
 
         const [user, setUser] = useState(null);
         const [messages, setMessages] = useState([]);
@@ -223,7 +224,8 @@
         const [isAppInstalled, setIsAppInstalled] = useState(() => isStandaloneDisplayMode());
 
         const audioRef = useRef(null);
-        const streamUrl = "https://uk14freenew.listen2myradio.com/live.mp3?typeportmount=s2_4705_stream_749143556";
+        const streamUrl = "https://server.streamcasthd.com/8422/stream";
+        const statsUrl = "https://server.streamcasthd.com:7210/stats?sid=1&json=1";
         const googleSheetsCsvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQP-N3so4cbqVC-4RfmlqZlRZapDugeYTSfrAjDKj8UghSOuqrvipAXXTQBCV5WEIoSajBhLoYfk5cO/pub?output=csv";
 
         const timeToMinutes = (value) => {
@@ -660,10 +662,27 @@
         const isShowingLivePromo = currentProgram && currentProgram.image && currentDisplayedImage === currentProgram.image;
         const isCompactHomeLayout = viewportHeight <= 760;
         const showInstallCta = isInstallable && !isAppInstalled;
-        const metadataText = (currentProgram?.title && String(currentProgram.title).trim())
+        const metadataText = nowPlaying || ((currentProgram?.title && String(currentProgram.title).trim())
           ? String(currentProgram.title).trim()
-          : 'FM Apocalipsis 100.7';
+          : 'FM Apocalipsis 100.7');
         const currentWhatsAppUrl = getWhatsAppUrl(currentProgram);
+
+        useEffect(() => {
+          let active = true;
+          const updateMetadata = async () => {
+            try {
+              const response = await fetch(statsUrl, { cache: 'no-store' });
+              if (!response.ok) throw new Error('stats_unavailable');
+              const data = await response.json();
+              if (active) setNowPlaying(typeof data.songtitle === 'string' ? data.songtitle.trim() : '');
+            } catch (_) {
+              if (active) setNowPlaying('');
+            }
+          };
+          updateMetadata();
+          const interval = setInterval(updateMetadata, 15000);
+          return () => { active = false; clearInterval(interval); };
+        }, []);
 
         const syncToLive = () => {
           if (audioRef.current) {
