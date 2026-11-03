@@ -1,4 +1,4 @@
-const CACHE_NAME = "fm-apocalipsis-v60";
+const CACHE_NAME = "fm-apocalipsis-v64";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -12,8 +12,13 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => cache.addAll(CORE_ASSETS))
-      .then(() => self.skipWaiting())
   );
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    event.waitUntil(self.skipWaiting());
+  }
 });
 
 self.addEventListener("activate", (event) => {

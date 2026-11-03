@@ -179,6 +179,70 @@
         const [selectedDay, setSelectedDay] = useState('L');
         const [streamError, setStreamError] = useState(false);
         const [nowPlaying, setNowPlaying] = useState('');
+        const [updateWorker, setUpdateWorker] = useState(null);
+        const [applyingUpdate, setApplyingUpdate] = useState(false);
+        const updateRequested = useRef(false);
+
+        useEffect(() => {
+          if (!('serviceWorker' in navigator) || !window.isSecureContext) return;
+          let disposed = false;
+          let registration;
+          let installing;
+          const onInstalled = () => {
+            if (!disposed && registration?.waiting && navigator.serviceWorker.controller) {
+              setUpdateWorker(registration.waiting);
+            }
+          };
+          const onUpdateFound = () => {
+            installing?.removeEventListener('statechange', onInstalled);
+            installing = registration.installing;
+            installing?.addEventListener('statechange', onInstalled);
+          };
+          const checkForUpdate = () => {
+            if (document.visibilityState === 'visible') registration?.update().catch(() => {});
+          };
+          const onControllerChange = () => {
+            if (updateRequested.current) window.location.reload();
+          };
+          navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
+          navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then((reg) => {
+            if (disposed) return;
+            registration = reg;
+            registration.addEventListener('updatefound', onUpdateFound);
+            onUpdateFound();
+            onInstalled();
+            checkForUpdate();
+          }).catch(() => {});
+          document.addEventListener('visibilitychange', checkForUpdate);
+          window.addEventListener('online', checkForUpdate);
+          const timer = setInterval(checkForUpdate, 60000);
+          return () => {
+            disposed = true;
+            clearInterval(timer);
+            registration?.removeEventListener('updatefound', onUpdateFound);
+            installing?.removeEventListener('statechange', onInstalled);
+            navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
+            document.removeEventListener('visibilitychange', checkForUpdate);
+            window.removeEventListener('online', checkForUpdate);
+          };
+        }, []);
+
+        const applyUpdate = () => {
+          if (!updateWorker) return;
+          if (updateWorker.state === 'activated') {
+            window.location.reload();
+            return;
+          }
+          updateRequested.current = true;
+          setApplyingUpdate(true);
+          // Release the live connection before replacing the offline worker.
+          if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.removeAttribute('src');
+            audioRef.current.load();
+          }
+          updateWorker.postMessage({ type: 'SKIP_WAITING' });
+        };
 
         const [user, setUser] = useState(null);
         const [messages, setMessages] = useState([]);
@@ -191,7 +255,23 @@
           }
         });
         const [isSettingName, setIsSettingName] = useState(false);
-        const [unreadCount, setUnreadCount] = useState(0);
+        const chatReadKey = `fm-chat-read-${appId}`;
+        const [readMessageIds, setReadMessageIds] = useState(() => {
+          try {
+            const saved = JSON.parse(window.localStorage.getItem(chatReadKey) || '[]');
+            return new Set(Array.isArray(saved) ? saved.filter((id) => typeof id === 'string') : []);
+          } catch (_) {
+            return new Set();
+          }
+        });
+        const [pageVisible, setPageVisible] = useState(() => document.visibilityState === 'visible');
+        const unreadCount = messages.filter((msg) => msg.userId !== user?.uid && !readMessageIds.has(msg.id)).length;
+
+        useEffect(() => {
+          const onVisibilityChange = () => setPageVisible(document.visibilityState === 'visible');
+          document.addEventListener('visibilitychange', onVisibilityChange);
+          return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+        }, []);
         const [isInputFocused, setIsInputFocused] = useState(false);
         const [msgToDelete, setMsgToDelete] = useState(null);
         const [showEmojis, setShowEmojis] = useState(false);
@@ -359,20 +439,25 @@
           const messagesCollection = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
           const unsubscribe = onSnapshot(messagesCollection, (snapshot) => {
             const msgs = snapshot.docs.map((docItem) => ({ id: docItem.id, ...docItem.data() }));
-            msgs.sort((a, b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0));
-            if (activeTab !== 'chat' && msgs.length > messages.length && messages.length > 0) {
-              setUnreadCount((prev) => prev + (msgs.length - messages.length));
-            }
+            msgs.sort((a, b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0)
+              || (a.timestamp?.nanoseconds || 0) - (b.timestamp?.nanoseconds || 0)
+              || a.id.localeCompare(b.id));
             setMessages(msgs.slice(-100));
           }, (error) => {
             console.error("Error Chat:", error);
           });
           return () => unsubscribe();
-        }, [user, activeTab, messages.length]);
+        }, [user?.uid]);
 
         useEffect(() => {
-          if (activeTab === 'chat') setUnreadCount(0);
-        }, [activeTab]);
+          if (activeTab !== 'chat' || !pageVisible || messages.length === 0) return;
+          const ids = messages.map((msg) => msg.id);
+          setReadMessageIds(new Set(ids));
+          try {
+            window.localStorage.setItem(chatReadKey, JSON.stringify(ids));
+          } catch (_) {
+          }
+        }, [activeTab, pageVisible, messages]);
 
         useEffect(() => {
           if (activeTab !== 'chat') return;
@@ -660,7 +745,7 @@
         const safeAdIndex = displayGifs.length > 0 ? currentAdIndex % displayGifs.length : 0;
         const currentDisplayedImage = displayGifs[safeAdIndex];
         const isShowingLivePromo = currentProgram && currentProgram.image && currentDisplayedImage === currentProgram.image;
-        const isCompactHomeLayout = viewportHeight <= 760;
+        const isCompactHomeLayout = viewportHeight <= 850;
         const showInstallCta = isInstallable && !isAppInstalled;
         const metadataText = nowPlaying || ((currentProgram?.title && String(currentProgram.title).trim())
           ? String(currentProgram.title).trim()
@@ -794,7 +879,7 @@
             className={`fixed inset-x-0 flex justify-center items-center w-full font-sans transition-colors duration-500 overflow-hidden ${isDark ? 'dark bg-[#0a0a0a]' : 'bg-gray-200'}`}
             style={{ height: `${viewportHeight}px`, top: `${activeTab === 'chat' && (isInputFocused || keyboardOpen) ? viewportOffsetTop : 0}px` }}
           >
-            <div className="w-full h-full sm:max-w-md bg-white dark:bg-slate-950 sm:h-[90vh] sm:rounded-[2.5rem] shadow-none sm:shadow-2xl overflow-hidden relative flex flex-col border-0 sm:border border-gray-300 dark:border-slate-800/60 transition-colors duration-500">
+            <div className="w-full h-full min-h-0 sm:max-w-md bg-white dark:bg-slate-950 sm:h-[calc(100%-2rem)] sm:rounded-[2.5rem] shadow-none sm:shadow-2xl overflow-hidden relative flex flex-col border-0 sm:border border-gray-300 dark:border-slate-800/60 transition-colors duration-500">
               <div className={`absolute top-0 inset-x-0 h-96 blur-[100px] rounded-full pointer-events-none transition-colors duration-1000 ${isDark ? 'bg-amber-500/10' : 'bg-blue-500/10'}`} />
 
               <audio ref={audioRef} src={streamUrl} playsInline onError={() => { setStreamError(true); setIsPlaying(false); }} />
@@ -837,10 +922,22 @@
                 </div>
               </div>
 
-              <div className="flex-1 overflow-hidden relative z-10 flex flex-col">
+              {updateWorker && (
+                <div role="status" aria-live="polite" className="relative z-20 shrink-0 flex flex-wrap items-center justify-between gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-950 text-blue-950 dark:text-blue-100 border-b border-blue-200 dark:border-blue-800">
+                  <div className="min-w-0 text-xs">
+                    <p className="font-bold">Nueva versión disponible</p>
+                    <p>Al actualizar se reiniciará la radio.</p>
+                  </div>
+                  <button type="button" onClick={applyUpdate} disabled={applyingUpdate} className="flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white disabled:opacity-60">
+                    <RefreshCw size={14} className={applyingUpdate ? 'animate-spin' : ''} />
+                    {applyingUpdate ? 'Actualizando...' : 'Actualizar'}
+                  </button>
+                </div>
+              )}
+              <div className="flex-1 min-h-0 min-w-0 overflow-hidden relative z-10 flex flex-col">
                 {activeTab === 'home' && (
-                  <div className={`flex-1 min-h-0 flex flex-col items-center ${isCompactHomeLayout ? 'justify-between px-6 pt-1 pb-2' : 'justify-evenly px-6 pt-2 pb-4'} h-full`}>
-                    <div className={`w-full aspect-square relative group shrink-0 ${isCompactHomeLayout ? 'max-w-[236px] mt-2' : 'max-w-[280px] sm:max-w-[260px] mt-4'}`}>
+                  <div className={`flex-1 min-h-0 flex flex-col items-center overflow-y-auto overflow-x-hidden custom-scrollbar px-4 sm:px-6 ${isCompactHomeLayout ? 'pt-1 pb-2 gap-2' : 'pt-2 pb-4 gap-3'}`}>
+                    <div className="w-full aspect-square relative group shrink-0 mt-2" style={{ maxWidth: `${Math.min(280, Math.max(120, viewportHeight - 540))}px` }}>
                       <div className={`absolute inset-0 rounded-3xl blur-2xl transition-opacity duration-1000 ${isDark ? 'bg-gradient-to-tr from-amber-600/40 to-purple-600/40' : 'bg-gradient-to-tr from-blue-400/40 to-indigo-400/40'} ${isPlaying ? 'opacity-100' : 'opacity-40'}`}></div>
                       <div className="w-full h-full rounded-3xl overflow-hidden relative shadow-2xl ring-1 ring-black/5 dark:ring-white/10 bg-slate-200 dark:bg-slate-900 flex items-center justify-center">
                         {isShowingLivePromo && (
@@ -957,12 +1054,12 @@
                 )}
 
                 {activeTab === 'chat' && (
-                  <div className="flex-1 flex flex-col h-full overflow-hidden bg-white/50 dark:bg-slate-950/50">
+                  <div className="flex-1 min-h-0 min-w-0 flex flex-col overflow-hidden bg-white/50 dark:bg-slate-950/50">
                     <div className="px-5 pt-3 pb-3 shrink-0 border-b border-black/5 dark:border-white/5 bg-white dark:bg-slate-950/80 shadow-sm z-10">
                       <h2 className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Chat en vivo</h2>
                     </div>
 
-                    <div ref={chatScrollRef} className="flex-1 overflow-y-auto px-4 py-2 space-y-1 custom-scrollbar select-none">
+                    <div ref={chatScrollRef} className="flex-1 min-h-0 overflow-y-auto px-4 py-2 space-y-1 custom-scrollbar select-none">
                       {messages.length === 0 ? (
                         <div className="h-full flex flex-col items-center justify-center text-gray-400 opacity-50 space-y-2">
                           <MessageCircle size={40} />
@@ -1023,7 +1120,7 @@
                         placeholder={userName.trim() ? "Di algo..." : "Toca para identificarte"}
                         onClick={() => !userName.trim() && setIsSettingName(true)}
                         readOnly={!userName.trim()}
-                        className="flex-1 bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white px-4 py-2.5 rounded-full text-[16px] sm:text-sm outline-none focus:ring-2 focus:ring-blue-500/50"
+                        className="flex-1 min-w-0 bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white px-4 py-2.5 rounded-full text-[16px] sm:text-sm outline-none focus:ring-2 focus:ring-blue-500/50"
                       />
                       <button type="submit" className={`p-2.5 rounded-full transition-all ${isDark ? 'bg-amber-500 text-slate-950' : 'bg-blue-600 text-white'} active:scale-90`}>
                         <Send size={18} />
@@ -1033,9 +1130,9 @@
                 )}
 
                 {activeTab === 'live' && (
-                  <div className="flex-1 flex flex-col px-6 pt-2 pb-4 h-full overflow-hidden">
+                  <div className="flex-1 min-h-0 flex flex-col px-4 sm:px-6 pt-2 pb-4 overflow-y-auto">
                     <h2 className="text-3xl font-light dark:text-slate-100 mb-6">Ver en Vivo</h2>
-                    <div className="space-y-4 overflow-y-auto pr-1 custom-scrollbar">
+                    <div className="space-y-4 pr-1 custom-scrollbar">
                       {liveItems.map((social, i) => (
                         <a key={i} href={social.url} target="_blank" rel="noopener noreferrer" className="bg-gray-50 dark:bg-slate-900/80 border border-gray-200 dark:border-slate-800 p-4 rounded-3xl flex items-center gap-5 hover:scale-[1.02] transition-transform shadow-sm dark:shadow-lg">
                           <div className={social.wrapperClass}>{social.icon}</div>
@@ -1051,7 +1148,7 @@
                 )}
 
                 {activeTab === 'schedule' && (
-                  <div className="flex-1 flex flex-col px-6 pt-2 pb-2 h-full overflow-hidden">
+                  <div className="flex-1 min-h-0 flex flex-col px-4 sm:px-6 pt-2 pb-2 overflow-hidden">
                     <div className="mb-4 shrink-0">
                       <h2 className="text-3xl font-light text-slate-900 dark:text-slate-100 transition-colors">Programación</h2>
                       <p className="text-gray-500 dark:text-slate-500 text-sm transition-colors">Programación semanal.</p>
@@ -1063,7 +1160,7 @@
                         </button>
                       ))}
                     </div>
-                    <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar space-y-3 pb-4">
+                    <div className="flex-1 min-h-0 overflow-y-auto pr-1 custom-scrollbar space-y-3 pb-4">
                       {scheduleData[selectedDay]?.length > 0 ? scheduleData[selectedDay].map((p, idx) => (
                         <div key={idx} className={`p-4 rounded-2xl border backdrop-blur-md transition-all flex items-center gap-4 ${currentProgram?.title === p.title ? 'bg-amber-500/10 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.1)]' : 'bg-gray-50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-800'}`}>
                           <div className="flex flex-col items-center min-w-[50px]">
@@ -1239,9 +1336,6 @@
       const root = ReactDOM.createRoot(document.getElementById('root'));
       root.render(<App />);
 
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
-      }
     </script>
   </body>
 </html>
