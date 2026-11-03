@@ -17,6 +17,12 @@
     </script>
 
     <style>
+      .radio-volume { appearance: none; -webkit-appearance: none; height: 44px; margin: 0; background: transparent; }
+      .radio-volume::-webkit-slider-runnable-track { height: 6px; border-radius: 6px; background: linear-gradient(to right, var(--volume-color) var(--volume-level), var(--volume-track) var(--volume-level)); }
+      .radio-volume::-moz-range-track { height: 6px; border-radius: 6px; background: linear-gradient(to right, var(--volume-color) var(--volume-level), var(--volume-track) var(--volume-level)); }
+      .radio-volume::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 20px; height: 20px; margin-top: -7px; border-radius: 50%; border: 3px solid var(--volume-color); background: white; box-shadow: 0 2px 8px #0004; }
+      .radio-volume::-moz-range-thumb { box-sizing: border-box; width: 20px; height: 20px; border-radius: 50%; border: 3px solid var(--volume-color); background: white; box-shadow: 0 2px 8px #0004; }
+      .radio-volume:focus-visible { outline: 2px solid var(--volume-color); outline-offset: 2px; border-radius: 6px; }
       html, body, #root {
         margin: 0;
         padding: 0;
@@ -97,6 +103,7 @@
         Radio,
         Volume2,
         VolumeX,
+        X,
         MessageCircle,
         MoreVertical,
         Minus,
@@ -181,6 +188,8 @@
         const [nowPlaying, setNowPlaying] = useState('');
         const [updateWorker, setUpdateWorker] = useState(null);
         const [applyingUpdate, setApplyingUpdate] = useState(false);
+        const [updateMinimized, setUpdateMinimized] = useState(false);
+        const audioGraph = useRef(null);
         const updateRequested = useRef(false);
 
         useEffect(() => {
@@ -771,14 +780,29 @@
 
         const syncToLive = () => {
           if (audioRef.current) {
+            const Context = window.AudioContext || window.webkitAudioContext;
+            if (!audioGraph.current && Context) {
+              try {
+                const context = new Context();
+                const gain = context.createGain();
+                const source = context.createMediaElementSource(audioRef.current);
+                source.connect(gain);
+                gain.connect(context.destination);
+                audioGraph.current = { context, gain, source };
+              } catch (error) {
+                console.warn('Audio gain unavailable', error);
+              }
+            }
+            applyVolume(volume, isMuted);
+            const resume = audioGraph.current?.context.resume() || Promise.resolve();
             setIsPlaying(false);
             setStreamError(false);
             audioRef.current.src = streamUrl;
             audioRef.current.load();
-            audioRef.current.play()
+            Promise.all([audioRef.current.play(), resume])
               .then(() => {
                 setIsPlaying(true);
-                setupMediaSession();
+                try { setupMediaSession(); } catch (_) {}
               })
               .catch((e) => {
                 if (e.name !== 'AbortError') {
@@ -794,12 +818,32 @@
         const handleVolumeChange = (e) => {
           const v = Number(e.target.value);
           setVolume(v);
-          if (v > 0 && isMuted) setIsMuted(false);
-          if (audioRef.current) {
-            audioRef.current.volume = v / 100;
-            audioRef.current.muted = v === 0 ? true : false;
+          setIsMuted(v === 0);
+          applyVolume(v, v === 0);
+        };
+
+        const applyVolume = (value, muted) => {
+          const audio = audioRef.current;
+          if (!audio) return;
+          const level = muted ? 0 : Math.pow(value / 100, 2);
+          const graph = audioGraph.current;
+          audio.muted = muted || value === 0;
+          audio.volume = graph ? 1 : level;
+          if (graph) {
+            graph.gain.gain.cancelScheduledValues(graph.context.currentTime);
+            graph.gain.gain.setTargetAtTime(level, graph.context.currentTime, 0.025);
           }
         };
+
+        const toggleMute = () => {
+          const nextMuted = !(isMuted || volume === 0);
+          const nextVolume = volume || 80;
+          setIsMuted(nextMuted);
+          setVolume(nextVolume);
+          applyVolume(nextVolume, nextMuted);
+        };
+
+        useEffect(() => { applyVolume(volume, isMuted); }, [volume, isMuted]);
 
         const setupMediaSession = () => {
           if ('mediaSession' in navigator) {
@@ -882,7 +926,7 @@
             <div className="w-full h-full min-h-0 sm:max-w-md bg-white dark:bg-slate-950 sm:h-[calc(100%-2rem)] sm:rounded-[2.5rem] shadow-none sm:shadow-2xl overflow-hidden relative flex flex-col border-0 sm:border border-gray-300 dark:border-slate-800/60 transition-colors duration-500">
               <div className={`absolute top-0 inset-x-0 h-96 blur-[100px] rounded-full pointer-events-none transition-colors duration-1000 ${isDark ? 'bg-amber-500/10' : 'bg-blue-500/10'}`} />
 
-              <audio ref={audioRef} src={streamUrl} playsInline onError={() => { setStreamError(true); setIsPlaying(false); }} />
+              <audio ref={audioRef} src={streamUrl} crossOrigin="anonymous" preload="none" playsInline onError={() => { setStreamError(true); setIsPlaying(false); }} />
 
               <div className={`absolute top-[max(1.5rem,env(safe-area-inset-top,1.5rem))] left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full text-xs font-medium shadow-lg transition-all duration-300 w-max max-w-[90%] text-center ${toastMsg ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'} ${isDark ? 'bg-amber-500 text-slate-950' : 'bg-blue-600 text-white'}`}>
                 {toastMsg}
@@ -923,15 +967,23 @@
               </div>
 
               {updateWorker && (
-                <div role="status" aria-live="polite" className="relative z-20 shrink-0 flex flex-wrap items-center justify-between gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-950 text-blue-950 dark:text-blue-100 border-b border-blue-200 dark:border-blue-800">
-                  <div className="min-w-0 text-xs">
-                    <p className="font-bold">Nueva versión disponible</p>
-                    <p>Al actualizar se reiniciará la radio.</p>
-                  </div>
-                  <button type="button" onClick={applyUpdate} disabled={applyingUpdate} className="flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-lg bg-blue-600 text-white disabled:opacity-60">
-                    <RefreshCw size={14} className={applyingUpdate ? 'animate-spin' : ''} />
-                    {applyingUpdate ? 'Actualizando...' : 'Actualizar'}
-                  </button>
+                <div className="absolute top-[5.5rem] right-4 z-50 max-w-[calc(100%-2rem)]">
+                  {updateMinimized ? (
+                    <button type="button" onClick={() => setUpdateMinimized(false)} aria-label="Ver actualización disponible" title="Nueva versión disponible" className={`w-11 h-11 flex items-center justify-center rounded-full shadow-xl border ${isDark ? 'bg-slate-900 text-amber-400 border-amber-400/40' : 'bg-white text-blue-600 border-blue-200'}`}><RefreshCw size={19} /></button>
+                  ) : (
+                    <div role="status" aria-live="polite" className={`w-72 max-w-full rounded-lg border p-4 shadow-2xl backdrop-blur-xl ${isDark ? 'bg-slate-900/95 text-slate-100 border-amber-400/30' : 'bg-white/95 text-gray-900 border-blue-200'}`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Download size={18} className={isDark ? 'text-amber-400' : 'text-blue-600'} />
+                        <p className="flex-1 text-sm font-bold">Nueva versión</p>
+                        <button type="button" onClick={() => setUpdateMinimized(true)} aria-label="Minimizar aviso" title="Más tarde" className="p-1 text-gray-400 hover:text-gray-500"><X size={18} /></button>
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-slate-400 mb-3">Lista para instalar. La radio se reiniciará al actualizar.</p>
+                      <button type="button" onClick={applyUpdate} disabled={applyingUpdate} className={`w-full flex justify-center items-center gap-2 px-3 py-2.5 text-xs font-bold rounded-lg disabled:opacity-60 ${isDark ? 'bg-amber-400 text-slate-950 hover:bg-amber-300' : 'bg-blue-600 text-white hover:bg-blue-500'}`}>
+                        <RefreshCw size={14} className={applyingUpdate ? 'animate-spin' : ''} />
+                        {applyingUpdate ? 'Actualizando...' : 'Actualizar ahora'}
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
               <div className="flex-1 min-h-0 min-w-0 overflow-hidden relative z-10 flex flex-col">
@@ -1030,25 +1082,23 @@
                     </div>
 
                     <div className={`flex items-center w-full max-w-[280px] gap-4 text-gray-500 dark:text-slate-500 shrink-0 ${isCompactHomeLayout ? 'mt-1 mb-2' : 'mt-2 mb-4'}`}>
-                      <button onClick={() => { const nextMuted = !isMuted; setIsMuted(nextMuted); if (audioRef.current) audioRef.current.muted = nextMuted; }} className="hover:text-gray-800 dark:hover:text-slate-300 transition-colors">
+                      <button onClick={toggleMute} aria-label={isMuted || volume === 0 ? 'Activar sonido' : 'Silenciar'} title={isMuted || volume === 0 ? 'Activar sonido' : 'Silenciar'} className="w-9 h-11 shrink-0 flex items-center justify-center hover:text-gray-800 dark:hover:text-slate-300 transition-colors">
                         {isMuted || volume == 0 ? <VolumeX size={18} strokeWidth={1.5} /> : <Volume2 size={18} strokeWidth={1.5} />}
                       </button>
-                      <div className="relative w-full h-8 flex items-center group">
+                      <div className="relative flex-1 min-w-0 h-11 flex items-center group">
                         <input
                           type="range"
                           min="0"
                           max="100"
-                          value={volume}
+                          value={isMuted ? 0 : volume}
                           onChange={handleVolumeChange}
-                          onInput={handleVolumeChange}
                           aria-label="Volumen"
-                          className="absolute inset-0 z-10 w-full h-full opacity-0 cursor-pointer"
+                          aria-valuetext={`${isMuted ? 0 : volume}%`}
+                          className="radio-volume w-full cursor-pointer"
+                          style={{ '--volume-level': `${isMuted ? 0 : volume}%`, '--volume-color': isDark ? '#fbbf24' : '#2563eb', '--volume-track': isDark ? '#334155' : '#d1d5db' }}
                         />
-                        <div className="relative w-full h-1 bg-gray-300 dark:bg-slate-800 rounded-full overflow-hidden pointer-events-none">
-                          <div className={`h-full rounded-full transition-colors ${isDark ? 'bg-slate-400 group-hover:bg-amber-400' : 'bg-gray-500 group-hover:bg-blue-500'}`} style={{ width: `${isMuted ? 0 : volume}%` }}></div>
-                        </div>
-                        <div className="absolute top-1/2 -translate-y-1/2 h-4 w-4 bg-white rounded-full shadow-md pointer-events-none opacity-100 transition-transform group-hover:scale-110" style={{ left: `calc(${isMuted ? 0 : volume}% - 8px)` }}></div>
                       </div>
+                      <output className={`w-10 shrink-0 text-right text-xs tabular-nums font-medium ${isDark ? 'text-amber-400' : 'text-blue-600'}`}>{isMuted ? 0 : volume}%</output>
                     </div>
                   </div>
                 )}
