@@ -1,4 +1,4 @@
-const CACHE_NAME = "fm-apocalipsis-v65";
+const CACHE_NAME = "fm-apocalipsis-v66";
 const CORE_ASSETS = [
   "./",
   "./index.html",

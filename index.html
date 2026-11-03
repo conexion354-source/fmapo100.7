@@ -190,6 +190,7 @@
         const [applyingUpdate, setApplyingUpdate] = useState(false);
         const [updateMinimized, setUpdateMinimized] = useState(false);
         const audioGraph = useRef(null);
+        const nativeVolumeSupported = useRef(null);
         const updateRequested = useRef(false);
 
         useEffect(() => {
@@ -780,8 +781,14 @@
 
         const syncToLive = () => {
           if (audioRef.current) {
+            if (nativeVolumeSupported.current === null) {
+              const previousVolume = audioRef.current.volume;
+              audioRef.current.volume = 0.5;
+              nativeVolumeSupported.current = Math.abs(audioRef.current.volume - 0.5) < 0.01;
+              audioRef.current.volume = previousVolume;
+            }
             const Context = window.AudioContext || window.webkitAudioContext;
-            if (!audioGraph.current && Context) {
+            if (!nativeVolumeSupported.current && !audioGraph.current && Context) {
               try {
                 const context = new Context();
                 const gain = context.createGain();
@@ -822,6 +829,11 @@
           applyVolume(v, v === 0);
         };
 
+        const resumeVolumeControl = () => {
+          const context = audioGraph.current?.context;
+          if (context && context.state !== 'running') context.resume().catch(() => {});
+        };
+
         const applyVolume = (value, muted) => {
           const audio = audioRef.current;
           if (!audio) return;
@@ -831,11 +843,12 @@
           audio.volume = graph ? 1 : level;
           if (graph) {
             graph.gain.gain.cancelScheduledValues(graph.context.currentTime);
-            graph.gain.gain.setTargetAtTime(level, graph.context.currentTime, 0.025);
+            graph.gain.gain.setValueAtTime(level, graph.context.currentTime);
           }
         };
 
         const toggleMute = () => {
+          resumeVolumeControl();
           const nextMuted = !(isMuted || volume === 0);
           const nextVolume = volume || 80;
           setIsMuted(nextMuted);
@@ -1092,6 +1105,9 @@
                           max="100"
                           value={isMuted ? 0 : volume}
                           onChange={handleVolumeChange}
+                          onInput={handleVolumeChange}
+                          onPointerDown={resumeVolumeControl}
+                          onKeyDown={resumeVolumeControl}
                           aria-label="Volumen"
                           aria-valuetext={`${isMuted ? 0 : volume}%`}
                           className="radio-volume w-full cursor-pointer"
