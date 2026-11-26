@@ -381,6 +381,8 @@
         const [artSize, setArtSize] = useState(0);
         // Pantallas bajas (notebooks 720p, ventanas chicas, app instalada en PC).
         const isShortScreen = viewportHeight < 640;
+        // Solo con altura de sobra se agrega aire extra alrededor de play y volumen.
+        const isRoomy = viewportHeight >= 780;
         // Celular acostado o ventana muy apaisada: portada a la izquierda y controles a la derecha.
         const isLandscapeHome = viewportWidth > viewportHeight * 1.25 && viewportHeight < 560 && viewportWidth >= 520;
         // En PC la tarjeta flotante solo deja márgenes si sobra altura.
@@ -1531,7 +1533,7 @@
                         ref={artAreaRef}
                         className={isLandscapeHome
                           ? 'h-full w-[42%] max-w-[280px] min-h-0 flex items-center justify-center shrink-0'
-                          : `w-full flex-1 min-h-[72px] flex items-center justify-center ${isShortScreen ? 'py-2' : 'pt-3 pb-4'}`}
+                          : `w-full flex-1 min-h-[72px] flex items-center justify-center ${isShortScreen ? 'py-2' : isRoomy ? 'pt-3 pb-4' : 'pt-3 pb-3'}`}
                       >
                         {artSize > 0 && (
                           <div className="relative shrink-0" style={{ width: `${artSize}px`, height: `${artSize}px` }}>
@@ -1587,13 +1589,13 @@
                         )}
                       </div>
 
-                      <div aria-hidden="true" className={`flex items-end justify-center gap-1 h-[30px] shrink-0 ${isShortScreen || isLandscapeHome ? 'mt-2' : 'mt-5'} ${isPlaying ? 'fm-eq-on' : ''}`}>
+                      <div aria-hidden="true" className={`flex items-end justify-center gap-1 h-[30px] shrink-0 ${isShortScreen || isLandscapeHome ? 'mt-2' : isRoomy ? 'mt-5' : 'mt-3'} ${isPlaying ? 'fm-eq-on' : ''}`}>
                         {EQ_HEIGHTS.map((h, i) => (
                           <span key={i} className="fm-eq-bar" style={{ height: `${h}px`, animationDelay: `${((i * 0.13) % 1).toFixed(2)}s`, opacity: i % 3 === 0 ? 0.65 : 1 }} />
                         ))}
                       </div>
 
-                      <div className={`flex items-center justify-center gap-[34px] shrink-0 ${isShortScreen || isLandscapeHome ? 'mt-3' : 'mt-7'}`}>
+                      <div className={`flex items-center justify-center gap-[34px] shrink-0 ${isShortScreen || isLandscapeHome ? 'mt-3' : isRoomy ? 'mt-7' : 'mt-4'}`}>
                         <button onClick={startPlayback} aria-label="Volver al vivo" title="Volver al vivo" className="fm-round-btn w-12 h-12">
                           <RotateCcw size={20} />
                         </button>
@@ -1616,7 +1618,7 @@
                         )}
                       </div>
 
-                      <div className={`w-full max-w-[322px] shrink-0 ${isShortScreen || isLandscapeHome ? 'mt-2' : 'mt-7 mb-2'}`}>
+                      <div className={`w-full max-w-[322px] shrink-0 ${isShortScreen || isLandscapeHome ? 'mt-2' : isRoomy ? 'mt-7 mb-2' : 'mt-3'}`}>
                         <div className="flex items-center gap-3" style={{ color: 'var(--muted)' }}>
                           <button
                             type="button"
