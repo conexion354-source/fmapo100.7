@@ -1087,15 +1087,20 @@
         // Título, imagen y controles de la pantalla de bloqueo / notificación del celular.
         useEffect(() => {
           if (!('mediaSession' in navigator) || typeof MediaMetadata === 'undefined') return;
-          const artworkSrc = new URL(currentDisplayedImage || 'icons/icon-512.png', window.location.href).href;
+          // Arma la dirección completa de la imagen; si no se puede (vista previa, archivo local),
+          // se usa tal cual. Nunca debe romper la app.
+          const toAbsoluteUrl = (src) => {
+            try { return new URL(src, document.baseURI).href; } catch (_) { return src; }
+          };
           try {
+            const artworkSrc = toAbsoluteUrl(currentDisplayedImage || 'icons/icon-512.png');
             navigator.mediaSession.metadata = new MediaMetadata({
               title: metadataText,
               artist: currentProgram?.title && currentProgram.title !== metadataText
                 ? String(currentProgram.title)
                 : 'FM Apocalipsis 100.7',
               album: 'La voz que viene de lo alto',
-              artwork: [{ src: artworkSrc, sizes: '512x512' }]
+              artwork: artworkSrc ? [{ src: artworkSrc, sizes: '512x512' }] : []
             });
             navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
           } catch (_) {
@@ -1665,7 +1670,40 @@
       }
 
       const root = ReactDOM.createRoot(document.getElementById('root'));
-      root.render(<App />);
+      // Si algo falla, se muestra un aviso con botón para recargar en vez de una pantalla negra.
+      class ErrorBoundary extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = { failed: false };
+        }
+        static getDerivedStateFromError() {
+          return { failed: true };
+        }
+        componentDidCatch(error) {
+          console.error('Error en la app:', error);
+        }
+        render() {
+          if (!this.state.failed) return this.props.children;
+          return (
+            <div className="app-fallback">
+              <div>
+                <img src="logo.png" alt="FM Apocalipsis 100.7" />
+                <strong>FM Apocalipsis 100.7</strong>
+                <p>Algo salió mal al cargar la radio.</p>
+                <button
+                  type="button"
+                  onClick={() => window.location.reload()}
+                  style={{ marginTop: '1rem', padding: '0.7rem 1.4rem', borderRadius: '999px', border: 0, background: '#f59e0b', color: '#0a0a0a', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer' }}
+                >
+                  Recargar
+                </button>
+              </div>
+            </div>
+          );
+        }
+      }
+
+      root.render(<ErrorBoundary><App /></ErrorBoundary>);
 
     </script>
   </body>
