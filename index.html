@@ -231,6 +231,18 @@
         const [isMuted, setIsMuted] = useState(false);
         const [selectedDay, setSelectedDay] = useState(() => DAY_LETTERS[new Date().getDay()]);
         const [onlineCount, setOnlineCount] = useState(null);
+        const [installDismissed, setInstallDismissed] = useState(() => {
+          try {
+            const until = Number(window.localStorage.getItem('fm-install-dismissed') || 0);
+            return until > Date.now();
+          } catch (_) {
+            return false;
+          }
+        });
+        const dismissInstall = () => {
+          setInstallDismissed(true);
+          try { window.localStorage.setItem('fm-install-dismissed', String(Date.now() + 7 * 86400000)); } catch (_) {}
+        };
         const [streamError, setStreamError] = useState(false);
         const [nowPlaying, setNowPlaying] = useState('');
         const [updateWorker, setUpdateWorker] = useState(null);
@@ -1377,6 +1389,9 @@
           : 'La voz que viene de lo alto';
         const backgroundImage = currentDisplayedImage || 'logo.png';
         const volumeLevel = isMuted ? 0 : volume;
+        // En pantallas angostas el botón Instalar va en un aviso aparte para no tapar el nombre.
+        const installInHeader = showInstallCta && viewportWidth >= 440;
+        const showInstallBanner = showInstallCta && !installInHeader && !installDismissed && activeTab === 'home' && !isShortScreen && !isLandscapeHome;
 
         return (
           <div
@@ -1410,7 +1425,7 @@
                 </div>
                 {showHeaderActions && (
                   <div className="flex gap-1.5 min-[390px]:gap-2 shrink-0 items-center">
-                    {showInstallCta && (
+                    {installInHeader && (
                       <button onClick={handleInstallClick} aria-label="Instalar app" title="Instalar app" className="install-cta install-cta-breathe relative h-10 min-[390px]:h-11 flex items-center justify-center gap-1.5 px-2.5 min-[420px]:px-3.5 rounded-full text-[11px] font-extrabold uppercase active:scale-95 transition-transform" style={{ background: 'var(--live)', color: '#fff' }}>
                         <Download size={16} /> <span className="hidden min-[420px]:inline">Instalar</span>
                       </button>
@@ -1424,6 +1439,15 @@
                   </div>
                 )}
               </div>
+
+              {showInstallBanner && (
+                <div className="relative z-10 mx-4 mt-1 mb-1 flex items-center gap-3 pl-3 pr-1.5 py-1.5 rounded-2xl border shrink-0" style={{ background: 'var(--surface)', borderColor: 'var(--line)' }}>
+                  <Download size={18} className="shrink-0" style={{ color: 'var(--accent-text)' }} />
+                  <p className="flex-1 min-w-0 text-[13px] font-semibold leading-tight">Instalá la app en tu celular</p>
+                  <button onClick={handleInstallClick} className="h-9 px-3.5 rounded-xl text-xs font-extrabold shrink-0" style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}>Instalar</button>
+                  <button onClick={dismissInstall} aria-label="Cerrar aviso de instalación" className="w-9 h-9 flex items-center justify-center rounded-xl shrink-0" style={{ color: 'var(--muted)' }}><X size={16} /></button>
+                </div>
+              )}
 
               {updateWorker && (
                 <div className="absolute top-[5.5rem] right-4 z-50 max-w-[calc(100%-2rem)]">
