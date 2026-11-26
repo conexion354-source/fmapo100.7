@@ -17,12 +17,6 @@
     </script>
 
     <style>
-      .radio-volume { appearance: none; -webkit-appearance: none; height: 44px; margin: 0; background: transparent; }
-      .radio-volume::-webkit-slider-runnable-track { height: 6px; border-radius: 6px; background: linear-gradient(to right, var(--volume-color) var(--volume-level), var(--volume-track) var(--volume-level)); }
-      .radio-volume::-moz-range-track { height: 6px; border-radius: 6px; background: linear-gradient(to right, var(--volume-color) var(--volume-level), var(--volume-track) var(--volume-level)); }
-      .radio-volume::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 20px; height: 20px; margin-top: -7px; border-radius: 50%; border: 3px solid var(--volume-color); background: white; box-shadow: 0 2px 8px #0004; }
-      .radio-volume::-moz-range-thumb { box-sizing: border-box; width: 20px; height: 20px; border-radius: 50%; border: 3px solid var(--volume-color); background: white; box-shadow: 0 2px 8px #0004; }
-      .radio-volume:focus-visible { outline: 2px solid var(--volume-color); outline-offset: 2px; border-radius: 6px; }
       html, body, #root {
         margin: 0;
         padding: 0;
@@ -103,6 +97,7 @@
         Radio,
         Volume2,
         VolumeX,
+        Volume1,
         X,
         MessageCircle,
         MoreVertical,
@@ -187,7 +182,18 @@
       function App() {
         const [isPlaying, setIsPlaying] = useState(false);
         const [activeTab, setActiveTab] = useState('home');
-        const [volume, setVolume] = useState(80);
+        const [volume, setVolume] = useState(() => {
+          try {
+            const saved = Number.parseInt(window.localStorage.getItem('fm-volume'), 10);
+            return Number.isFinite(saved) && saved > 0 && saved <= 100 ? saved : 80;
+          } catch (_) {
+            return 80;
+          }
+        });
+        const [volumeDragging, setVolumeDragging] = useState(false);
+        // true cuando el dispositivo no deja cambiar el volumen desde la página (iPhone sin CORS).
+        const [volumeLocked, setVolumeLocked] = useState(false);
+        const volumeTrackRef = useRef(null);
         const [isMuted, setIsMuted] = useState(false);
         const [selectedDay, setSelectedDay] = useState('L');
         const [streamError, setStreamError] = useState(false);
@@ -904,17 +910,25 @@
           audio.volume = 0.5;
           nativeVolumeSupported.current = Math.abs(audio.volume - 0.5) < 0.01;
           audio.volume = previousVolume;
-          if (nativeVolumeSupported.current || !(window.AudioContext || window.webkitAudioContext)) return;
+          if (nativeVolumeSupported.current) return;
+          if (!(window.AudioContext || window.webkitAudioContext)) {
+            setVolumeLocked(true);
+            return;
+          }
 
           const controller = new AbortController();
           const timeout = setTimeout(() => controller.abort(), 5000);
           fetch(streamUrl, { mode: 'cors', cache: 'no-store', signal: controller.signal })
             .then((response) => {
               streamCorsOk.current = response.ok;
+              if (!response.ok) setVolumeLocked(true);
               controller.abort(); // Solo hacían falta las cabeceras, no el audio.
             })
             .catch(() => {
-              if (streamCorsOk.current === null) streamCorsOk.current = false;
+              if (streamCorsOk.current === null) {
+                streamCorsOk.current = false;
+                setVolumeLocked(true);
+              }
             })
             .finally(() => clearTimeout(timeout));
           return () => { clearTimeout(timeout); controller.abort(); };
@@ -1048,11 +1062,47 @@
           }
         };
 
-        const handleVolumeChange = (e) => {
-          const v = Number(e.target.value);
+        const setVolumeLevel = (value) => {
+          const v = Math.max(0, Math.min(100, Math.round(value)));
+          resumeVolumeControl();
           setVolume(v);
           setIsMuted(v === 0);
           applyVolume(v, v === 0);
+        };
+
+        const volumeFromPointer = (clientX) => {
+          const track = volumeTrackRef.current;
+          if (!track) return;
+          const rect = track.getBoundingClientRect();
+          if (!rect.width) return;
+          setVolumeLevel(((clientX - rect.left) / rect.width) * 100);
+        };
+
+        const volumePointerHandlers = {
+          onPointerDown: (e) => {
+            if (e.button !== undefined && e.button !== 0) return;
+            e.preventDefault();
+            try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) {}
+            e.currentTarget.focus({ preventScroll: true });
+            setVolumeDragging(true);
+            volumeFromPointer(e.clientX);
+          },
+          onPointerMove: (e) => {
+            if (volumeDragging) volumeFromPointer(e.clientX);
+          },
+          onPointerUp: () => setVolumeDragging(false),
+          onPointerCancel: () => setVolumeDragging(false),
+          onLostPointerCapture: () => setVolumeDragging(false)
+        };
+
+        const handleVolumeKey = (e) => {
+          const current = isMuted ? 0 : volume;
+          const steps = { ArrowLeft: -5, ArrowDown: -5, ArrowRight: 5, ArrowUp: 5, PageDown: -10, PageUp: 10 };
+          if (e.key in steps) setVolumeLevel(current + steps[e.key]);
+          else if (e.key === 'Home') setVolumeLevel(0);
+          else if (e.key === 'End') setVolumeLevel(100);
+          else return;
+          e.preventDefault();
         };
 
         const resumeVolumeControl = () => {
@@ -1083,6 +1133,12 @@
         };
 
         useEffect(() => { applyVolume(volume, isMuted); }, [volume, isMuted]);
+
+        // Recuerda el último volumen elegido (no se guarda el 0 para no arrancar muda).
+        useEffect(() => {
+          if (volume <= 0) return;
+          try { window.localStorage.setItem('fm-volume', String(volume)); } catch (_) {}
+        }, [volume]);
 
         // Título, imagen y controles de la pantalla de bloqueo / notificación del celular.
         useEffect(() => {
@@ -1356,27 +1412,60 @@
                       </button>
                     </div>
 
-                    <div className={`flex items-center w-full max-w-[280px] gap-4 text-gray-500 dark:text-slate-500 shrink-0 ${isCompactHomeLayout ? 'mt-1 mb-2' : 'mt-2 mb-4'}`}>
-                      <button onClick={toggleMute} aria-label={isMuted || volume === 0 ? 'Activar sonido' : 'Silenciar'} title={isMuted || volume === 0 ? 'Activar sonido' : 'Silenciar'} className="w-9 h-11 shrink-0 flex items-center justify-center hover:text-gray-800 dark:hover:text-slate-300 transition-colors">
-                        {isMuted || volume == 0 ? <VolumeX size={18} strokeWidth={1.5} /> : <Volume2 size={18} strokeWidth={1.5} />}
-                      </button>
-                      <div className="relative flex-1 min-w-0 h-11 flex items-center group">
-                        <input
-                          type="range"
-                          min="0"
-                          max="100"
-                          value={isMuted ? 0 : volume}
-                          onChange={handleVolumeChange}
-                          onInput={handleVolumeChange}
-                          onPointerDown={resumeVolumeControl}
-                          onKeyDown={resumeVolumeControl}
+                    <div className={`w-full max-w-[300px] shrink-0 pb-4 ${isCompactHomeLayout ? 'mt-1 mb-2' : 'mt-2 mb-4'}`}>
+                      <div className="flex items-center gap-2 text-gray-500 dark:text-slate-400">
+                        <button
+                          type="button"
+                          onClick={toggleMute}
+                          disabled={volumeLocked}
+                          aria-label={isMuted || volume === 0 ? 'Activar sonido' : 'Silenciar'}
+                          title={isMuted || volume === 0 ? 'Activar sonido' : 'Silenciar'}
+                          className="w-10 h-11 shrink-0 flex items-center justify-center rounded-full hover:text-gray-800 dark:hover:text-slate-200 transition-colors disabled:opacity-40"
+                        >
+                          {isMuted || volume === 0 ? <VolumeX size={20} strokeWidth={1.75} /> : <Volume1 size={20} strokeWidth={1.75} />}
+                        </button>
+
+                        <div
+                          role="slider"
+                          tabIndex={volumeLocked ? -1 : 0}
                           aria-label="Volumen"
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-valuenow={isMuted ? 0 : volume}
                           aria-valuetext={`${isMuted ? 0 : volume}%`}
-                          className="radio-volume w-full cursor-pointer"
-                          style={{ '--volume-level': `${isMuted ? 0 : volume}%`, '--volume-color': isDark ? '#fbbf24' : '#2563eb', '--volume-track': isDark ? '#334155' : '#d1d5db' }}
-                        />
+                          aria-disabled={volumeLocked}
+                          onKeyDown={volumeLocked ? undefined : handleVolumeKey}
+                          {...(volumeLocked ? {} : volumePointerHandlers)}
+                          className={`volume-slider relative flex-1 min-w-0 h-11 flex items-center outline-none ${volumeLocked ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
+                          style={{ touchAction: 'none', '--vol-color': isDark ? '#fbbf24' : '#2563eb' }}
+                        >
+                          <div ref={volumeTrackRef} className={`relative w-full h-1 rounded-full ${isDark ? 'bg-slate-700' : 'bg-gray-300'}`}>
+                            <div
+                              className="absolute inset-y-0 left-0 rounded-full"
+                              style={{ width: `${isMuted ? 0 : volume}%`, background: 'var(--vol-color)' }}
+                            />
+                            <div
+                              className={`volume-thumb absolute top-1/2 rounded-full bg-white ${volumeDragging ? 'is-dragging' : ''}`}
+                              style={{ left: `${isMuted ? 0 : volume}%`, borderColor: 'var(--vol-color)' }}
+                            />
+                            <span
+                              className={`volume-bubble absolute top-full mt-3 -translate-x-1/2 text-[11px] font-semibold tabular-nums ${isDark ? 'text-amber-400' : 'text-blue-600'}`}
+                              style={{ left: `${Math.min(92, Math.max(8, isMuted ? 0 : volume))}%` }}
+                            >
+                              {isMuted ? 0 : volume}%
+                            </span>
+                          </div>
+                        </div>
+
+                        <span className="w-10 h-11 shrink-0 flex items-center justify-center" aria-hidden="true">
+                          <Volume2 size={20} strokeWidth={1.75} />
+                        </span>
                       </div>
-                      <output className={`w-10 shrink-0 text-right text-xs tabular-nums font-medium ${isDark ? 'text-amber-400' : 'text-blue-600'}`}>{isMuted ? 0 : volume}%</output>
+                      {volumeLocked && (
+                        <p className="mt-4 text-center text-[11px] text-gray-500 dark:text-slate-500">
+                          En este teléfono el volumen se maneja con los botones del costado.
+                        </p>
+                      )}
                     </div>
                   </div>
                 )}
@@ -1591,6 +1680,25 @@
               .custom-scrollbar::-webkit-scrollbar { width: 4px; }
               .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
               .custom-scrollbar::-webkit-scrollbar-thumb { background-color: ${isDark ? '#334155' : '#cbd5e1'}; border-radius: 20px; }
+              .volume-thumb {
+                width: 18px;
+                height: 18px;
+                border-width: 3px;
+                border-style: solid;
+                transform: translate(-50%, -50%);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+                transition: transform 0.15s ease, box-shadow 0.15s ease;
+              }
+              .volume-slider:hover .volume-thumb,
+              .volume-thumb.is-dragging {
+                transform: translate(-50%, -50%) scale(1.2);
+                box-shadow: 0 0 0 6px color-mix(in srgb, var(--vol-color) 20%, transparent), 0 2px 8px rgba(0,0,0,0.25);
+              }
+              .volume-slider:focus-visible .volume-thumb {
+                box-shadow: 0 0 0 4px color-mix(in srgb, var(--vol-color) 45%, transparent);
+              }
+              .volume-slider[aria-disabled="true"] .volume-thumb { transform: translate(-50%, -50%); }
+              .volume-bubble { pointer-events: none; white-space: nowrap; }
               .scale-in { animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
               @keyframes scaleIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
               .metadata-marquee-container {
