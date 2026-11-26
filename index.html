@@ -1290,13 +1290,13 @@
                 {toastMsg}
               </div>
 
-              <div className={`${isShortScreen || isLandscapeHome ? 'pt-[max(0.75rem,env(safe-area-inset-top,0.75rem))] pb-2 px-4' : 'pt-[max(1.5rem,env(safe-area-inset-top,1.5rem))] sm:pt-8 pb-3 px-4 min-[400px]:px-6'} relative z-10 flex justify-between items-center gap-2 backdrop-blur-sm shrink-0 border-b border-black/5 dark:border-white/5`}>
+              <div className={`${isShortScreen || isLandscapeHome ? 'pt-[max(0.75rem,env(safe-area-inset-top,0.75rem))] pb-2 px-3 min-[360px]:px-4' : 'pt-[max(1.5rem,env(safe-area-inset-top,1.5rem))] sm:pt-8 pb-3 px-3 min-[360px]:px-4 min-[400px]:px-6'} relative z-10 flex justify-between items-center gap-2 backdrop-blur-sm shrink-0 border-b border-black/5 dark:border-white/5`}>
                 <div className="flex items-center gap-2 min-[400px]:gap-3 flex-1 min-w-0 overflow-hidden">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-lg shrink-0 transition-colors ${isDark ? 'bg-gradient-to-tr from-amber-600 to-amber-300' : 'bg-gradient-to-tr from-blue-600 to-blue-400'}`}>
+                  <div className={`w-7 h-7 min-[360px]:w-8 min-[360px]:h-8 rounded-full flex items-center justify-center shadow-lg shrink-0 transition-colors ${isDark ? 'bg-gradient-to-tr from-amber-600 to-amber-300' : 'bg-gradient-to-tr from-blue-600 to-blue-400'}`}>
                     <Radio size={16} className={isDark ? 'text-slate-950' : 'text-white'} strokeWidth={2.5} />
                   </div>
                   <div className="overflow-hidden flex flex-col w-full min-w-0">
-                    <h1 className="text-[15px] min-[400px]:text-base font-bold tracking-wide text-blue-600 dark:text-blue-400 truncate">FM Apocalipsis 100.7</h1>
+                    <h1 className="text-[14px] min-[360px]:text-[15px] min-[400px]:text-base font-bold tracking-wide text-blue-600 dark:text-blue-400 truncate">FM Apocalipsis 100.7</h1>
                     {currentProgram ? (
                       <span className="text-[10px] font-bold uppercase tracking-wider text-red-500 flex items-center gap-1">
                         <span className="relative flex h-1.5 w-1.5">
@@ -1309,16 +1309,16 @@
                   </div>
                 </div>
 
-                <div className="flex gap-1.5 min-[400px]:gap-2 shrink-0 items-center">
+                <div className="flex gap-1 min-[360px]:gap-1.5 min-[400px]:gap-2 shrink-0 items-center">
                   {showInstallCta && (
-                    <button onClick={handleInstallClick} aria-label="Instalar app" title="Instalar app" className="install-cta install-cta-breathe relative flex items-center gap-1.5 p-2.5 min-[420px]:px-3 min-[420px]:py-1.5 bg-red-600 text-white text-[10px] font-bold uppercase rounded-full shadow-lg transition-transform active:scale-95">
+                    <button onClick={handleInstallClick} aria-label="Instalar app" title="Instalar app" className="install-cta install-cta-breathe relative flex items-center gap-1.5 p-2 min-[360px]:p-2.5 min-[420px]:px-3 min-[420px]:py-1.5 bg-red-600 text-white text-[10px] font-bold uppercase rounded-full shadow-lg transition-transform active:scale-95">
                       <Download size={14} /> <span className="hidden min-[420px]:inline">Instalar App</span>
                     </button>
                   )}
-                  <button onClick={handleShare} aria-label="Compartir" title="Compartir" className="flex items-center justify-center p-2.5 bg-black/5 dark:bg-white/10 text-gray-700 dark:text-slate-200 hover:bg-black/10 dark:hover:bg-white/20 rounded-full backdrop-blur-md shadow-sm active:scale-90 transition-all">
+                  <button onClick={handleShare} aria-label="Compartir" title="Compartir" className="flex items-center justify-center p-2 min-[360px]:p-2.5 bg-black/5 dark:bg-white/10 text-gray-700 dark:text-slate-200 hover:bg-black/10 dark:hover:bg-white/20 rounded-full backdrop-blur-md shadow-sm active:scale-90 transition-all">
                     <Share2 size={18} />
                   </button>
-                  <button onClick={toggleThemeMode} aria-label="Cambiar tema" title="Tema: automático, claro u oscuro" className="flex items-center justify-center p-2.5 bg-black/5 dark:bg-white/10 text-gray-700 dark:text-slate-200 hover:bg-black/10 dark:hover:bg-white/20 rounded-full backdrop-blur-md shadow-sm active:scale-90 transition-all">
+                  <button onClick={toggleThemeMode} aria-label="Cambiar tema" title="Tema: automático, claro u oscuro" className="flex items-center justify-center p-2 min-[360px]:p-2.5 bg-black/5 dark:bg-white/10 text-gray-700 dark:text-slate-200 hover:bg-black/10 dark:hover:bg-white/20 rounded-full backdrop-blur-md shadow-sm active:scale-90 transition-all">
                     {themeMode === 'auto' ? <Clock size={18} /> : themeMode === 'dark' ? <Moon size={18} /> : <Sun size={18} />}
                   </button>
                 </div>
@@ -1618,15 +1618,15 @@
                     </div>
                     <div className="flex-1 min-h-0 overflow-y-auto pr-1 custom-scrollbar space-y-3 pb-4">
                       {scheduleData[selectedDay]?.length > 0 ? scheduleData[selectedDay].map((p, idx) => (
-                        <div key={idx} className={`p-4 rounded-2xl border backdrop-blur-md transition-all flex items-center gap-4 ${isCurrentProgram(p) ? 'bg-amber-500/10 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.1)]' : 'bg-gray-50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-800'}`}>
-                          <div className="flex flex-col items-center min-w-[50px]">
+                        <div key={idx} className={`p-3 min-[400px]:p-4 rounded-2xl border backdrop-blur-md transition-all flex items-center gap-2.5 min-[400px]:gap-4 ${isCurrentProgram(p) ? 'bg-amber-500/10 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.1)]' : 'bg-gray-50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-800'}`}>
+                          <div className="flex flex-col items-center min-w-[44px] shrink-0">
                             <span className={`text-xs font-medium ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{p.start}</span>
                             <Minus size={10} className="text-gray-400 dark:text-slate-600 my-0.5" />
                             <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{p.end}</span>
                           </div>
-                          <div className="w-px h-10 bg-gray-300 dark:bg-slate-800"></div>
-                          {p.image && <img src={p.image} alt={p.title} className="w-10 h-10 rounded-lg object-cover ring-1 ring-black/5 dark:ring-white/10 shadow-sm" />}
-                          <div className="flex-1 overflow-hidden pr-2">
+                          <div className="w-px h-10 shrink-0 bg-gray-300 dark:bg-slate-800"></div>
+                          {p.image && <img src={p.image} alt={p.title} className="w-10 h-10 shrink-0 rounded-lg object-cover ring-1 ring-black/5 dark:ring-white/10 shadow-sm" />}
+                          <div className="flex-1 min-w-0 overflow-hidden pr-1">
                             <h3 className={`text-sm font-medium leading-snug flex items-start gap-2 ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
                               <span className="line-clamp-2 break-words min-w-0">{p.title}</span>
                               {isCurrentProgram(p) && (
