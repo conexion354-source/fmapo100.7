@@ -231,6 +231,9 @@
         const [isMuted, setIsMuted] = useState(false);
         const [selectedDay, setSelectedDay] = useState(() => DAY_LETTERS[new Date().getDay()]);
         const [onlineCount, setOnlineCount] = useState(null);
+        const [streamOnline, setStreamOnline] = useState(null);
+        const streamOnlineRef = useRef(null);
+        streamOnlineRef.current = streamOnline;
         const [installDismissed, setInstallDismissed] = useState(() => {
           try {
             const until = Number(window.localStorage.getItem('fm-install-dismissed') || 0);
@@ -944,7 +947,7 @@
           const area = artAreaRef.current;
           if (!area) return;
           const measure = () => {
-            const size = Math.floor(Math.min(area.clientWidth, area.clientHeight, 280));
+            const size = Math.floor(Math.min(area.clientWidth, area.clientHeight, 236));
             setArtSize(size >= 72 ? size : 0);
           };
           measure();
@@ -1003,20 +1006,32 @@
               const response = await fetch(statsUrl, { cache: 'no-store' });
               if (!response.ok) throw new Error('stats_unavailable');
               const data = await response.json();
-              if (active) setNowPlaying(typeof data.songtitle === 'string' ? data.songtitle.trim() : '');
+              if (!active) return;
+              setNowPlaying(typeof data.songtitle === 'string' ? data.songtitle.trim() : '');
+              // streamstatus 1 = le llega audio de la radio; 0 = la radio no está transmitiendo.
+              if (typeof data.streamstatus === 'number') setStreamOnline(data.streamstatus === 1);
             } catch (_) {
-              if (active) setNowPlaying('');
+              if (active) {
+                setNowPlaying('');
+                setStreamOnline(null); // No se sabe: no se afirma que esté fuera del aire.
+              }
             }
           };
           updateMetadata();
           const interval = setInterval(updateMetadata, 15000);
-          return () => { active = false; clearInterval(interval); };
+          document.addEventListener('visibilitychange', updateMetadata);
+          return () => { active = false; clearInterval(interval); document.removeEventListener('visibilitychange', updateMetadata); };
         }, []);
 
-        // Detecta si el navegador permite cambiar el volumen del <audio> (iPhone no lo permite).
-        // En ese caso el volumen se controla con Web Audio, que necesita que el servidor
-        // del stream permita CORS. Se comprueba antes, para no dejar la radio muda.
-        const streamCorsOk = useRef(null);
+        // iPhone no deja cambiar el volumen del <audio>. Ahí el volumen se controla con Web Audio,
+        // que necesita que el servidor del stream permita CORS. Para no dejar la radio muda:
+        //  1) al dar play se pide el audio "con CORS";
+        //  2) si suena, CORS funciona y se recuerda;
+        //  3) recién ahí, al tocar la barra (un toque del usuario), se conecta el control de volumen;
+        //  4) si con CORS no carga, se vuelve al modo normal y la barra avisa que se usen los botones.
+        const streamCorsOk = useRef((() => {
+          try { return window.localStorage.getItem('fm-stream-cors') === '1' ? true : null; } catch (_) { return null; }
+        })());
         useEffect(() => {
           const audio = audioRef.current;
           if (!audio) return;
@@ -1024,47 +1039,37 @@
           audio.volume = 0.5;
           nativeVolumeSupported.current = Math.abs(audio.volume - 0.5) < 0.01;
           audio.volume = previousVolume;
-          if (nativeVolumeSupported.current) return;
-          if (!(window.AudioContext || window.webkitAudioContext)) {
-            setVolumeLocked(true);
-            return;
-          }
-
-          const controller = new AbortController();
-          const timeout = setTimeout(() => controller.abort(), 5000);
-          fetch(streamUrl, { mode: 'cors', cache: 'no-store', signal: controller.signal })
-            .then((response) => {
-              streamCorsOk.current = response.ok;
-              if (!response.ok) setVolumeLocked(true);
-              controller.abort(); // Solo hacían falta las cabeceras, no el audio.
-            })
-            .catch(() => {
-              if (streamCorsOk.current === null) {
-                streamCorsOk.current = false;
-                setVolumeLocked(true);
-              }
-            })
-            .finally(() => clearTimeout(timeout));
-          return () => { clearTimeout(timeout); controller.abort(); };
+          if (!nativeVolumeSupported.current && !(window.AudioContext || window.webkitAudioContext)) setVolumeLocked(true);
         }, []);
+
+        const needsVolumeGraph = () => nativeVolumeSupported.current === false && Boolean(window.AudioContext || window.webkitAudioContext);
+
+        // Conecta el control de volumen por Web Audio. Solo se llama desde un toque del usuario.
+        const ensureVolumeGraph = () => {
+          const audio = audioRef.current;
+          if (!audio || audioGraph.current || !needsVolumeGraph() || streamCorsOk.current !== true) return;
+          if (audio.crossOrigin !== 'anonymous' && audio.getAttribute('src') && !audio.paused) return; // cargado sin CORS: se conecta en el próximo play
+          try {
+            const Context = window.AudioContext || window.webkitAudioContext;
+            const context = new Context();
+            const gain = context.createGain();
+            const source = context.createMediaElementSource(audio);
+            source.connect(gain);
+            gain.connect(context.destination);
+            audioGraph.current = { context, gain, source };
+            context.resume().catch(() => {});
+          } catch (error) {
+            console.warn('Audio gain unavailable', error);
+          }
+        };
 
         const syncToLive = () => {
           const audio = audioRef.current;
           if (!audio) return;
-          const Context = window.AudioContext || window.webkitAudioContext;
-          if (nativeVolumeSupported.current === false && streamCorsOk.current === true && !audioGraph.current && Context) {
-            try {
-              audio.crossOrigin = 'anonymous';
-              const context = new Context();
-              const gain = context.createGain();
-              const source = context.createMediaElementSource(audio);
-              source.connect(gain);
-              gain.connect(context.destination);
-              audioGraph.current = { context, gain, source };
-            } catch (error) {
-              audio.removeAttribute('crossorigin');
-              console.warn('Audio gain unavailable', error);
-            }
+          if (needsVolumeGraph() && streamCorsOk.current !== false) {
+            audio.crossOrigin = 'anonymous';
+            // Si ya se sabe que CORS funciona, el control se conecta ahora (estamos dentro del toque en play).
+            if (streamCorsOk.current === true) ensureVolumeGraph();
           }
           applyVolume(volume, isMuted);
           const resume = audioGraph.current?.context.resume() || Promise.resolve();
@@ -1078,7 +1083,7 @@
               reconnectAttempts.current = 0;
             })
             .catch((e) => {
-              if (e.name !== 'AbortError') {
+              if (e.name !== 'AbortError' && !handleCorsFailure()) {
                 setStreamError(true);
                 setIsPlaying(false);
               }
@@ -1109,6 +1114,12 @@
         const scheduleReconnect = () => {
           if (userPausedRef.current || updateRequested.current) return;
           clearTimeout(reconnectTimer.current);
+          if (streamOnlineRef.current === false) {
+            // La radio no transmite: se espera a que vuelva (ver efecto de streamOnline).
+            setStreamError(true);
+            setIsBuffering(false);
+            return;
+          }
           if (reconnectAttempts.current >= 5) {
             setStreamError(true);
             setIsBuffering(false);
@@ -1140,10 +1151,37 @@
           clearTimeout(stallTimer.current);
         }, []);
 
+        // Cuando la radio vuelve al aire y el oyente había querido escuchar, se reconecta solo.
+        useEffect(() => {
+          if (streamOnline === true && streamError && !userPausedRef.current) {
+            reconnectAttempts.current = 0;
+            syncToLive();
+          }
+        }, [streamOnline]);
+
+        // Si con CORS no carga (y nunca cargó así) en iPhone, se vuelve al modo normal.
+        // Devuelve true si se reintenta sin CORS.
+        const handleCorsFailure = () => {
+          const audio = audioRef.current;
+          if (!audio || audio.crossOrigin !== 'anonymous' || audioGraph.current || streamCorsOk.current === true) return false;
+          if (streamOnlineRef.current === false) return false; // falla porque la radio no transmite, no por CORS
+          streamCorsOk.current = false;
+          audio.removeAttribute('crossorigin');
+          setVolumeLocked(true);
+          if (!userPausedRef.current) setTimeout(() => syncToLive(), 0);
+          return true;
+        };
+
         // Mantiene el botón y el texto "SONANDO / PAUSADO" sincronizados con lo que
         // realmente hace el audio (auriculares, pantalla de bloqueo, cortes de red).
         const audioEvents = {
           onPlaying: () => {
+            const audio = audioRef.current;
+            if (audio && audio.crossOrigin === 'anonymous' && needsVolumeGraph() && streamCorsOk.current !== true) {
+              streamCorsOk.current = true;
+              setVolumeLocked(false);
+              try { window.localStorage.setItem('fm-stream-cors', '1'); } catch (_) {}
+            }
             setIsPlaying(true);
             setIsBuffering(false);
             setStreamError(false);
@@ -1171,6 +1209,7 @@
             const audio = audioRef.current;
             if (!audio || !audio.getAttribute('src') || updateRequested.current) return;
             setIsPlaying(false);
+            if (handleCorsFailure()) return;
             if (userPausedRef.current) return;
             scheduleReconnect();
           }
@@ -1220,6 +1259,7 @@
         };
 
         const resumeVolumeControl = () => {
+          ensureVolumeGraph();
           const context = audioGraph.current?.context;
           if (context && context.state !== 'running') context.resume().catch(() => {});
         };
@@ -1389,6 +1429,7 @@
           : 'La voz que viene de lo alto';
         const backgroundImage = currentDisplayedImage || 'logo.png';
         const volumeLevel = isMuted ? 0 : volume;
+        const offAir = streamOnline === false;
         // En pantallas angostas el botón Instalar va en un aviso aparte para no tapar el nombre.
         const installInHeader = showInstallCta && viewportWidth >= 440;
         const showInstallBanner = showInstallCta && !installInHeader && !installDismissed && activeTab === 'home' && !isShortScreen && !isLandscapeHome;
@@ -1475,7 +1516,7 @@
                 {activeTab === 'home' && (
                   <div className={`flex-1 min-h-0 flex overflow-y-auto overflow-x-hidden custom-scrollbar px-4 sm:px-6 ${isLandscapeHome ? 'flex-row items-center gap-6 py-3' : `flex-col items-center ${isShortScreen ? 'pt-1 pb-1 gap-1' : 'pt-1 pb-3 gap-2'}`}`}>
                     <div className={isLandscapeHome ? 'contents' : 'w-full flex-1 min-h-0 flex flex-col items-center'}>
-                      {currentProgram && !isLandscapeHome && (
+                      {currentProgram && !offAir && !isLandscapeHome && (
                         <div className="shrink-0 inline-flex items-center gap-2 max-w-full pl-2.5 pr-3.5 py-1.5 rounded-full border mt-1" style={{ background: 'var(--live-bg)', borderColor: 'var(--live-border)' }}>
                           <span className="w-2 h-2 rounded-full shrink-0 fm-live-dot" style={{ background: 'var(--live)' }} />
                           <span className="text-xs font-extrabold tracking-wide shrink-0" style={{ color: 'var(--live-text)' }}>AL AIRE</span>
@@ -1486,7 +1527,7 @@
                         ref={artAreaRef}
                         className={isLandscapeHome
                           ? 'h-full w-[42%] max-w-[280px] min-h-0 flex items-center justify-center shrink-0'
-                          : `w-full flex-1 min-h-[72px] flex items-center justify-center ${isShortScreen ? 'py-2' : 'py-4'}`}
+                          : `w-full flex-1 min-h-[72px] flex items-center justify-center ${isShortScreen ? 'py-2' : 'pt-3 pb-4'}`}
                       >
                         {artSize > 0 && (
                           <div className="relative shrink-0" style={{ width: `${artSize}px`, height: `${artSize}px` }}>
@@ -1512,7 +1553,7 @@
                     </div>
 
                     <div className={isLandscapeHome ? 'flex-1 min-w-0 flex flex-col items-center justify-center' : 'contents'}>
-                      {currentProgram && isLandscapeHome && (
+                      {currentProgram && !offAir && isLandscapeHome && (
                         <div className="shrink-0 inline-flex items-center gap-2 max-w-full pl-2.5 pr-3.5 py-1 rounded-full border mb-2" style={{ background: 'var(--live-bg)', borderColor: 'var(--live-border)' }}>
                           <span className="w-2 h-2 rounded-full shrink-0" style={{ background: 'var(--live)' }} />
                           <span className="text-[11px] font-extrabold tracking-wide shrink-0" style={{ color: 'var(--live-text)' }}>AL AIRE</span>
@@ -1521,26 +1562,34 @@
                       )}
 
                       <div className="w-full max-w-[340px] px-2 text-center shrink-0">
-                        {streamError ? (
+                        {offAir && !isPlaying ? (
+                          <p className="text-xs font-extrabold tracking-wide" style={{ color: 'var(--live-text)' }}>FUERA DEL AIRE</p>
+                        ) : streamError ? (
                           <p className="text-xs font-extrabold tracking-wide" style={{ color: 'var(--live-text)' }}>NO SE PUDO CONECTAR</p>
                         ) : (
                           <p className="text-xs font-extrabold tracking-[0.06em]" style={{ color: 'var(--accent-text)' }}>{isBuffering ? 'CONECTANDO…' : isPlaying ? 'SONANDO AHORA' : 'EN PAUSA'}</p>
                         )}
                         <p className={`font-sora font-bold leading-tight mt-1.5 line-clamp-2 break-words ${isShortScreen || isLandscapeHome ? 'text-lg' : 'text-[21px]'}`}>
-                          {streamError ? 'Revisá tu conexión y tocá play' : metadataText}
+                          {offAir && !isPlaying
+                            ? 'La radio está fuera del aire en este momento'
+                            : streamError ? 'Revisá tu conexión y tocá play' : metadataText}
                         </p>
-                        {!streamError && currentProgram?.hosts && (
+                        {offAir && !isPlaying ? (
+                          <p className="text-[13px] mt-1" style={{ color: 'var(--muted)' }}>
+                            {userPausedRef.current ? 'Volvé en un rato.' : 'Se va a conectar sola cuando vuelva.'}
+                          </p>
+                        ) : !streamError && currentProgram?.hosts && (
                           <p className="text-[13px] mt-1 truncate" style={{ color: 'var(--muted)' }}>con {String(currentProgram.hosts)}</p>
                         )}
                       </div>
 
-                      <div aria-hidden="true" className={`flex items-end justify-center gap-1 h-[30px] shrink-0 ${isShortScreen || isLandscapeHome ? 'mt-2' : 'mt-4'} ${isPlaying ? 'fm-eq-on' : ''}`}>
+                      <div aria-hidden="true" className={`flex items-end justify-center gap-1 h-[30px] shrink-0 ${isShortScreen || isLandscapeHome ? 'mt-2' : 'mt-5'} ${isPlaying ? 'fm-eq-on' : ''}`}>
                         {EQ_HEIGHTS.map((h, i) => (
                           <span key={i} className="fm-eq-bar" style={{ height: `${h}px`, animationDelay: `${((i * 0.13) % 1).toFixed(2)}s`, opacity: i % 3 === 0 ? 0.65 : 1 }} />
                         ))}
                       </div>
 
-                      <div className={`flex items-center justify-center gap-[34px] shrink-0 ${isShortScreen || isLandscapeHome ? 'mt-3' : 'mt-5'}`}>
+                      <div className={`flex items-center justify-center gap-[34px] shrink-0 ${isShortScreen || isLandscapeHome ? 'mt-3' : 'mt-7'}`}>
                         <button onClick={startPlayback} aria-label="Volver al vivo" title="Volver al vivo" className="fm-round-btn w-12 h-12">
                           <RotateCcw size={20} />
                         </button>
@@ -1563,7 +1612,7 @@
                         )}
                       </div>
 
-                      <div className={`w-full max-w-[322px] shrink-0 ${isShortScreen || isLandscapeHome ? 'mt-2' : 'mt-5'}`}>
+                      <div className={`w-full max-w-[322px] shrink-0 ${isShortScreen || isLandscapeHome ? 'mt-2' : 'mt-7 mb-2'}`}>
                         <div className="flex items-center gap-3" style={{ color: 'var(--muted)' }}>
                           <button
                             type="button"
