@@ -1414,26 +1414,26 @@
               </div>
 
               {/* Encabezado */}
-              <div className={`relative z-10 flex items-center gap-3 shrink-0 ${isShortScreen || isLandscapeHome ? 'pt-[max(0.75rem,env(safe-area-inset-top,0.75rem))] pb-2' : 'pt-[max(1.25rem,env(safe-area-inset-top,1.25rem))] sm:pt-7 pb-3'} px-4 min-[390px]:px-5 ${activeTab === 'home' ? '' : 'border-b'}`} style={{ borderColor: 'var(--line)' }}>
-                <img src="logo.png" alt="Logo FM Apocalipsis" className="w-10 h-10 min-[390px]:w-[42px] min-[390px]:h-[42px] rounded-xl object-cover shrink-0 shadow-md" />
+              <div className={`relative z-10 flex items-center gap-2 min-[360px]:gap-3 shrink-0 ${isShortScreen || isLandscapeHome ? 'pt-[max(0.75rem,env(safe-area-inset-top,0.75rem))] pb-2' : 'pt-[max(1.25rem,env(safe-area-inset-top,1.25rem))] sm:pt-7 pb-3'} px-3 min-[360px]:px-4 min-[390px]:px-5 ${activeTab === 'home' ? '' : 'border-b'}`} style={{ borderColor: 'var(--line)' }}>
+                <img src="logo.png" alt="Logo FM Apocalipsis" className="w-9 h-9 min-[360px]:w-10 min-[360px]:h-10 min-[390px]:w-[42px] min-[390px]:h-[42px] rounded-xl object-cover shrink-0 shadow-md" />
                 <div className="flex-1 min-w-0">
-                  <h1 className="font-sora font-bold text-[15px] min-[390px]:text-[17px] leading-tight truncate">{headerTitle}</h1>
+                  <h1 className="font-sora font-bold text-[14px] min-[360px]:text-[15px] min-[390px]:text-[17px] leading-tight truncate">{headerTitle}</h1>
                   <p className="text-xs mt-0.5 truncate flex items-center gap-1.5" style={{ color: 'var(--muted)' }}>
                     {activeTab === 'chat' && onlineCount ? <span className="w-[7px] h-[7px] rounded-full shrink-0" style={{ background: 'var(--wa-fg)' }} /> : null}
                     <span className="truncate">{headerSubtitle}</span>
                   </p>
                 </div>
                 {showHeaderActions && (
-                  <div className="flex gap-1.5 min-[390px]:gap-2 shrink-0 items-center">
+                  <div className="flex gap-1 min-[360px]:gap-1.5 min-[390px]:gap-2 shrink-0 items-center">
                     {installInHeader && (
                       <button onClick={handleInstallClick} aria-label="Instalar app" title="Instalar app" className="install-cta install-cta-breathe relative h-10 min-[390px]:h-11 flex items-center justify-center gap-1.5 px-2.5 min-[420px]:px-3.5 rounded-full text-[11px] font-extrabold uppercase active:scale-95 transition-transform" style={{ background: 'var(--live)', color: '#fff' }}>
                         <Download size={16} /> <span className="hidden min-[420px]:inline">Instalar</span>
                       </button>
                     )}
-                    <button onClick={handleShare} aria-label="Compartir" title="Compartir" className="fm-round-btn w-10 h-10 min-[390px]:w-11 min-[390px]:h-11">
+                    <button onClick={handleShare} aria-label="Compartir" title="Compartir" className="fm-round-btn w-9 h-9 min-[360px]:w-10 min-[360px]:h-10 min-[390px]:w-11 min-[390px]:h-11">
                       <Share2 size={19} />
                     </button>
-                    <button onClick={toggleThemeMode} aria-label={`Tema: ${themeMode === 'auto' ? 'automático' : themeMode === 'dark' ? 'oscuro' : 'claro'}`} title="Tema: automático, claro u oscuro" className="fm-round-btn w-10 h-10 min-[390px]:w-11 min-[390px]:h-11">
+                    <button onClick={toggleThemeMode} aria-label={`Tema: ${themeMode === 'auto' ? 'automático' : themeMode === 'dark' ? 'oscuro' : 'claro'}`} title="Tema: automático, claro u oscuro" className="fm-round-btn w-9 h-9 min-[360px]:w-10 min-[360px]:h-10 min-[390px]:w-11 min-[390px]:h-11">
                       {themeMode === 'auto' ? <SunMoon size={19} /> : themeMode === 'dark' ? <Moon size={19} /> : <Sun size={19} />}
                     </button>
                   </div>
