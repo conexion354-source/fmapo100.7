@@ -947,7 +947,11 @@
           const area = artAreaRef.current;
           if (!area) return;
           const measure = () => {
-            const size = Math.floor(Math.min(area.clientWidth, area.clientHeight, 236));
+            // Se descuenta el margen interno: si no, la portada se sale de su lugar y se encima con lo de arriba.
+            const style = window.getComputedStyle(area);
+            const innerW = area.clientWidth - parseFloat(style.paddingLeft || 0) - parseFloat(style.paddingRight || 0);
+            const innerH = area.clientHeight - parseFloat(style.paddingTop || 0) - parseFloat(style.paddingBottom || 0);
+            const size = Math.floor(Math.min(innerW, innerH, 236));
             setArtSize(size >= 72 ? size : 0);
           };
           measure();
@@ -1579,7 +1583,7 @@
                             {userPausedRef.current ? 'Volvé en un rato.' : 'Se va a conectar sola cuando vuelva.'}
                           </p>
                         ) : !streamError && currentProgram?.hosts && (
-                          <p className="text-[13px] mt-1 truncate" style={{ color: 'var(--muted)' }}>con {String(currentProgram.hosts)}</p>
+                          <p className="text-[13px] mt-1 truncate" style={{ color: 'var(--muted)' }}>{/^con\s/i.test(String(currentProgram.hosts).trim()) ? String(currentProgram.hosts).trim() : `con ${String(currentProgram.hosts).trim()}`}</p>
                         )}
                       </div>
 
