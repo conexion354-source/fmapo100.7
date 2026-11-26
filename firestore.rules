@@ -1,0 +1,37 @@
+rules_version = '2';
+
+// Reglas de seguridad para el chat de FM Apocalipsis 100.7.
+// Cómo aplicarlas: Firebase Console > Firestore Database > Reglas,
+// pegá este contenido y tocá "Publicar".
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /artifacts/{appId}/public/data/messages/{messageId} {
+      // Cualquiera puede leer el chat.
+      allow read: if true;
+
+      // Para escribir hay que estar identificado (la app inicia sesión anónima sola)
+      // y el mensaje tiene que tener exactamente el formato que usa la app.
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['text', 'sender', 'userId', 'timestamp'])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 300
+        && request.resource.data.sender is string
+        && request.resource.data.sender.size() > 0
+        && request.resource.data.sender.size() <= 15
+        && request.resource.data.timestamp == request.time;
+
+      // Nadie puede editar mensajes; cada uno solo puede borrar los suyos.
+      allow update: if false;
+      allow delete: if request.auth != null
+        && resource.data.userId == request.auth.uid;
+    }
+
+    // Todo lo demás queda cerrado.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
