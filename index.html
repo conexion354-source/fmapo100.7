@@ -1290,13 +1290,13 @@
                 {toastMsg}
               </div>
 
-              <div className={`${isShortScreen || isLandscapeHome ? 'pt-[max(0.75rem,env(safe-area-inset-top,0.75rem))] pb-2 px-3 min-[360px]:px-4' : 'pt-[max(1.5rem,env(safe-area-inset-top,1.5rem))] sm:pt-8 pb-3 px-3 min-[360px]:px-4 min-[400px]:px-6'} relative z-10 flex justify-between items-center gap-2 backdrop-blur-sm shrink-0 border-b border-black/5 dark:border-white/5`}>
+              <div className={`${isShortScreen || isLandscapeHome ? 'pt-[max(0.75rem,env(safe-area-inset-top,0.75rem))] pb-2 px-3 min-[390px]:px-4' : 'pt-[max(1.5rem,env(safe-area-inset-top,1.5rem))] sm:pt-8 pb-3 px-3 min-[390px]:px-4 min-[400px]:px-6'} relative z-10 flex justify-between items-center gap-2 backdrop-blur-sm shrink-0 border-b border-black/5 dark:border-white/5`}>
                 <div className="flex items-center gap-2 min-[400px]:gap-3 flex-1 min-w-0 overflow-hidden">
-                  <div className={`w-7 h-7 min-[360px]:w-8 min-[360px]:h-8 rounded-full flex items-center justify-center shadow-lg shrink-0 transition-colors ${isDark ? 'bg-gradient-to-tr from-amber-600 to-amber-300' : 'bg-gradient-to-tr from-blue-600 to-blue-400'}`}>
+                  <div className={`w-7 h-7 min-[390px]:w-8 min-[390px]:h-8 rounded-full flex items-center justify-center shadow-lg shrink-0 transition-colors ${isDark ? 'bg-gradient-to-tr from-amber-600 to-amber-300' : 'bg-gradient-to-tr from-blue-600 to-blue-400'}`}>
                     <Radio size={16} className={isDark ? 'text-slate-950' : 'text-white'} strokeWidth={2.5} />
                   </div>
                   <div className="overflow-hidden flex flex-col w-full min-w-0">
-                    <h1 className="text-[14px] min-[360px]:text-[15px] min-[400px]:text-base font-bold tracking-normal min-[360px]:tracking-wide text-blue-600 dark:text-blue-400 truncate">FM Apocalipsis 100.7</h1>
+                    <h1 className="text-[14px] min-[390px]:text-[15px] min-[400px]:text-base font-bold tracking-normal min-[390px]:tracking-wide text-blue-600 dark:text-blue-400 truncate">FM Apocalipsis 100.7</h1>
                     {currentProgram ? (
                       <span className="text-[10px] font-bold uppercase tracking-wider text-red-500 flex items-center gap-1">
                         <span className="relative flex h-1.5 w-1.5">
@@ -1309,16 +1309,16 @@
                   </div>
                 </div>
 
-                <div className="flex gap-1 min-[360px]:gap-1.5 min-[400px]:gap-2 shrink-0 items-center">
+                <div className="flex gap-1 min-[390px]:gap-1.5 min-[400px]:gap-2 shrink-0 items-center">
                   {showInstallCta && (
-                    <button onClick={handleInstallClick} aria-label="Instalar app" title="Instalar app" className="install-cta install-cta-breathe relative flex items-center gap-1.5 p-2 min-[360px]:p-2.5 min-[420px]:px-3 min-[420px]:py-1.5 bg-red-600 text-white text-[10px] font-bold uppercase rounded-full shadow-lg transition-transform active:scale-95">
+                    <button onClick={handleInstallClick} aria-label="Instalar app" title="Instalar app" className="install-cta install-cta-breathe relative flex items-center gap-1.5 p-2 min-[390px]:p-2.5 min-[420px]:px-3 min-[420px]:py-1.5 bg-red-600 text-white text-[10px] font-bold uppercase rounded-full shadow-lg transition-transform active:scale-95">
                       <Download size={14} /> <span className="hidden min-[420px]:inline">Instalar App</span>
                     </button>
                   )}
-                  <button onClick={handleShare} aria-label="Compartir" title="Compartir" className="flex items-center justify-center p-2 min-[360px]:p-2.5 bg-black/5 dark:bg-white/10 text-gray-700 dark:text-slate-200 hover:bg-black/10 dark:hover:bg-white/20 rounded-full backdrop-blur-md shadow-sm active:scale-90 transition-all">
+                  <button onClick={handleShare} aria-label="Compartir" title="Compartir" className="flex items-center justify-center p-2 min-[390px]:p-2.5 bg-black/5 dark:bg-white/10 text-gray-700 dark:text-slate-200 hover:bg-black/10 dark:hover:bg-white/20 rounded-full backdrop-blur-md shadow-sm active:scale-90 transition-all">
                     <Share2 size={18} />
                   </button>
-                  <button onClick={toggleThemeMode} aria-label="Cambiar tema" title="Tema: automático, claro u oscuro" className="flex items-center justify-center p-2 min-[360px]:p-2.5 bg-black/5 dark:bg-white/10 text-gray-700 dark:text-slate-200 hover:bg-black/10 dark:hover:bg-white/20 rounded-full backdrop-blur-md shadow-sm active:scale-90 transition-all">
+                  <button onClick={toggleThemeMode} aria-label="Cambiar tema" title="Tema: automático, claro u oscuro" className="flex items-center justify-center p-2 min-[390px]:p-2.5 bg-black/5 dark:bg-white/10 text-gray-700 dark:text-slate-200 hover:bg-black/10 dark:hover:bg-white/20 rounded-full backdrop-blur-md shadow-sm active:scale-90 transition-all">
                     {themeMode === 'auto' ? <Clock size={18} /> : themeMode === 'dark' ? <Moon size={18} /> : <Sun size={18} />}
                   </button>
                 </div>
