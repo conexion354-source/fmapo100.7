@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="theme-color" content="#0B1D1B" />
     <meta name="description" content="FM Apocalipsis 100.7 - Radio en vivo" />
     <title>FM Apocalipsis 100.7</title>
 
@@ -11,49 +11,80 @@
     <link rel="icon" href="logo.png" />
     <link rel="apple-touch-icon" href="icons/icon-192.png" />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = { darkMode: 'class' };
     </script>
 
     <style>
-      html, body, #root {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-      }
+      html, body, #root { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; }
       body {
-        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        background: #0a0a0a;
+        font-family: Manrope, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: #0B1D1B;
         overscroll-behavior: none;
+        -webkit-font-smoothing: antialiased;
       }
-      .animate-spin-slow {
-        animation: spin 2s linear infinite;
+      .font-sora { font-family: Sora, Manrope, ui-sans-serif, system-ui, sans-serif; }
+
+      /* Colores de la marca (logo: verde petróleo + amarillo) */
+      .fm-dark {
+        --page: #06110F; --bg: #0B1D1B; --ink: #F2F7F5; --muted: #A9C4BE; --faint: #8FAAA4;
+        --accent: #FFD84D; --accent-text: #FFD84D; --on-accent: #0B1D1B;
+        --play-bg: #FFD84D; --play-fg: #0B1D1B; --play-shadow: 0 12px 30px rgba(255,216,77,.35);
+        --surface: rgba(255,255,255,.05); --surface-2: rgba(255,255,255,.1);
+        --line: rgba(255,255,255,.07); --line-strong: rgba(255,255,255,.14);
+        --nav-bg: rgba(9,24,22,.94); --pill: rgba(255,216,77,.16); --sheet: #132926; --input-bg: rgba(255,255,255,.07);
+        --live: #FF5A52; --live-text: #FFB3AE; --live-bg: rgba(255,90,82,.16); --live-border: rgba(255,90,82,.4);
+        --wa-bg: rgba(37,211,102,.16); --wa-fg: #4BE08A; --eq: #FFD84D; --track: rgba(255,255,255,.16);
+        --mine-bg: #FFD84D; --mine-fg: #0B1D1B; --other-bg: rgba(255,255,255,.08); --other-shadow: none;
+        --cover-shadow: 0 22px 50px rgba(0,0,0,.5);
+        --backdrop-opacity: .55; --backdrop-fade: linear-gradient(180deg, rgba(11,29,27,.35) 0%, rgba(11,29,27,.85) 52%, #0B1D1B 78%);
+        --live-card-bg: linear-gradient(135deg, rgba(255,216,77,.18), rgba(255,216,77,.06)); --live-card-border: rgba(255,216,77,.45); --live-card-time: #E8D9A0;
       }
-      .app-fallback {
-        min-height: 100%;
-        display: grid;
-        place-items: center;
-        color: #f8fafc;
-        text-align: center;
-        padding: 2rem;
-        box-sizing: border-box;
+      .fm-light {
+        --page: #DCE6E2; --bg: #F4F7F3; --ink: #10302B; --muted: #4E6B65; --faint: #5F7974;
+        --accent: #2F5F5A; --accent-text: #2F5F5A; --on-accent: #FFFFFF;
+        --play-bg: #2F5F5A; --play-fg: #FFD84D; --play-shadow: 0 12px 28px rgba(47,95,90,.35);
+        --surface: rgba(16,48,43,.04); --surface-2: rgba(16,48,43,.08);
+        --line: rgba(16,48,43,.08); --line-strong: rgba(16,48,43,.16);
+        --nav-bg: rgba(255,255,255,.95); --pill: #FFE68A; --sheet: #FFFFFF; --input-bg: #FFFFFF;
+        --live: #D93A33; --live-text: #C0302A; --live-bg: #FFE4E1; --live-border: #F5B5AF;
+        --wa-bg: #DDF6E6; --wa-fg: #1C7A43; --eq: #2F5F5A; --track: rgba(16,48,43,.14);
+        --mine-bg: #2F5F5A; --mine-fg: #FFFFFF; --other-bg: #FFFFFF; --other-shadow: 0 1px 2px rgba(16,48,43,.1);
+        --cover-shadow: 0 22px 44px rgba(16,48,43,.28);
+        --backdrop-opacity: .35; --backdrop-fade: linear-gradient(180deg, rgba(244,247,243,.2) 0%, rgba(244,247,243,.85) 52%, #F4F7F3 78%);
+        --live-card-bg: #FFF6D1; --live-card-border: #EBCB5A; --live-card-time: #7A5D00;
       }
-      .app-fallback img {
-        width: 96px;
-        height: 96px;
-        border-radius: 24px;
-        object-fit: cover;
-        margin: 0 auto 1rem;
-        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+      .fm-theme { font-family: Manrope, ui-sans-serif, system-ui, sans-serif; color: var(--ink); }
+      .fm-round-btn { display: flex; align-items: center; justify-content: center; flex-shrink: 0; border-radius: 9999px; background: var(--surface-2); color: var(--ink); transition: transform .15s ease; }
+      .fm-round-btn:active { transform: scale(.92); }
+      .fm-backdrop { position: absolute; left: -30%; top: -10%; width: 160%; height: 75%; object-fit: cover; filter: blur(60px) saturate(1.3); opacity: var(--backdrop-opacity); pointer-events: none; z-index: 0; transition: opacity 1s; }
+      .fm-backdrop-fade { position: absolute; inset: 0; background: var(--backdrop-fade); pointer-events: none; z-index: 0; }
+      .fm-eq-bar { width: 5px; border-radius: 3px; background: var(--eq); transform-origin: bottom; transform: scaleY(.35); transition: transform .4s ease; }
+      .fm-eq-on .fm-eq-bar { animation: fmEq 1s ease-in-out infinite; }
+      @keyframes fmEq { 0%, 100% { transform: scaleY(.35); } 50% { transform: scaleY(1); } }
+      .fm-play-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--play-bg); animation: fmRing 2.2s ease-out infinite; pointer-events: none; }
+      @keyframes fmRing { 0% { transform: scale(1); opacity: .55; } 100% { transform: scale(1.45); opacity: 0; } }
+      .fm-live-dot { box-shadow: 0 0 10px var(--live); }
+      .fm-input { background: var(--input-bg); border-color: var(--line-strong); color: var(--ink); }
+      .fm-input::placeholder { color: var(--faint); }
+      .fm-input:focus { border-color: var(--accent); }
+      .volume-thumb { width: 18px; height: 18px; border: 3px solid var(--accent); box-sizing: border-box; transform: translate(-50%, -50%); box-shadow: 0 2px 8px rgba(0,0,0,.3); transition: transform .15s ease, box-shadow .15s ease; }
+      .volume-slider:hover .volume-thumb, .volume-thumb.is-dragging { transform: translate(-50%, -50%) scale(1.2); box-shadow: 0 0 0 6px var(--pill), 0 2px 8px rgba(0,0,0,.3); }
+      .volume-slider:focus-visible .volume-thumb { box-shadow: 0 0 0 4px var(--pill), 0 0 0 6px var(--accent); }
+      .volume-slider[aria-disabled="true"] .volume-thumb { transform: translate(-50%, -50%); }
+      .install-cta-breathe { animation: installBreathe 2s ease-in-out infinite; }
+      @keyframes installBreathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+      .animate-spin-slow { animation: spin 2s linear infinite; }
+      @media (prefers-reduced-motion: reduce) {
+        .fm-eq-on .fm-eq-bar, .fm-play-ring, .install-cta-breathe { animation: none; }
       }
-      .app-fallback p {
-        margin: 0.35rem 0 0;
-        color: #94a3b8;
-        font-size: 0.875rem;
-      }
+      .app-fallback { min-height: 100%; display: grid; place-items: center; color: #F2F7F5; text-align: center; padding: 2rem; box-sizing: border-box; }
+      .app-fallback img { width: 96px; height: 96px; border-radius: 24px; object-fit: cover; margin: 0 auto 1rem; box-shadow: 0 20px 45px rgba(0,0,0,.35); }
+      .app-fallback p { margin: .35rem 0 0; color: #A9C4BE; font-size: .875rem; }
     </style>
   </head>
   <body>
@@ -111,6 +142,9 @@
         Moon,
         Clock,
         RefreshCw,
+        RotateCcw,
+        SunMoon,
+        Loader2,
         Bell,
         BellRing,
         Share2,
@@ -195,7 +229,8 @@
         const [volumeLocked, setVolumeLocked] = useState(false);
         const volumeTrackRef = useRef(null);
         const [isMuted, setIsMuted] = useState(false);
-        const [selectedDay, setSelectedDay] = useState('L');
+        const [selectedDay, setSelectedDay] = useState(() => DAY_LETTERS[new Date().getDay()]);
+        const [onlineCount, setOnlineCount] = useState(null);
         const [streamError, setStreamError] = useState(false);
         const [nowPlaying, setNowPlaying] = useState('');
         const [updateWorker, setUpdateWorker] = useState(null);
@@ -496,6 +531,38 @@
             console.error("Error Chat:", error);
           });
           return () => unsubscribe();
+        }, [user?.uid]);
+
+        // Oyentes conectados: cada app avisa que está abierta cada minuto y se cuentan
+        // los que avisaron en los últimos 3 minutos. Si las reglas no lo permiten, no se muestra.
+        useEffect(() => {
+          if (!user || !db || typeof firebase === 'undefined') return;
+          const presenceCollection = collection(db, 'artifacts', appId, 'public', 'data', 'presence');
+          const myPresence = presenceCollection.doc(user.uid);
+          let unsubscribe = () => {};
+          let stopped = false;
+          const ping = () => {
+            if (document.visibilityState !== 'visible') return;
+            myPresence.set({ lastSeen: serverTimestamp() }).catch(() => {});
+          };
+          const subscribe = () => {
+            unsubscribe();
+            const cutoff = firebase.firestore.Timestamp.fromMillis(Date.now() - 3 * 60 * 1000);
+            unsubscribe = presenceCollection.where('lastSeen', '>', cutoff).onSnapshot(
+              (snap) => { if (!stopped) setOnlineCount(snap.size); },
+              () => { if (!stopped) setOnlineCount(null); }
+            );
+          };
+          ping();
+          subscribe();
+          const timer = setInterval(() => { ping(); subscribe(); }, 60000);
+          document.addEventListener('visibilitychange', ping);
+          return () => {
+            stopped = true;
+            clearInterval(timer);
+            unsubscribe();
+            document.removeEventListener('visibilitychange', ping);
+          };
         }, [user?.uid]);
 
         useEffect(() => {
@@ -904,6 +971,14 @@
           ? String(currentProgram.title).trim()
           : 'FM Apocalipsis 100.7');
         const currentWhatsAppUrl = getWhatsAppUrl(currentProgram);
+        const todayLetter = DAY_LETTERS[new Date().getDay()];
+        // Próximo programa de hoy (para la etiqueta "A continuación").
+        const nextProgramKey = (() => {
+          const now = new Date();
+          const nowMinutes = (now.getHours() * 60) + now.getMinutes();
+          const upcoming = (scheduleData[todayLetter] || []).find((p) => timeToMinutes(p.start) > nowMinutes);
+          return upcoming ? `${upcoming.day}|${upcoming.start}|${upcoming.title}` : '';
+        })();
         const isCurrentProgram = (p) => Boolean(currentProgram
           && p.day === currentProgram.day
           && p.start === currentProgram.start
@@ -1225,7 +1300,7 @@
 
             const metaTheme = document.querySelector('meta[name="theme-color"]');
             if (metaTheme) {
-              metaTheme.setAttribute('content', nextIsDark ? '#0a0a0a' : '#e5e7eb');
+              metaTheme.setAttribute('content', nextIsDark ? '#0B1D1B' : '#F4F7F3');
             }
           };
           applyTheme();
@@ -1253,90 +1328,116 @@
         const TIKTOK_URL = '';
 
         const liveItems = [
-          {
-            name: 'YouTube',
-            url: 'https://www.youtube.com/@zonafe',
-            icon: <Youtube size={28} />,
-            wrapperClass: 'w-14 h-14 rounded-2xl flex items-center justify-center text-red-600 dark:text-red-500 bg-red-100 dark:bg-red-500/10',
-            dotClass: 'w-2 h-2 rounded-full bg-red-500 animate-pulse mr-2 shadow-[0_0_10px_rgba(239,68,68,0.8)]'
-          },
-          {
-            name: 'Facebook',
-            url: 'https://www.facebook.com/zonafe25',
-            icon: <Facebook size={28} />,
-            wrapperClass: 'w-14 h-14 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-500 bg-blue-100 dark:bg-blue-500/10',
-            dotClass: 'w-2 h-2 rounded-full bg-blue-500 animate-pulse mr-2 shadow-[0_0_10px_rgba(59,130,246,0.8)]'
-          },
-          {
-            name: 'TikTok',
-            url: TIKTOK_URL,
-            icon: <TikTokIcon size={26} />,
-            wrapperClass: 'w-14 h-14 rounded-2xl flex items-center justify-center text-pink-600 dark:text-pink-500 bg-pink-100 dark:bg-pink-500/10',
-            dotClass: 'w-2 h-2 rounded-full bg-pink-500 animate-pulse mr-2 shadow-[0_0_10px_rgba(236,72,153,0.8)]'
-          }
+          { name: 'YouTube', url: 'https://www.youtube.com/@zonafe', icon: <Youtube size={26} />, tint: '#FF4D4D', tintBg: 'rgba(255,77,77,.14)' },
+          { name: 'Facebook', url: 'https://www.facebook.com/zonafe25', icon: <Facebook size={26} />, tint: '#4C8DFF', tintBg: 'rgba(76,141,255,.14)' },
+          { name: 'TikTok', url: TIKTOK_URL, icon: <TikTokIcon size={24} />, tint: '#FF5FA2', tintBg: 'rgba(255,95,162,.14)' }
         ].filter((item) => item.url);
+
+        const EQ_HEIGHTS = [10, 18, 26, 14, 22, 30, 16, 24, 12, 28, 20, 30, 14, 26, 18, 22, 10, 28, 16, 24, 12, 20];
+        const AVATAR_COLORS = isDark
+          ? ['#7FD1C2', '#F7A8A0', '#B9A7F5', '#F5C26B', '#8EC5FF', '#9BE28F']
+          : ['#1F7A6B', '#B5473C', '#6A4FC9', '#8A5F00', '#2563A8', '#3D7A2E'];
+        const colorFor = (key) => {
+          const text = String(key || '');
+          let hash = 0;
+          for (let i = 0; i < text.length; i++) hash = ((hash * 31) + text.charCodeAt(i)) | 0;
+          return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+        };
+        const dayLabelFor = (timestamp) => {
+          if (!timestamp) return 'Hoy';
+          try {
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            const start = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+            const diff = Math.round((start(new Date()) - start(date)) / 86400000);
+            if (diff === 0) return 'Hoy';
+            if (diff === 1) return 'Ayer';
+            return new Intl.DateTimeFormat('es-AR', { weekday: 'long', day: 'numeric', month: 'numeric' }).format(date);
+          } catch (_) {
+            return '';
+          }
+        };
+        const QUICK_REPLIES = ['Amén', 'Gloria a Dios', 'Saludos', 'Bendiciones'];
+        const addQuickReply = (text) => {
+          if (!userName.trim()) {
+            setIsSettingName(true);
+            return;
+          }
+          setNewMessage((prev) => `${prev.trim() ? `${prev.trim()} ` : ''}${text}`.slice(0, MAX_MESSAGE_LENGTH));
+        };
+        const DAY_NAMES = { L: 'Lun', M: 'Mar', X: 'Mié', J: 'Jue', V: 'Vie', S: 'Sáb', D: 'Dom' };
+        const listenNow = () => {
+          setActiveTab('home');
+          if (!isPlaying && !isBuffering) startPlayback();
+        };
+
+        const showHeaderActions = activeTab === 'home' || activeTab === 'live';
+        const headerTitle = activeTab === 'chat' ? 'Chat en vivo' : 'FM Apocalipsis 100.7';
+        const headerSubtitle = activeTab === 'chat'
+          ? (onlineCount ? `${onlineCount} ${onlineCount === 1 ? 'oyente conectado' : 'oyentes conectados'}` : 'Conversá con otros oyentes')
+          : 'La voz que viene de lo alto';
+        const backgroundImage = currentDisplayedImage || 'logo.png';
+        const volumeLevel = isMuted ? 0 : volume;
 
         return (
           <div
-            className={`fixed inset-x-0 flex justify-center items-center w-full font-sans transition-colors duration-500 overflow-hidden ${isDark ? 'dark bg-[#0a0a0a]' : 'bg-gray-200'}`}
-            style={{ height: `${viewportHeight}px`, top: `${activeTab === 'chat' && (isInputFocused || keyboardOpen) ? viewportOffsetTop : 0}px` }}
+            className={`fm-theme ${isDark ? 'fm-dark dark' : 'fm-light'} fixed inset-x-0 flex justify-center items-center w-full overflow-hidden transition-colors duration-500`}
+            style={{ height: `${viewportHeight}px`, top: `${activeTab === 'chat' && (isInputFocused || keyboardOpen) ? viewportOffsetTop : 0}px`, background: 'var(--page)' }}
           >
-            <div className={`w-full h-full min-h-0 bg-white dark:bg-slate-950 shadow-none sm:shadow-2xl overflow-hidden relative flex flex-col border-0 border-gray-300 dark:border-slate-800/60 transition-colors duration-500 ${isLandscapeHome ? 'sm:max-w-3xl' : 'sm:max-w-md'} ${useFloatingCard ? 'sm:h-[calc(100%-2rem)] sm:rounded-[2.5rem] sm:border' : 'sm:border-x'}`}>
-              <div className={`absolute top-0 inset-x-0 h-96 blur-[100px] rounded-full pointer-events-none transition-colors duration-1000 ${isDark ? 'bg-amber-500/10' : 'bg-blue-500/10'}`} />
+            <div className={`w-full h-full min-h-0 overflow-hidden relative flex flex-col transition-colors duration-500 ${isLandscapeHome ? 'sm:max-w-3xl' : 'sm:max-w-md'} ${useFloatingCard ? 'sm:h-[calc(100%-2rem)] sm:rounded-[2.5rem] sm:border' : 'sm:border-x'} sm:shadow-2xl`} style={{ background: 'var(--bg)', color: 'var(--ink)', borderColor: 'var(--line)' }}>
+
+              {activeTab === 'home' && (
+                <>
+                  <img src={backgroundImage} alt="" aria-hidden="true" onError={(e) => { e.target.style.display = 'none'; }} className="fm-backdrop" />
+                  <div aria-hidden="true" className="fm-backdrop-fade" />
+                </>
+              )}
 
               <audio ref={audioRef} src={streamUrl} preload="none" playsInline {...audioEvents} />
 
-              <div className={`absolute top-[max(1.5rem,env(safe-area-inset-top,1.5rem))] left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full text-xs font-medium shadow-lg transition-all duration-300 w-max max-w-[90%] text-center ${toastMsg ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'} ${isDark ? 'bg-amber-500 text-slate-950' : 'bg-blue-600 text-white'}`}>
+              <div role="status" aria-live="polite" className={`absolute top-[max(1.25rem,env(safe-area-inset-top,1.25rem))] left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full text-xs font-bold shadow-lg transition-all duration-300 w-max max-w-[90%] text-center ${toastMsg ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`} style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}>
                 {toastMsg}
               </div>
 
-              <div className={`${isShortScreen || isLandscapeHome ? 'pt-[max(0.75rem,env(safe-area-inset-top,0.75rem))] pb-2 px-3 min-[390px]:px-4' : 'pt-[max(1.5rem,env(safe-area-inset-top,1.5rem))] sm:pt-8 pb-3 px-3 min-[390px]:px-4 min-[400px]:px-6'} relative z-10 flex justify-between items-center gap-2 backdrop-blur-sm shrink-0 border-b border-black/5 dark:border-white/5`}>
-                <div className="flex items-center gap-2 min-[400px]:gap-3 flex-1 min-w-0 overflow-hidden">
-                  <div className={`w-7 h-7 min-[390px]:w-8 min-[390px]:h-8 rounded-full flex items-center justify-center shadow-lg shrink-0 transition-colors ${isDark ? 'bg-gradient-to-tr from-amber-600 to-amber-300' : 'bg-gradient-to-tr from-blue-600 to-blue-400'}`}>
-                    <Radio size={16} className={isDark ? 'text-slate-950' : 'text-white'} strokeWidth={2.5} />
-                  </div>
-                  <div className="overflow-hidden flex flex-col w-full min-w-0">
-                    <h1 className="text-[14px] min-[390px]:text-[15px] min-[400px]:text-base font-bold tracking-normal min-[390px]:tracking-wide text-blue-600 dark:text-blue-400 truncate">FM Apocalipsis 100.7</h1>
-                    {currentProgram ? (
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-red-500 flex items-center gap-1">
-                        <span className="relative flex h-1.5 w-1.5">
-                          <span className="animate-ping absolute h-full w-full rounded-full opacity-75 bg-red-400"></span>
-                          <span className="relative rounded-full h-1.5 w-1.5 bg-red-500"></span>
-                        </span>
-                        <span className="truncate">En Vivo: {String(currentProgram.title)}</span>
-                      </span>
-                    ) : <p className="text-[11px] text-gray-500 dark:text-slate-400 truncate">La voz que viene de lo alto</p>}
-                  </div>
+              {/* Encabezado */}
+              <div className={`relative z-10 flex items-center gap-3 shrink-0 ${isShortScreen || isLandscapeHome ? 'pt-[max(0.75rem,env(safe-area-inset-top,0.75rem))] pb-2' : 'pt-[max(1.25rem,env(safe-area-inset-top,1.25rem))] sm:pt-7 pb-3'} px-4 min-[390px]:px-5 ${activeTab === 'home' ? '' : 'border-b'}`} style={{ borderColor: 'var(--line)' }}>
+                <img src="logo.png" alt="Logo FM Apocalipsis" className="w-10 h-10 min-[390px]:w-[42px] min-[390px]:h-[42px] rounded-xl object-cover shrink-0 shadow-md" />
+                <div className="flex-1 min-w-0">
+                  <h1 className="font-sora font-bold text-[15px] min-[390px]:text-[17px] leading-tight truncate">{headerTitle}</h1>
+                  <p className="text-xs mt-0.5 truncate flex items-center gap-1.5" style={{ color: 'var(--muted)' }}>
+                    {activeTab === 'chat' && onlineCount ? <span className="w-[7px] h-[7px] rounded-full shrink-0" style={{ background: 'var(--wa-fg)' }} /> : null}
+                    <span className="truncate">{headerSubtitle}</span>
+                  </p>
                 </div>
-
-                <div className="flex gap-1 min-[390px]:gap-1.5 min-[400px]:gap-2 shrink-0 items-center">
-                  {showInstallCta && (
-                    <button onClick={handleInstallClick} aria-label="Instalar app" title="Instalar app" className="install-cta install-cta-breathe relative flex items-center gap-1.5 p-2 min-[390px]:p-2.5 min-[420px]:px-3 min-[420px]:py-1.5 bg-red-600 text-white text-[10px] font-bold uppercase rounded-full shadow-lg transition-transform active:scale-95">
-                      <Download size={14} /> <span className="hidden min-[420px]:inline">Instalar App</span>
+                {showHeaderActions && (
+                  <div className="flex gap-1.5 min-[390px]:gap-2 shrink-0 items-center">
+                    {showInstallCta && (
+                      <button onClick={handleInstallClick} aria-label="Instalar app" title="Instalar app" className="install-cta install-cta-breathe relative h-10 min-[390px]:h-11 flex items-center justify-center gap-1.5 px-2.5 min-[420px]:px-3.5 rounded-full text-[11px] font-extrabold uppercase active:scale-95 transition-transform" style={{ background: 'var(--live)', color: '#fff' }}>
+                        <Download size={16} /> <span className="hidden min-[420px]:inline">Instalar</span>
+                      </button>
+                    )}
+                    <button onClick={handleShare} aria-label="Compartir" title="Compartir" className="fm-round-btn w-10 h-10 min-[390px]:w-11 min-[390px]:h-11">
+                      <Share2 size={19} />
                     </button>
-                  )}
-                  <button onClick={handleShare} aria-label="Compartir" title="Compartir" className="flex items-center justify-center p-2 min-[390px]:p-2.5 bg-black/5 dark:bg-white/10 text-gray-700 dark:text-slate-200 hover:bg-black/10 dark:hover:bg-white/20 rounded-full backdrop-blur-md shadow-sm active:scale-90 transition-all">
-                    <Share2 size={18} />
-                  </button>
-                  <button onClick={toggleThemeMode} aria-label="Cambiar tema" title="Tema: automático, claro u oscuro" className="flex items-center justify-center p-2 min-[390px]:p-2.5 bg-black/5 dark:bg-white/10 text-gray-700 dark:text-slate-200 hover:bg-black/10 dark:hover:bg-white/20 rounded-full backdrop-blur-md shadow-sm active:scale-90 transition-all">
-                    {themeMode === 'auto' ? <Clock size={18} /> : themeMode === 'dark' ? <Moon size={18} /> : <Sun size={18} />}
-                  </button>
-                </div>
+                    <button onClick={toggleThemeMode} aria-label={`Tema: ${themeMode === 'auto' ? 'automático' : themeMode === 'dark' ? 'oscuro' : 'claro'}`} title="Tema: automático, claro u oscuro" className="fm-round-btn w-10 h-10 min-[390px]:w-11 min-[390px]:h-11">
+                      {themeMode === 'auto' ? <SunMoon size={19} /> : themeMode === 'dark' ? <Moon size={19} /> : <Sun size={19} />}
+                    </button>
+                  </div>
+                )}
               </div>
 
               {updateWorker && (
                 <div className="absolute top-[5.5rem] right-4 z-50 max-w-[calc(100%-2rem)]">
                   {updateMinimized ? (
-                    <button type="button" onClick={() => setUpdateMinimized(false)} aria-label="Ver actualización disponible" title="Nueva versión disponible" className={`w-11 h-11 flex items-center justify-center rounded-full shadow-xl border ${isDark ? 'bg-slate-900 text-amber-400 border-amber-400/40' : 'bg-white text-blue-600 border-blue-200'}`}><RefreshCw size={19} /></button>
+                    <button type="button" onClick={() => setUpdateMinimized(false)} aria-label="Ver actualización disponible" title="Nueva versión disponible" className="w-11 h-11 flex items-center justify-center rounded-full shadow-xl border" style={{ background: 'var(--bg)', color: 'var(--accent-text)', borderColor: 'var(--line)' }}><RefreshCw size={19} /></button>
                   ) : (
-                    <div role="status" aria-live="polite" className={`w-72 max-w-full rounded-lg border p-4 shadow-2xl backdrop-blur-xl ${isDark ? 'bg-slate-900/95 text-slate-100 border-amber-400/30' : 'bg-white/95 text-gray-900 border-blue-200'}`}>
+                    <div role="status" aria-live="polite" className="w-72 max-w-full rounded-2xl border p-4 shadow-2xl backdrop-blur-xl" style={{ background: 'var(--sheet)', borderColor: 'var(--line)' }}>
                       <div className="flex items-center gap-2 mb-2">
-                        <Download size={18} className={isDark ? 'text-amber-400' : 'text-blue-600'} />
+                        <Download size={18} style={{ color: 'var(--accent-text)' }} />
                         <p className="flex-1 text-sm font-bold">Nueva versión</p>
-                        <button type="button" onClick={() => setUpdateMinimized(true)} aria-label="Minimizar aviso" title="Más tarde" className="p-1 text-gray-400 hover:text-gray-500"><X size={18} /></button>
+                        <button type="button" onClick={() => setUpdateMinimized(true)} aria-label="Minimizar aviso" title="Más tarde" className="p-1" style={{ color: 'var(--muted)' }}><X size={18} /></button>
                       </div>
-                      <p className="text-xs text-gray-500 dark:text-slate-400 mb-3">Lista para instalar. La radio se reiniciará al actualizar.</p>
-                      <button type="button" onClick={applyUpdate} disabled={applyingUpdate} className={`w-full flex justify-center items-center gap-2 px-3 py-2.5 text-xs font-bold rounded-lg disabled:opacity-60 ${isDark ? 'bg-amber-400 text-slate-950 hover:bg-amber-300' : 'bg-blue-600 text-white hover:bg-blue-500'}`}>
+                      <p className="text-xs mb-3" style={{ color: 'var(--muted)' }}>Lista para instalar. La radio se reiniciará al actualizar.</p>
+                      <button type="button" onClick={applyUpdate} disabled={applyingUpdate} className="w-full flex justify-center items-center gap-2 px-3 py-2.5 text-xs font-bold rounded-xl disabled:opacity-60" style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}>
                         <RefreshCw size={14} className={applyingUpdate ? 'animate-spin' : ''} />
                         {applyingUpdate ? 'Actualizando...' : 'Actualizar ahora'}
                       </button>
@@ -1344,324 +1445,322 @@
                   )}
                 </div>
               )}
-              <div className="flex-1 min-h-0 min-w-0 overflow-hidden relative z-10 flex flex-col">
-                {activeTab === 'home' && (
-                  <div className={`flex-1 min-h-0 flex overflow-y-auto overflow-x-hidden custom-scrollbar px-4 sm:px-6 ${isLandscapeHome ? 'flex-row items-center gap-6 py-3' : `flex-col items-center ${isShortScreen ? 'pt-2 pb-1 gap-1' : isCompactHomeLayout ? 'pt-3 pb-2 gap-2' : 'pt-4 pb-4 gap-3'}`}`}>
-                    <div
-                      ref={artAreaRef}
-                      className={isLandscapeHome
-                        ? 'h-full w-[42%] max-w-[280px] min-h-0 flex items-center justify-center shrink-0'
-                        : 'w-full flex-1 min-h-[72px] flex items-center justify-center'}
-                    >
-                    {artSize > 0 && (
-                    <div className="aspect-square relative group shrink-0" style={{ width: `${artSize}px`, height: `${artSize}px` }}>
-                      <div className={`absolute inset-0 rounded-3xl blur-2xl transition-opacity duration-1000 ${isDark ? 'bg-gradient-to-tr from-amber-600/40 to-purple-600/40' : 'bg-gradient-to-tr from-blue-400/40 to-indigo-400/40'} ${isPlaying ? 'opacity-100' : 'opacity-40'}`}></div>
-                      <div className="w-full h-full rounded-3xl overflow-hidden relative shadow-2xl ring-1 ring-black/5 dark:ring-white/10 bg-slate-200 dark:bg-slate-900 flex items-center justify-center">
-                        {isShowingLivePromo && (
-                          <div className="absolute top-3 right-3 z-20 backdrop-blur-md px-2 py-1 rounded-md text-[8px] font-bold tracking-wider text-white border border-white/10 uppercase transition-colors duration-500 bg-red-600/80 shadow-[0_0_10px_rgba(220,38,38,0.5)]">
-                            En Vivo
-                          </div>
-                        )}
 
-                        {displayGifs.length > 0 ? (
-                          displayGifs.map((gifUrl, index) => (
-                            <img
-                              key={index}
-                              src={gifUrl}
-                              alt="Visual"
-                              onError={(e) => { e.target.style.display = 'none'; }}
-                              className={`absolute w-full h-full object-cover transition-all duration-1000 ease-in-out ${safeAdIndex === index ? 'opacity-100 scale-100' : 'opacity-0 scale-105'}`}
-                            />
-                          ))
-                        ) : (
-                          <div className="text-gray-400 flex flex-col items-center opacity-50">
-                            <Radio size={48} />
+              <div className="flex-1 min-h-0 min-w-0 overflow-hidden relative z-10 flex flex-col">
+                {/* ---------- RADIO ---------- */}
+                {activeTab === 'home' && (
+                  <div className={`flex-1 min-h-0 flex overflow-y-auto overflow-x-hidden custom-scrollbar px-4 sm:px-6 ${isLandscapeHome ? 'flex-row items-center gap-6 py-3' : `flex-col items-center ${isShortScreen ? 'pt-1 pb-1 gap-1' : 'pt-1 pb-3 gap-2'}`}`}>
+                    <div className={isLandscapeHome ? 'contents' : 'w-full flex-1 min-h-0 flex flex-col items-center'}>
+                      {currentProgram && !isLandscapeHome && (
+                        <div className="shrink-0 inline-flex items-center gap-2 max-w-full pl-2.5 pr-3.5 py-1.5 rounded-full border mt-1" style={{ background: 'var(--live-bg)', borderColor: 'var(--live-border)' }}>
+                          <span className="w-2 h-2 rounded-full shrink-0 fm-live-dot" style={{ background: 'var(--live)' }} />
+                          <span className="text-xs font-extrabold tracking-wide shrink-0" style={{ color: 'var(--live-text)' }}>AL AIRE</span>
+                          <span className="text-[13px] font-semibold truncate">{String(currentProgram.title)}</span>
+                        </div>
+                      )}
+                      <div
+                        ref={artAreaRef}
+                        className={isLandscapeHome
+                          ? 'h-full w-[42%] max-w-[280px] min-h-0 flex items-center justify-center shrink-0'
+                          : `w-full flex-1 min-h-[72px] flex items-center justify-center ${isShortScreen ? 'py-2' : 'py-4'}`}
+                      >
+                        {artSize > 0 && (
+                          <div className="relative shrink-0" style={{ width: `${artSize}px`, height: `${artSize}px` }}>
+                            <div aria-hidden="true" className={`absolute inset-[18px] rounded-[32px] blur-[38px] transition-opacity duration-1000 ${isPlaying ? 'opacity-60' : 'opacity-35'}`} style={{ background: '#FFD84D' }} />
+                            <div className="w-full h-full rounded-[30px] overflow-hidden relative flex items-center justify-center" style={{ background: 'var(--surface-2)', boxShadow: 'var(--cover-shadow)', outline: '1px solid var(--line)' }}>
+                              {displayGifs.length > 0 ? (
+                                displayGifs.map((gifUrl, index) => (
+                                  <img
+                                    key={gifUrl}
+                                    src={gifUrl}
+                                    alt={safeAdIndex === index ? 'Flyer del programa' : ''}
+                                    onError={(e) => { e.target.style.display = 'none'; }}
+                                    className={`absolute w-full h-full object-cover transition-all duration-1000 ease-in-out ${safeAdIndex === index ? 'opacity-100 scale-100' : 'opacity-0 scale-105'}`}
+                                  />
+                                ))
+                              ) : (
+                                <img src="logo.png" alt="FM Apocalipsis 100.7" className="absolute w-full h-full object-cover" />
+                              )}
+                            </div>
                           </div>
                         )}
-                        <div className={`absolute inset-0 transition-colors ${isDark ? 'bg-gradient-to-t from-slate-950/90 via-transparent to-transparent' : 'bg-gradient-to-t from-black/60 via-transparent to-transparent'}`}></div>
                       </div>
-                    </div>
-                    )}
                     </div>
 
                     <div className={isLandscapeHome ? 'flex-1 min-w-0 flex flex-col items-center justify-center' : 'contents'}>
-                    <div className={`w-full px-2 min-[400px]:px-4 text-center flex flex-col justify-end shrink-0 ${isShortScreen ? 'mt-0' : isCompactHomeLayout ? 'mt-1' : 'mt-2'}`}>
-                      {streamError ? (
-                        <div className={`marquee-container flex items-center ${isShortScreen || isCompactHomeLayout ? 'min-h-[44px]' : 'min-h-[56px]'}`}>
-                          <div className="marquee-text text-red-500 font-bold text-[11px] sm:text-xs tracking-widest uppercase">
-                            No se pudo conectar con la radio. Compruebe su conexión e intente nuevamente.
-                          </div>
-                        </div>
-                      ) : (
-                        <div className={`flex flex-col justify-center ${isCompactHomeLayout ? 'min-h-[44px]' : 'min-h-[56px]'}`}>
-                          <p className="text-[10px] font-bold tracking-[0.12em] uppercase text-gray-500 dark:text-slate-500 mb-1">
-                            Reproduciendo Ahora
-                          </p>
-                          <div className="metadata-marquee-container">
-                            <div className={`metadata-marquee-track ${isDark ? 'text-slate-100' : 'text-gray-900'}`}>
-                              <span>{metadataText}</span>
-                              <span aria-hidden="true">{metadataText}</span>
-                            </div>
-                          </div>
+                      {currentProgram && isLandscapeHome && (
+                        <div className="shrink-0 inline-flex items-center gap-2 max-w-full pl-2.5 pr-3.5 py-1 rounded-full border mb-2" style={{ background: 'var(--live-bg)', borderColor: 'var(--live-border)' }}>
+                          <span className="w-2 h-2 rounded-full shrink-0" style={{ background: 'var(--live)' }} />
+                          <span className="text-[11px] font-extrabold tracking-wide shrink-0" style={{ color: 'var(--live-text)' }}>AL AIRE</span>
+                          <span className="text-xs font-semibold truncate">{String(currentProgram.title)}</span>
                         </div>
                       )}
 
-                      <div className={isShortScreen || isLandscapeHome ? 'mt-2' : isCompactHomeLayout ? 'mt-3' : 'mt-4'}>
-                        <div className="h-1 w-full bg-gray-300 dark:bg-slate-800 rounded-full overflow-hidden transition-colors">
-                          <div className={`h-full w-1/3 relative transition-colors duration-500 ${isPlaying ? (isDark ? 'bg-amber-500' : 'bg-blue-600') : 'bg-gray-400 dark:bg-slate-700'}`}>
-                            <div className={`absolute right-0 top-0 bottom-0 w-2 bg-white blur-[2px] transition-opacity duration-500 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}></div>
-                          </div>
-                        </div>
-
-                        <div className="flex justify-between items-center mt-3">
-                          <button onClick={startPlayback} aria-label="Volver al vivo" className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-300 shadow-sm active:scale-95 ${isPlaying ? 'bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-500 hover:bg-red-200 dark:hover:bg-red-500/20' : 'bg-gray-200 dark:bg-slate-800 text-gray-600 dark:text-slate-400 hover:bg-gray-300 dark:hover:bg-slate-700'}`}>
-                            <span className="relative flex h-2 w-2">
-                              {isPlaying && <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-red-400 dark:bg-red-500"></span>}
-                              <span className={`relative inline-flex rounded-full h-2 w-2 transition-colors duration-500 ${isPlaying ? 'bg-red-600 dark:bg-red-500' : 'bg-gray-500 dark:bg-slate-500'}`}></span>
-                            </span>
-                            <span className="text-[10px] font-bold tracking-wider">EN VIVO</span>
-                            <RefreshCw size={10} className={isPlaying ? 'animate-spin-slow' : ''} />
-                          </button>
-
-                          <div className="flex items-center gap-3">
-                            <span className={`text-[10px] font-medium tracking-wider transition-colors duration-500 ${isPlaying ? (isDark ? 'text-amber-500 animate-pulse' : 'text-blue-600 animate-pulse') : 'text-gray-500 dark:text-slate-500'}`}>
-                              {isBuffering ? 'CONECTANDO...' : isPlaying ? 'SONANDO' : 'PAUSADO'}
-                            </span>
-                          </div>
-                        </div>
-                        {currentWhatsAppUrl && (
-                          <a
-                            href={currentWhatsAppUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`mt-3 w-full flex items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-bold shadow-sm active:scale-95 transition-all ${isDark ? 'bg-green-500/15 text-green-400 hover:bg-green-500/25' : 'bg-green-600 text-white hover:bg-green-700'}`}
-                          >
-                            <MessageCircle size={16} />
-                            WhatsApp del programa
-                          </a>
+                      <div className="w-full max-w-[340px] px-2 text-center shrink-0">
+                        {streamError ? (
+                          <p className="text-xs font-extrabold tracking-wide" style={{ color: 'var(--live-text)' }}>NO SE PUDO CONECTAR</p>
+                        ) : (
+                          <p className="text-xs font-extrabold tracking-[0.06em]" style={{ color: 'var(--accent-text)' }}>{isBuffering ? 'CONECTANDO…' : isPlaying ? 'SONANDO AHORA' : 'EN PAUSA'}</p>
+                        )}
+                        <p className={`font-sora font-bold leading-tight mt-1.5 line-clamp-2 break-words ${isShortScreen || isLandscapeHome ? 'text-lg' : 'text-[21px]'}`}>
+                          {streamError ? 'Revisá tu conexión y tocá play' : metadataText}
+                        </p>
+                        {!streamError && currentProgram?.hosts && (
+                          <p className="text-[13px] mt-1 truncate" style={{ color: 'var(--muted)' }}>con {String(currentProgram.hosts)}</p>
                         )}
                       </div>
-                    </div>
 
-                    <div className={`flex items-center justify-center shrink-0 ${isShortScreen || isLandscapeHome ? 'mt-2 mb-0' : isCompactHomeLayout ? 'mt-3 mb-1' : 'mt-6 sm:mt-4 mb-2'}`}>
-                      <button onClick={togglePlay} aria-label={isPlaying || isBuffering ? 'Pausar' : 'Reproducir'} className={`${isShortScreen || isLandscapeHome ? 'w-14 h-14' : isCompactHomeLayout ? 'w-16 h-16' : 'w-20 h-20 sm:w-16 sm:h-16'} flex items-center justify-center rounded-full hover:scale-105 active:scale-95 transition-all shadow-xl ${isDark ? 'bg-slate-100 text-slate-950 shadow-[0_0_30px_rgba(255,255,255,0.1)]' : 'bg-blue-600 text-white shadow-[0_0_20px_rgba(37,99,235,0.3)]'}`}>
-                        {isPlaying ? <Pause size={isCompactHomeLayout ? 28 : 32} className={isDark ? 'fill-slate-950' : 'fill-white'} strokeWidth={1} /> : <Play size={isCompactHomeLayout ? 30 : 36} className={`ml-2 ${isDark ? 'fill-slate-950' : 'fill-white'}`} strokeWidth={1} />}
-                      </button>
-                    </div>
-
-                    <div className={`w-full max-w-[300px] shrink-0 pb-4 ${isShortScreen || isLandscapeHome ? 'mt-0 mb-0' : isCompactHomeLayout ? 'mt-1 mb-2' : 'mt-2 mb-4'}`}>
-                      <div className="flex items-center gap-2 text-gray-500 dark:text-slate-400">
-                        <button
-                          type="button"
-                          onClick={toggleMute}
-                          disabled={volumeLocked}
-                          aria-label={isMuted || volume === 0 ? 'Activar sonido' : 'Silenciar'}
-                          title={isMuted || volume === 0 ? 'Activar sonido' : 'Silenciar'}
-                          className="w-10 h-11 shrink-0 flex items-center justify-center rounded-full hover:text-gray-800 dark:hover:text-slate-200 transition-colors disabled:opacity-40"
-                        >
-                          {isMuted || volume === 0 ? <VolumeX size={20} strokeWidth={1.75} /> : <Volume1 size={20} strokeWidth={1.75} />}
-                        </button>
-
-                        <div
-                          role="slider"
-                          tabIndex={volumeLocked ? -1 : 0}
-                          aria-label="Volumen"
-                          aria-valuemin={0}
-                          aria-valuemax={100}
-                          aria-valuenow={isMuted ? 0 : volume}
-                          aria-valuetext={`${isMuted ? 0 : volume}%`}
-                          aria-disabled={volumeLocked}
-                          onKeyDown={volumeLocked ? undefined : handleVolumeKey}
-                          {...(volumeLocked ? {} : volumePointerHandlers)}
-                          className={`volume-slider relative flex-1 min-w-0 h-11 flex items-center outline-none ${volumeLocked ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
-                          style={{ touchAction: 'none', '--vol-color': isDark ? '#fbbf24' : '#2563eb' }}
-                        >
-                          <div ref={volumeTrackRef} className={`relative w-full h-1 rounded-full ${isDark ? 'bg-slate-700' : 'bg-gray-300'}`}>
-                            <div
-                              className="absolute inset-y-0 left-0 rounded-full"
-                              style={{ width: `${isMuted ? 0 : volume}%`, background: 'var(--vol-color)' }}
-                            />
-                            <div
-                              className={`volume-thumb absolute top-1/2 rounded-full bg-white ${volumeDragging ? 'is-dragging' : ''}`}
-                              style={{ left: `${isMuted ? 0 : volume}%`, borderColor: 'var(--vol-color)' }}
-                            />
-                            <span
-                              className={`volume-bubble absolute top-full mt-3 -translate-x-1/2 text-[11px] font-semibold tabular-nums ${isDark ? 'text-amber-400' : 'text-blue-600'}`}
-                              style={{ left: `${Math.min(92, Math.max(8, isMuted ? 0 : volume))}%` }}
-                            >
-                              {isMuted ? 0 : volume}%
-                            </span>
-                          </div>
-                        </div>
-
-                        <span className="w-10 h-11 shrink-0 flex items-center justify-center" aria-hidden="true">
-                          <Volume2 size={20} strokeWidth={1.75} />
-                        </span>
+                      <div aria-hidden="true" className={`flex items-end justify-center gap-1 h-[30px] shrink-0 ${isShortScreen || isLandscapeHome ? 'mt-2' : 'mt-4'} ${isPlaying ? 'fm-eq-on' : ''}`}>
+                        {EQ_HEIGHTS.map((h, i) => (
+                          <span key={i} className="fm-eq-bar" style={{ height: `${h}px`, animationDelay: `${((i * 0.13) % 1).toFixed(2)}s`, opacity: i % 3 === 0 ? 0.65 : 1 }} />
+                        ))}
                       </div>
-                      {volumeLocked && (
-                        <p className="mt-4 text-center text-[11px] text-gray-500 dark:text-slate-500">
-                          En este teléfono el volumen se maneja con los botones del costado.
-                        </p>
-                      )}
-                    </div>
+
+                      <div className={`flex items-center justify-center gap-[34px] shrink-0 ${isShortScreen || isLandscapeHome ? 'mt-3' : 'mt-5'}`}>
+                        <button onClick={startPlayback} aria-label="Volver al vivo" title="Volver al vivo" className="fm-round-btn w-12 h-12">
+                          <RotateCcw size={20} />
+                        </button>
+                        <div className={`relative ${isShortScreen || isLandscapeHome ? 'w-[68px] h-[68px]' : 'w-[84px] h-[84px]'}`}>
+                          {isPlaying && <span aria-hidden="true" className="fm-play-ring" />}
+                          <button onClick={togglePlay} aria-label={isPlaying || isBuffering ? 'Pausar' : 'Reproducir'} className="relative w-full h-full rounded-full flex items-center justify-center active:scale-95 hover:scale-[1.03] transition-transform" style={{ background: 'var(--play-bg)', color: 'var(--play-fg)', boxShadow: 'var(--play-shadow)' }}>
+                            {isBuffering
+                              ? <Loader2 size={30} className="animate-spin" />
+                              : isPlaying
+                                ? <Pause size={30} fill="currentColor" strokeWidth={0} />
+                                : <Play size={32} fill="currentColor" strokeWidth={0} className="ml-1" />}
+                          </button>
+                        </div>
+                        {currentWhatsAppUrl ? (
+                          <a href={currentWhatsAppUrl} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp del programa" title="WhatsApp del programa" className="w-12 h-12 rounded-full flex items-center justify-center active:scale-95 transition-transform" style={{ background: 'var(--wa-bg)', color: 'var(--wa-fg)' }}>
+                            <MessageCircle size={20} />
+                          </a>
+                        ) : (
+                          <span className="w-12 h-12" aria-hidden="true" />
+                        )}
+                      </div>
+
+                      <div className={`w-full max-w-[322px] shrink-0 ${isShortScreen || isLandscapeHome ? 'mt-2' : 'mt-5'}`}>
+                        <div className="flex items-center gap-3" style={{ color: 'var(--muted)' }}>
+                          <button
+                            type="button"
+                            onClick={toggleMute}
+                            disabled={volumeLocked}
+                            aria-label={isMuted || volume === 0 ? 'Activar sonido' : 'Silenciar'}
+                            title={isMuted || volume === 0 ? 'Activar sonido' : 'Silenciar'}
+                            className="w-9 h-11 shrink-0 flex items-center justify-center rounded-full disabled:opacity-40"
+                          >
+                            {isMuted || volume === 0 ? <VolumeX size={20} /> : <Volume1 size={20} />}
+                          </button>
+                          <div
+                            role="slider"
+                            tabIndex={volumeLocked ? -1 : 0}
+                            aria-label="Volumen"
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                            aria-valuenow={volumeLevel}
+                            aria-valuetext={`${volumeLevel}%`}
+                            aria-disabled={volumeLocked}
+                            onKeyDown={volumeLocked ? undefined : handleVolumeKey}
+                            {...(volumeLocked ? {} : volumePointerHandlers)}
+                            className={`volume-slider relative flex-1 min-w-0 h-11 flex items-center outline-none ${volumeLocked ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
+                            style={{ touchAction: 'none' }}
+                          >
+                            <div ref={volumeTrackRef} className="relative w-full h-1 rounded-full" style={{ background: 'var(--track)' }}>
+                              <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${volumeLevel}%`, background: 'var(--accent)' }} />
+                              <div className={`volume-thumb absolute top-1/2 rounded-full bg-white ${volumeDragging ? 'is-dragging' : ''}`} style={{ left: `${volumeLevel}%` }} />
+                            </div>
+                          </div>
+                          <output className="w-[38px] shrink-0 text-right text-xs font-bold tabular-nums" style={{ color: 'var(--accent-text)' }}>{volumeLevel}%</output>
+                        </div>
+                        {volumeLocked && (
+                          <p className="mt-1 text-center text-[11px]" style={{ color: 'var(--muted)' }}>
+                            En este teléfono el volumen se maneja con los botones del costado.
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
 
+                {/* ---------- CHAT ---------- */}
                 {activeTab === 'chat' && (
-                  <div className="flex-1 min-h-0 min-w-0 flex flex-col overflow-hidden bg-white/50 dark:bg-slate-950/50">
-                    <div className="px-5 pt-3 pb-3 shrink-0 border-b border-black/5 dark:border-white/5 bg-white dark:bg-slate-950/80 shadow-sm z-10">
-                      <h2 className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">Chat en vivo</h2>
-                    </div>
-
-                    <div ref={chatScrollRef} className="flex-1 min-h-0 overflow-y-auto px-4 py-2 space-y-1 custom-scrollbar select-none">
+                  <div className="flex-1 min-h-0 min-w-0 flex flex-col overflow-hidden">
+                    <div ref={chatScrollRef} className="flex-1 min-h-0 overflow-y-auto px-3.5 pt-4 pb-3 custom-scrollbar select-none flex flex-col">
                       {messages.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center text-gray-400 opacity-50 space-y-2">
+                        <div className="m-auto flex flex-col items-center gap-2 text-center" style={{ color: 'var(--muted)' }}>
                           <MessageCircle size={40} />
-                          <p className="text-xs">¡Sé el primero en saludar!</p>
+                          <p className="text-sm">¡Sé el primero en saludar!</p>
                         </div>
                       ) : (
-                        messages.map((msg) => (
-                          <div
-                            key={msg.id}
-                            className={`px-3 py-1.5 rounded-lg flex flex-col transition-colors cursor-pointer ${msg.userId === user?.uid ? (isDark ? 'bg-amber-500/10' : 'bg-blue-50/70') : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
-                            onTouchStart={() => handlePressStart(msg)}
-                            onTouchMove={handlePressCancel}
-                            onTouchEnd={handlePressCancel}
-                            onMouseDown={() => handlePressStart(msg)}
-                            onMouseMove={handlePressCancel}
-                            onMouseUp={handlePressCancel}
-                            onMouseLeave={handlePressCancel}
-                            onContextMenu={(e) => { if (msg.userId === user?.uid) e.preventDefault(); }}
-                          >
-                            <div className="text-[13px] leading-tight flex items-start gap-1.5">
-                              <div className="flex-1">
-                                <span className={`font-bold mr-1.5 ${msg.userId === user?.uid ? (isDark ? 'text-amber-500' : 'text-blue-600') : 'text-slate-600 dark:text-slate-400'}`}>
-                                  {msg.sender}
-                                </span>
-                                <span className="text-slate-800 dark:text-slate-100 break-words">{msg.text}</span>
-                              </div>
-                              <span className="text-[9px] text-gray-400 shrink-0 mt-0.5">{formatMsgDate(msg.timestamp)}</span>
-                            </div>
-                          </div>
-                        ))
+                        <div className="mt-auto flex flex-col gap-2.5">
+                          {messages.map((msg, index) => {
+                            const mine = msg.userId === user?.uid;
+                            const label = dayLabelFor(msg.timestamp);
+                            const showDay = index === 0 || label !== dayLabelFor(messages[index - 1].timestamp);
+                            const tint = colorFor(msg.userId || msg.sender);
+                            return (
+                              <React.Fragment key={msg.id}>
+                                {showDay && label && (
+                                  <div className="self-center text-[11px] font-bold px-2.5 py-1 rounded-full capitalize" style={{ color: 'var(--faint)', background: 'var(--surface)' }}>{label}</div>
+                                )}
+                                <div
+                                  className={`flex gap-2 items-end ${mine ? 'flex-row-reverse' : 'flex-row'}`}
+                                  onTouchStart={() => handlePressStart(msg)}
+                                  onTouchMove={handlePressCancel}
+                                  onTouchEnd={handlePressCancel}
+                                  onMouseDown={() => handlePressStart(msg)}
+                                  onMouseMove={handlePressCancel}
+                                  onMouseUp={handlePressCancel}
+                                  onMouseLeave={handlePressCancel}
+                                  onContextMenu={(e) => { if (mine) e.preventDefault(); }}
+                                >
+                                  {!mine && (
+                                    <div aria-hidden="true" className="w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-[13px] font-extrabold uppercase" style={{ background: tint, color: isDark ? '#0B1D1B' : '#FFFFFF' }}>
+                                      {String(msg.sender || '?').trim().charAt(0) || '?'}
+                                    </div>
+                                  )}
+                                  <div className={`max-w-[78%] px-3.5 pt-2 pb-1.5 ${mine ? 'rounded-[18px_18px_6px_18px]' : 'rounded-[18px_18px_18px_6px]'}`} style={mine ? { background: 'var(--mine-bg)', color: 'var(--mine-fg)' } : { background: 'var(--other-bg)', boxShadow: 'var(--other-shadow)' }}>
+                                    {!mine && <div className="text-xs font-extrabold mb-0.5" style={{ color: tint }}>{msg.sender}</div>}
+                                    <div className="text-[15px] leading-snug break-words">{msg.text}</div>
+                                    <div className="text-[10px] opacity-65 text-right mt-0.5">{formatMsgDate(msg.timestamp)}</div>
+                                  </div>
+                                </div>
+                              </React.Fragment>
+                            );
+                          })}
+                        </div>
                       )}
                     </div>
 
-                    {showEmojis && (
-                      <div className="flex gap-3 px-4 py-2 bg-gray-50 dark:bg-slate-800/50 border-t border-black/5 dark:border-white/5 overflow-x-auto custom-scrollbar shrink-0 shadow-inner">
-                        {['🙏', '🙌', '❤️', '✨', '😊', '🔥', '🎵', '📖'].map((emoji) => (
-                          <button key={emoji} type="button" onClick={() => setNewMessage((prev) => (prev + emoji).slice(0, MAX_MESSAGE_LENGTH))} className="text-2xl p-1.5 hover:bg-black/10 dark:hover:bg-white/10 rounded-full transition-colors active:scale-90">
-                            {emoji}
+                    {!keyboardOpen && (
+                      <div className="flex gap-2 px-3 py-2 overflow-x-auto custom-scrollbar shrink-0">
+                        {QUICK_REPLIES.map((text) => (
+                          <button key={text} type="button" onClick={() => addQuickReply(text)} className="h-9 px-3 rounded-full border text-[13px] font-bold whitespace-nowrap active:scale-95 transition-transform" style={{ borderColor: 'var(--line-strong)', background: 'var(--surface)' }}>
+                            {text}
                           </button>
                         ))}
                       </div>
                     )}
 
-                    <form onSubmit={handleSendMessage} className={`p-3 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 flex gap-2 items-center shrink-0 transition-all ${isInputFocused || showEmojis || keyboardOpen ? 'pb-3' : 'pb-[max(0.75rem,env(safe-area-inset-bottom))]'}`}>
-                      <button type="button" onClick={() => setShowEmojis(!showEmojis)} className={`p-2 rounded-full transition-colors ${showEmojis ? 'text-amber-500 bg-amber-500/10' : 'text-gray-400 hover:text-amber-500 hover:bg-black/5 dark:hover:bg-white/5'}`}>
-                        <Smile size={22} />
-                      </button>
+                    <form onSubmit={handleSendMessage} className={`flex gap-2.5 items-center px-3 pt-2 shrink-0 border-t ${isInputFocused || keyboardOpen ? 'pb-2' : 'pb-[max(0.75rem,env(safe-area-inset-bottom))]'}`} style={{ background: 'var(--nav-bg)', borderColor: 'var(--line)' }}>
+                      <label htmlFor="chat-input" className="sr-only">Mensaje</label>
                       <input
+                        id="chat-input"
                         type="text"
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value.slice(0, MAX_MESSAGE_LENGTH))}
                         maxLength={MAX_MESSAGE_LENGTH}
                         onFocus={() => {
                           setIsInputFocused(true);
-                          setShowEmojis(false);
                           if (!userName.trim()) setIsSettingName(true);
                         }}
                         onBlur={() => setTimeout(() => setIsInputFocused(false), 200)}
-                        placeholder={userName.trim() ? "Di algo..." : "Toca para identificarte"}
+                        placeholder={userName.trim() ? 'Escribí un mensaje…' : 'Tocá para elegir tu nombre'}
                         onClick={() => !userName.trim() && setIsSettingName(true)}
                         readOnly={!userName.trim()}
-                        className="flex-1 min-w-0 bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white px-4 py-2.5 rounded-full text-[16px] sm:text-sm outline-none focus:ring-2 focus:ring-blue-500/50"
+                        className="flex-1 min-w-0 h-[46px] px-4 rounded-full border text-[16px] outline-none fm-input"
                       />
-                      <button type="submit" className={`p-2.5 rounded-full transition-all ${isDark ? 'bg-amber-500 text-slate-950' : 'bg-blue-600 text-white'} active:scale-90`}>
-                        <Send size={18} />
+                      <button type="submit" aria-label="Enviar" className="w-[46px] h-[46px] shrink-0 rounded-full flex items-center justify-center active:scale-90 transition-transform" style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}>
+                        <Send size={19} />
                       </button>
                     </form>
                   </div>
                 )}
 
+                {/* ---------- EN VIVO ---------- */}
                 {activeTab === 'live' && (
-                  <div className="flex-1 min-h-0 flex flex-col px-4 sm:px-6 pt-2 pb-4 overflow-y-auto">
-                    <h2 className="text-3xl font-light dark:text-slate-100 mb-6">Ver en Vivo</h2>
-                    <div className="space-y-4 pr-1 custom-scrollbar">
-                      {liveItems.map((social, i) => (
-                        <a key={i} href={social.url} target="_blank" rel="noopener noreferrer" className="bg-gray-50 dark:bg-slate-900/80 border border-gray-200 dark:border-slate-800 p-4 rounded-3xl flex items-center gap-5 hover:scale-[1.02] transition-transform shadow-sm dark:shadow-lg">
-                          <div className={social.wrapperClass}>{social.icon}</div>
-                          <div className="flex-1">
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">{social.name}</h3>
-                            <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">Transmisión oficial</p>
+                  <div className="flex-1 min-h-0 flex flex-col px-4 pt-3 pb-4 overflow-y-auto custom-scrollbar">
+                    <h2 className="font-sora font-extrabold text-[30px] leading-none mb-1">Ver en vivo</h2>
+                    <p className="text-sm mb-5" style={{ color: 'var(--muted)' }}>Mirá la transmisión con imagen.</p>
+                    <div className="flex flex-col gap-3">
+                      {liveItems.map((social) => (
+                        <a key={social.name} href={social.url} target="_blank" rel="noopener noreferrer" className="p-4 rounded-[20px] border flex items-center gap-4 active:scale-[0.99] transition-transform" style={{ background: 'var(--surface)', borderColor: 'var(--line)' }}>
+                          <div className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0" style={{ background: social.tintBg, color: social.tint }}>{social.icon}</div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-sora font-bold text-[17px]">{social.name}</h3>
+                            <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>Transmisión oficial</p>
                           </div>
-                          <div className={social.dotClass}></div>
+                          <span className="text-xs font-extrabold px-3 py-2 rounded-full" style={{ background: 'var(--pill)', color: 'var(--accent-text)' }}>Abrir</span>
                         </a>
                       ))}
                     </div>
                   </div>
                 )}
 
+                {/* ---------- PROGRAMACIÓN ---------- */}
                 {activeTab === 'schedule' && (
-                  <div className="flex-1 min-h-0 flex flex-col px-4 sm:px-6 pt-2 pb-2 overflow-hidden">
-                    <div className="mb-4 shrink-0">
-                      <h2 className="text-3xl font-light text-slate-900 dark:text-slate-100 transition-colors">Programación</h2>
-                      <p className="text-gray-500 dark:text-slate-500 text-sm transition-colors">Programación semanal.</p>
+                  <div className="flex-1 min-h-0 flex flex-col px-4 pt-3 overflow-hidden">
+                    <h2 className="font-sora font-extrabold text-[30px] leading-none shrink-0">Programación</h2>
+                    <div className="grid grid-cols-7 gap-1 mt-4 p-[5px] rounded-[18px] shrink-0" style={{ background: 'var(--surface)' }}>
+                      {['L', 'M', 'X', 'J', 'V', 'S', 'D'].map((dayId) => {
+                        const selected = selectedDay === dayId;
+                        return (
+                          <button key={dayId} onClick={() => setSelectedDay(dayId)} aria-pressed={selected} className="min-w-0 h-[52px] rounded-[14px] flex flex-col items-center justify-center gap-0.5 transition-colors" style={selected ? { background: 'var(--accent)', color: 'var(--on-accent)' } : { color: 'var(--muted)' }}>
+                            <span className="text-[13px] font-bold">{DAY_NAMES[dayId]}</span>
+                            <span className="text-[10px] font-semibold opacity-80 h-3 leading-3">{dayId === todayLetter ? 'Hoy' : ''}</span>
+                          </button>
+                        );
+                      })}
                     </div>
-                    <div className="grid grid-cols-7 gap-0.5 mb-4 bg-gray-100 dark:bg-slate-900/50 p-1 min-[400px]:p-1.5 rounded-2xl shrink-0">
-                      {['L','M','X','J','V','S','D'].map((dayId) => (
-                        <button key={dayId} onClick={() => setSelectedDay(dayId)} className={`min-w-0 py-2 rounded-xl text-xs font-medium transition-all ${selectedDay === dayId ? (isDark ? 'bg-amber-500 text-slate-950 shadow-[0_0_15px_rgba(245,158,11,0.3)]' : 'bg-blue-600 text-white shadow-md') : 'text-gray-500 hover:bg-gray-200 dark:hover:bg-slate-800/50 dark:text-slate-400'}`}>
-                          {dayId === 'X' ? 'MI' : dayId}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="flex-1 min-h-0 overflow-y-auto pr-1 custom-scrollbar space-y-3 pb-4">
-                      {scheduleData[selectedDay]?.length > 0 ? scheduleData[selectedDay].map((p, idx) => (
-                        <div key={idx} className={`p-3 min-[400px]:p-4 rounded-2xl border backdrop-blur-md transition-all flex items-center gap-2.5 min-[400px]:gap-4 ${isCurrentProgram(p) ? 'bg-amber-500/10 border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.1)]' : 'bg-gray-50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-800'}`}>
-                          <div className="flex flex-col items-center min-w-[44px] shrink-0">
-                            <span className={`text-xs font-medium ${isDark ? 'text-slate-200' : 'text-slate-900'}`}>{p.start}</span>
-                            <Minus size={10} className="text-gray-400 dark:text-slate-600 my-0.5" />
-                            <span className={`text-xs font-medium ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>{p.end}</span>
-                          </div>
-                          <div className="w-px h-10 shrink-0 bg-gray-300 dark:bg-slate-800"></div>
-                          {p.image && <img src={p.image} alt={p.title} className="w-10 h-10 shrink-0 rounded-lg object-cover ring-1 ring-black/5 dark:ring-white/10 shadow-sm" />}
-                          <div className="flex-1 min-w-0 overflow-hidden pr-1">
-                            <h3 className={`text-sm font-medium leading-snug flex items-start gap-2 ${isDark ? 'text-slate-100' : 'text-slate-900'}`}>
-                              <span className="line-clamp-2 break-words min-w-0">{p.title}</span>
-                              {isCurrentProgram(p) && (
-                                <span className="flex h-2 w-2 relative shrink-0">
-                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-amber-400"></span>
-                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-                                </span>
-                              )}
-                            </h3>
-                            <p className={`text-xs mt-0.5 leading-snug ${isDark ? 'text-slate-400' : 'text-gray-600'}`}>{p.hosts}</p>
-                          </div>
-                          {isCurrentProgram(p) && getWhatsAppUrl(p) ? (
-                            <a
-                              href={getWhatsAppUrl(p)}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-2 rounded-full bg-green-600 text-white shadow-md shadow-green-600/20 active:scale-90 transition-all"
-                              aria-label={`WhatsApp de ${p.title}`}
-                            >
-                              <MessageCircle size={18} />
-                            </a>
-                          ) : (
+                    <div className="flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col gap-2.5 pt-4 pb-4 -mx-1 px-1">
+                      {scheduleData[selectedDay]?.length > 0 ? scheduleData[selectedDay].map((p, idx) => {
+                        const key = getReminderKey(p);
+                        const live = isCurrentProgram(p);
+                        const isNext = !live && key === nextProgramKey;
+                        const reminded = reminders.has(key);
+                        if (live) {
+                          const wa = getWhatsAppUrl(p);
+                          return (
+                            <div key={idx} className="p-4 rounded-[20px] border" style={{ background: 'var(--live-card-bg)', borderColor: 'var(--live-card-border)' }}>
+                              <div className="flex items-center gap-2 mb-2.5">
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-extrabold tracking-wide text-white" style={{ background: 'var(--live)' }}><span className="w-1.5 h-1.5 rounded-full bg-white" />AL AIRE</span>
+                                <span className="text-xs font-semibold" style={{ color: 'var(--live-card-time)' }}>{p.start} – {p.end}</span>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <img src={p.image || 'logo.png'} alt="" onError={(e) => { e.target.src = 'logo.png'; }} className="w-14 h-14 rounded-[14px] object-cover shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="font-sora font-bold text-[17px] leading-tight line-clamp-2 break-words">{p.title}</h3>
+                                  {p.hosts && <p className="text-[13px] mt-1" style={{ color: 'var(--muted)' }}>{p.hosts}</p>}
+                                </div>
+                              </div>
+                              <div className="flex gap-2 mt-3.5">
+                                <button type="button" onClick={listenNow} className="flex-1 h-11 rounded-[14px] font-extrabold text-sm flex items-center justify-center gap-2" style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}>
+                                  <Play size={16} fill="currentColor" strokeWidth={0} /> {isPlaying ? 'Escuchando' : 'Escuchar'}
+                                </button>
+                                {wa && (
+                                  <a href={wa} target="_blank" rel="noopener noreferrer" className="flex-1 h-11 rounded-[14px] font-bold text-sm flex items-center justify-center gap-2" style={{ background: 'var(--wa-bg)', color: 'var(--wa-fg)' }}>
+                                    <MessageCircle size={16} /> WhatsApp
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        }
+                        return (
+                          <div key={idx} className="flex items-center gap-3.5 py-3.5 pl-4 pr-3.5 rounded-[18px] border" style={{ background: 'var(--surface)', borderColor: 'var(--line)' }}>
+                            <div className="w-[50px] shrink-0 text-center">
+                              <div className="font-sora font-bold text-[15px]">{p.start}</div>
+                              <div className="text-[11px] mt-0.5" style={{ color: 'var(--faint)' }}>{p.end}</div>
+                            </div>
+                            <div className="w-px self-stretch" style={{ background: 'var(--line-strong)' }} />
+                            {p.image && <img src={p.image} alt="" onError={(e) => { e.target.style.display = 'none'; }} className="w-10 h-10 rounded-xl object-cover shrink-0" />}
+                            <div className="flex-1 min-w-0">
+                              {isNext && <div className="text-[10px] font-extrabold tracking-[0.06em] mb-0.5" style={{ color: 'var(--accent-text)' }}>A CONTINUACIÓN</div>}
+                              <h3 className="font-bold text-[15px] leading-tight line-clamp-2 break-words">{p.title}</h3>
+                              {p.hosts && <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>{p.hosts}</p>}
+                            </div>
                             <button
                               onClick={() => toggleReminder(p)}
-                              aria-pressed={reminders.has(getReminderKey(p))}
-                              aria-label={reminders.has(getReminderKey(p)) ? `Quitar recordatorio de ${p.title}` : `Recordarme ${p.title}`}
-                              className={`p-2 rounded-full transition-colors ${reminders.has(getReminderKey(p))
-                                ? (isDark ? 'text-amber-400 bg-amber-500/10' : 'text-blue-600 bg-blue-50')
-                                : (isDark ? 'text-slate-500 hover:text-amber-500' : 'text-gray-400 hover:text-blue-600')}`}
+                              aria-pressed={reminded}
+                              aria-label={reminded ? `Quitar recordatorio de ${p.title}` : `Recordarme ${p.title}`}
+                              className="w-11 h-11 shrink-0 rounded-full flex items-center justify-center transition-colors"
+                              style={reminded || isNext ? { background: 'var(--pill)', color: 'var(--accent-text)' } : { background: 'var(--surface)', color: 'var(--muted)' }}
                             >
-                              {reminders.has(getReminderKey(p)) ? <BellRing size={18} /> : <Bell size={18} />}
+                              {reminded ? <BellRing size={19} /> : <Bell size={19} />}
                             </button>
-                          )}
-                        </div>
-                      )) : <p className="text-center text-gray-400 dark:text-slate-500 text-sm py-10 font-medium">Sin programación para este día.</p>}
+                          </div>
+                        );
+                      }) : <p className="text-center text-sm py-10 font-medium" style={{ color: 'var(--muted)' }}>Sin programación para este día.</p>}
                     </div>
                   </div>
                 )}
@@ -1669,15 +1768,15 @@
 
               {msgToDelete && (
                 <div className="absolute inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
-                  <div className="w-full max-w-xs bg-white dark:bg-slate-900 rounded-[2rem] p-6 shadow-2xl scale-in text-center">
-                    <div className="w-16 h-16 bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-500 rounded-full flex items-center justify-center mb-4 mx-auto">
+                  <div className="w-full max-w-xs rounded-[2rem] p-6 shadow-2xl scale-in text-center" style={{ background: 'var(--sheet)' }}>
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto" style={{ background: 'var(--live-bg)', color: 'var(--live-text)' }}>
                       <Trash2 size={28} />
                     </div>
-                    <h3 className="text-lg font-bold mb-1 dark:text-white">¿Eliminar mensaje?</h3>
-                    <p className="text-xs text-gray-500 mb-6">Esta acción no se puede deshacer.</p>
+                    <h3 className="font-sora text-lg font-bold mb-1">¿Eliminar mensaje?</h3>
+                    <p className="text-xs mb-6" style={{ color: 'var(--muted)' }}>Esta acción no se puede deshacer.</p>
                     <div className="flex gap-3">
-                      <button onClick={() => setMsgToDelete(null)} className="flex-1 py-3 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 font-bold text-sm transition-colors hover:bg-gray-200 dark:hover:bg-slate-700">Cancelar</button>
-                      <button onClick={confirmDeleteMessage} className="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold text-sm hover:bg-red-700 transition-colors shadow-lg shadow-red-600/30">Eliminar</button>
+                      <button onClick={() => setMsgToDelete(null)} className="flex-1 py-3 rounded-xl font-bold text-sm" style={{ background: 'var(--surface-2)' }}>Cancelar</button>
+                      <button onClick={confirmDeleteMessage} className="flex-1 py-3 rounded-xl text-white font-bold text-sm" style={{ background: 'var(--live)' }}>Eliminar</button>
                     </div>
                   </div>
                 </div>
@@ -1685,137 +1784,69 @@
 
               {isSettingName && (
                 <div className="absolute inset-0 z-[60] flex items-center justify-center p-6 bg-black/60 backdrop-blur-md">
-                  <div className="w-full max-w-xs bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 shadow-2xl scale-in border dark:border-white/5">
-                    <div className="w-16 h-16 bg-blue-500/20 dark:bg-amber-500/20 text-blue-600 dark:text-amber-500 rounded-full flex items-center justify-center mb-6 mx-auto">
+                  <div className="w-full max-w-xs rounded-[2.5rem] p-8 shadow-2xl scale-in border" style={{ background: 'var(--sheet)', borderColor: 'var(--line)' }}>
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center mb-6 mx-auto" style={{ background: 'var(--pill)', color: 'var(--accent-text)' }}>
                       <User size={32} />
                     </div>
-                    <h3 className="text-xl font-bold text-center mb-2 dark:text-white">¿Quién eres?</h3>
-                    <p className="text-xs text-gray-500 text-center mb-6">Elige un nombre para participar en el chat.</p>
+                    <h3 className="font-sora text-xl font-bold text-center mb-2">¿Cómo te llamás?</h3>
+                    <p className="text-xs text-center mb-6" style={{ color: 'var(--muted)' }}>Elegí un nombre para participar en el chat.</p>
+                    <label htmlFor="chat-name" className="sr-only">Tu nombre</label>
                     <input
+                      id="chat-name"
                       type="text"
                       maxLength={MAX_NAME_LENGTH}
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
-                      placeholder="Escribe tu apodo aquí..."
-                      className="w-full bg-gray-100 dark:bg-slate-800 text-gray-900 dark:text-white px-4 py-3 rounded-2xl text-[16px] sm:text-sm mb-4 outline-none border-2 border-transparent focus:border-blue-500 dark:focus:border-amber-500 transition-all"
+                      onKeyDown={(e) => { if (e.key === 'Enter') saveUserName(); }}
+                      placeholder="Tu nombre o apodo"
+                      className="w-full px-4 py-3 rounded-2xl text-[16px] mb-4 outline-none border-2 fm-input"
                     />
-                    <button onClick={saveUserName} className="w-full py-3 bg-blue-600 dark:bg-amber-500 text-white dark:text-slate-950 font-bold rounded-2xl hover:opacity-90 active:scale-95 transition-all shadow-lg">
-                      Comenzar a chatear
+                    <button onClick={saveUserName} className="w-full py-3 font-bold rounded-2xl active:scale-95 transition-all" style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}>
+                      Empezar a chatear
+                    </button>
+                    <button onClick={() => setIsSettingName(false)} className="w-full mt-2 py-2 text-sm font-semibold" style={{ color: 'var(--muted)' }}>
+                      Ahora no
                     </button>
                   </div>
                 </div>
               )}
 
-              <div className={`shrink-0 w-full bg-white/90 dark:bg-slate-950/80 backdrop-blur-xl border-t border-gray-200 dark:border-slate-800/80 transition-all duration-300 z-20 ${isInputFocused || keyboardOpen ? 'h-0 py-0 border-0 opacity-0 overflow-hidden pointer-events-none' : `${isShortScreen || isLandscapeHome ? 'pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom,4px))]' : 'pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom,12px))]'} px-4 min-[400px]:px-8 flex justify-between items-center shadow-[0_-10px_40px_rgba(0,0,0,0.05)]`}`}>
-                <NavButton icon={<Radio size={22} />} label="Radio" isActive={activeTab === 'home'} onClick={() => setActiveTab('home')} isDark={isDark} />
-                <NavButton icon={<MessageCircle size={22} />} label="Chat" isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} isDark={isDark} badge={unreadCount} />
-                <NavButton icon={<MonitorPlay size={22} />} label="En Vivo" isActive={activeTab === 'live'} onClick={() => setActiveTab('live')} isDark={isDark} />
-                <NavButton icon={<CalendarDays size={22} />} label="Programación" isActive={activeTab === 'schedule'} onClick={() => setActiveTab('schedule')} isDark={isDark} />
-              </div>
+              {/* Barra de abajo */}
+              <nav className={`relative z-20 shrink-0 w-full border-t transition-all duration-300 ${isInputFocused || keyboardOpen ? 'h-0 py-0 border-0 opacity-0 overflow-hidden pointer-events-none' : `${isShortScreen || isLandscapeHome ? 'pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom,4px))]' : 'pt-2.5 pb-[max(0.85rem,env(safe-area-inset-bottom,14px))]'} px-2 min-[390px]:px-3 flex justify-around items-center`}`} style={{ background: 'var(--nav-bg)', borderColor: 'var(--line)' }}>
+                <NavButton icon={<Radio size={22} />} label="Radio" isActive={activeTab === 'home'} onClick={() => setActiveTab('home')} />
+                <NavButton icon={<MessageCircle size={22} />} label="Chat" isActive={activeTab === 'chat'} onClick={() => setActiveTab('chat')} badge={unreadCount} />
+                <NavButton icon={<MonitorPlay size={22} />} label="En vivo" isActive={activeTab === 'live'} onClick={() => setActiveTab('live')} />
+                <NavButton icon={<CalendarDays size={22} />} label="Programación" isActive={activeTab === 'schedule'} onClick={() => setActiveTab('schedule')} />
+              </nav>
             </div>
 
             <style dangerouslySetInnerHTML={{__html: `
-              .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+              .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
               .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-              .custom-scrollbar::-webkit-scrollbar-thumb { background-color: ${isDark ? '#334155' : '#cbd5e1'}; border-radius: 20px; }
-              .volume-thumb {
-                width: 18px;
-                height: 18px;
-                border-width: 3px;
-                border-style: solid;
-                transform: translate(-50%, -50%);
-                box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-                transition: transform 0.15s ease, box-shadow 0.15s ease;
-              }
-              .volume-slider:hover .volume-thumb,
-              .volume-thumb.is-dragging {
-                transform: translate(-50%, -50%) scale(1.2);
-                box-shadow: 0 0 0 6px color-mix(in srgb, var(--vol-color) 20%, transparent), 0 2px 8px rgba(0,0,0,0.25);
-              }
-              .volume-slider:focus-visible .volume-thumb {
-                box-shadow: 0 0 0 4px color-mix(in srgb, var(--vol-color) 45%, transparent);
-              }
-              .volume-slider[aria-disabled="true"] .volume-thumb { transform: translate(-50%, -50%); }
-              .volume-bubble { pointer-events: none; white-space: nowrap; }
+              .custom-scrollbar::-webkit-scrollbar-thumb { background-color: var(--line-strong); border-radius: 20px; }
               .scale-in { animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
               @keyframes scaleIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-              .metadata-marquee-container {
-                width: 100%;
-                overflow: hidden;
-                white-space: nowrap;
-                position: relative;
-              }
-              .metadata-marquee-track {
-                display: inline-flex;
-                align-items: center;
-                gap: 3rem;
-                min-width: max-content;
-                font-size: 1.02rem;
-                font-weight: 700;
-                line-height: 1.2;
-                animation: metadataScroll 24s linear infinite;
-                will-change: transform;
-              }
-              @keyframes metadataScroll {
-                0% { transform: translateX(0); }
-                100% { transform: translateX(calc(-50% - 1.5rem)); }
-              }
-              @media (prefers-reduced-motion: reduce) {
-                .metadata-marquee-track {
-                  animation: none;
-                }
-              }
-              .marquee-container { width: 100%; overflow: hidden; white-space: nowrap; position: relative; }
-              .marquee-text { display: inline-block; padding-left: 100%; animation: marquee 15s linear infinite; }
-              @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-              .install-cta::after {
-                content: '';
-                position: absolute;
-                inset: -1px;
-                border-radius: inherit;
-                border: 1px solid rgba(255, 255, 255, 0.35);
-                pointer-events: none;
-                opacity: 0.8;
-              }
-              .install-cta-breathe {
-                animation: installBreathe 2s ease-in-out infinite;
-              }
-              @keyframes installBreathe {
-                0%, 100% { transform: scale(1); box-shadow: 0 8px 18px rgba(220,38,38,0.28); }
-                50% { transform: scale(1.04); box-shadow: 0 10px 24px rgba(220,38,38,0.36); }
-              }
-              @media (prefers-reduced-motion: reduce) {
-                .install-cta-breathe { animation: none; }
-              }
             `}} />
           </div>
         );
       }
 
-      function NavButton({ icon, label, isActive, onClick, isDark, badge }) {
+      function NavButton({ icon, label, isActive, onClick, badge }) {
         return (
-          <button onClick={onClick} className="flex flex-col items-center justify-center p-2 transition-all duration-300 relative group">
-            <div className={`mb-1 transition-transform duration-300 ${isActive ? '-translate-y-1 scale-110' : 'group-hover:scale-105'} ${isActive ? (isDark ? 'text-amber-500' : 'text-blue-600') : 'text-gray-500'}`}>
-              {icon}
-            </div>
-            <span className={`text-[9px] font-medium transition-all duration-300 ${isActive ? 'opacity-100' : 'opacity-70'} ${isActive ? (isDark ? 'text-amber-500' : 'text-blue-600') : 'text-gray-500'}`}>
-              {label}
-            </span>
-
+          <button onClick={onClick} aria-current={isActive ? 'page' : undefined} className="relative flex flex-col items-center gap-1 min-w-[64px] py-0.5" style={{ color: isActive ? 'var(--accent-text)' : 'var(--muted)' }}>
+            <span className="flex px-4 py-[5px] rounded-full transition-colors" style={{ background: isActive ? 'var(--pill)' : 'transparent' }}>{icon}</span>
+            <span className={`text-[11px] ${isActive ? 'font-bold' : 'font-semibold'}`}>{label}</span>
             {badge > 0 && (
-              <div className="absolute top-1 right-1 bg-red-500 text-white text-[8px] font-black h-4 w-4 flex items-center justify-center rounded-full border-2 border-white dark:border-slate-950 animate-bounce shadow-lg">
+              <span className="absolute top-0 right-2.5 min-w-[18px] h-[18px] px-1 rounded-full text-white text-[10px] font-extrabold flex items-center justify-center" style={{ background: 'var(--live)' }}>
                 {badge > 9 ? '9+' : badge}
-              </div>
-            )}
-
-            {isActive && (
-              <div className={`absolute -bottom-1 h-1 w-1 rounded-full ${isDark ? 'bg-amber-500' : 'bg-blue-600'}`}></div>
+              </span>
             )}
           </button>
         );
       }
 
       const root = ReactDOM.createRoot(document.getElementById('root'));
+
       // Si algo falla, se muestra un aviso con botón para recargar en vez de una pantalla negra.
       class ErrorBoundary extends React.Component {
         constructor(props) {
@@ -1839,7 +1870,7 @@
                 <button
                   type="button"
                   onClick={() => window.location.reload()}
-                  style={{ marginTop: '1rem', padding: '0.7rem 1.4rem', borderRadius: '999px', border: 0, background: '#f59e0b', color: '#0a0a0a', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer' }}
+                  style={{ marginTop: '1rem', padding: '0.7rem 1.4rem', borderRadius: '999px', border: 0, background: '#FFD84D', color: '#0B1D1B', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer' }}
                 >
                   Recargar
                 </button>

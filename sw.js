@@ -1,4 +1,4 @@
-const CACHE_NAME = "fm-apocalipsis-v67";
+const CACHE_NAME = "fm-apocalipsis-v68";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -20,7 +20,7 @@ const CDN_ASSETS = [
   "https://unpkg.com/lucide-react@0.468.0/dist/umd/lucide-react.min.js",
   "https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"
 ];
-const CDN_HOSTS = ["cdn.tailwindcss.com", "unpkg.com", "www.gstatic.com"];
+const CDN_HOSTS = ["cdn.tailwindcss.com", "unpkg.com", "www.gstatic.com", "fonts.googleapis.com", "fonts.gstatic.com"];
 
 const isCdnRequest = (url) => (
   CDN_HOSTS.includes(url.hostname) &&

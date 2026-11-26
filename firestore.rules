@@ -29,6 +29,17 @@ service cloud.firestore {
         && resource.data.userId == request.auth.uid;
     }
 
+    // Oyentes conectados: cada app solo puede escribir su propio aviso ("estoy conectado")
+    // con la hora del servidor. Se usa para mostrar cuántos hay en el chat.
+    match /artifacts/{appId}/public/data/presence/{userId} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasOnly(['lastSeen'])
+        && request.resource.data.lastSeen == request.time;
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+
     // Todo lo demás queda cerrado.
     match /{document=**} {
       allow read, write: if false;
